@@ -40,9 +40,9 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 2. Floating action button entrance/exit
+  // 2. Floating action button entrance/exit (Show on scroll OR when menu is open)
   useGSAP(() => {
-    if (showFloatingButton) {
+    if (showFloatingButton || menuActive) {
       gsap.to(floatingButtonRef.current, {
         scale: 1,
         opacity: 1,
@@ -57,7 +57,7 @@ export default function Header() {
         ease: "power2.in",
       });
     }
-  }, [showFloatingButton]);
+  }, [showFloatingButton, menuActive]);
 
   // 3. Liquid menu slide-out animation (Curved panel morphing)
   useGSAP(
@@ -160,29 +160,50 @@ export default function Header() {
 
   // Optimized dynamic navigation callback
   const handleNavigation = useCallback((label: string, href: string) => {
+    const wasMenuOpen = menuActive;
     setMenuActive(false);
 
     // If Contact click, transition to contact page
     if (label === "Contact" || href === "#contact") {
-      transitionTo("/contact", "Contact");
+      if (wasMenuOpen) {
+        setTimeout(() => {
+          transitionTo("/contact", "Contact");
+        }, 600);
+      } else {
+        transitionTo("/contact", "Contact");
+      }
       return;
     }
 
     // Scroll to section directly if already on home page
     if (pathname === "/") {
-      const el = document.querySelector(href) as HTMLElement;
-      if (el) {
-        lenis?.scrollTo(el, {
-          duration: 1.8,
-          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        });
+      const scrollTrigger = () => {
+        const el = document.querySelector(href) as HTMLElement;
+        if (el) {
+          lenis?.scrollTo(el, {
+            duration: 1.8,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          });
+        }
+      };
+
+      if (wasMenuOpen) {
+        setTimeout(scrollTrigger, 700);
+      } else {
+        scrollTrigger();
       }
     } else {
       // Transition to homepage with hash target
       const targetUrl = href === "#hero" ? "/" : `/${href}`;
-      transitionTo(targetUrl, label);
+      if (wasMenuOpen) {
+        setTimeout(() => {
+          transitionTo(targetUrl, label);
+        }, 600);
+      } else {
+        transitionTo(targetUrl, label);
+      }
     }
-  }, [pathname, lenis, transitionTo]);
+  }, [pathname, lenis, transitionTo, menuActive]);
 
   return (
     <>
@@ -231,10 +252,10 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Floating Sticky Menu Action Trigger (Slides in on scroll down) */}
+      {/* Floating Sticky Menu Action Trigger (Slides in on scroll down or when menu is active) */}
       <div
         ref={floatingButtonRef}
-        className="fixed top-6 right-6 sm:top-8 sm:right-8 z-40 scale-0 opacity-0"
+        className="fixed top-6 right-6 sm:top-8 sm:right-8 z-50 scale-0 opacity-0"
       >
         <Magnetic actionStrength={0.4} hoverAreaPadding="p-0">
           <button
@@ -251,7 +272,7 @@ export default function Header() {
       {/* Fullscreen Overlay Menu (Curved Morphing slide panel) */}
       <div
         ref={menuContainerRef}
-        className="fixed top-0 right-0 h-full w-[380px] max-w-full z-30 hidden bg-[#1c1c1f]"
+        className="fixed top-0 right-0 h-full w-[380px] max-w-full z-45 hidden bg-[#1c1c1f]"
       >
         {/* Curved boundary graphic using morphing SVG path */}
         <svg className="absolute top-0 left-[-99px] w-[100px] h-full fill-[#1c1c1f] pointer-events-none">

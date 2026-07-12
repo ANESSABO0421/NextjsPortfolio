@@ -152,7 +152,7 @@ export default function ProjectPage({ params }: PageProps) {
         </a>
 
         {/* Dynamic Project Title */}
-        <div className="overflow-hidden h-16 sm:h-28 md:h-36 border-b border-zinc-300 pb-2 sm:pb-4">
+        <div className="overflow-hidden h-auto min-h-16 sm:min-h-28 md:min-h-36 border-b border-zinc-300 pb-2 sm:pb-4">
           <h1 className="project-header-title font-heading text-5xl sm:text-7xl md:text-8xl font-bold uppercase tracking-tight leading-none text-zinc-900">
             {project.title}
           </h1>

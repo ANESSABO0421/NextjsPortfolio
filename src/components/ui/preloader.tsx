@@ -18,13 +18,26 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const [index, setIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
+  const onCompleteRef = useRef(onComplete);
 
-  // 1. Text cycle animation
+  // Keep ref updated with latest onComplete callback
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
+  // 1. Text cycle animation with a guaranteed onComplete fallback
   useEffect(() => {
     console.log("Preloader useEffect triggered, index:", index);
     if (index === words.length - 1) {
-      console.log("Reached last word, stopping loop");
-      return;
+      console.log("Reached last word, starting exit animation timeline timeout");
+      // Fallback timeout to guarantee onComplete is called even if GSAP is interrupted/reverted (e.g. by React StrictMode)
+      const exitTimeout = setTimeout(() => {
+        console.log("Exit animation timeout fired, calling onComplete");
+        onCompleteRef.current();
+      }, 1500); // 1.5s matches the exit animation timeline duration
+      return () => {
+        clearTimeout(exitTimeout);
+      };
     }
     
     const timeout = setTimeout(

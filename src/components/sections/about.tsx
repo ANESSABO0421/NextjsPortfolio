@@ -67,18 +67,47 @@ export default function About() {
     >
       <div className="px-6 sm:px-12 md:px-24 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 z-10">
         
-        {/* Left Column: Interactive Paragraph */}
+        {/* Left Column: Interactive Paragraph & Tech Stack */}
         <div className="lg:col-span-8 flex flex-col gap-12">
-          <span className="text-xs uppercase tracking-widest text-zinc-500 font-semibold flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#c9fd34]" />
-            What I Do
-          </span>
-          <p
-            ref={textRef}
-            className="font-sans text-2xl sm:text-4xl font-light leading-relaxed text-zinc-200 tracking-tight"
-          >
-            {paragraphText}
-          </p>
+          <div className="flex flex-col gap-12">
+            <span className="text-xs uppercase tracking-widest text-zinc-500 font-semibold flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#c9fd34]" />
+              What I Do
+            </span>
+            <p
+              ref={textRef}
+              className="font-sans text-2xl sm:text-4xl font-light leading-relaxed text-zinc-200 tracking-tight"
+            >
+              {paragraphText}
+            </p>
+          </div>
+
+          {/* Interactive Tech Stack */}
+          <div className="flex flex-col gap-4 border-t border-zinc-800/60 pt-8 mt-4">
+            <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">
+              Tech Stack & Expertise
+            </span>
+            <div className="flex flex-wrap gap-2 pt-2">
+              {[
+                "Next.js 15",
+                "React 19",
+                "TypeScript",
+                "GSAP & ScrollTrigger",
+                "Lenis Smooth Scroll",
+                "Framer Motion",
+                "Tailwind CSS v4",
+                "shadcn/ui",
+                "Three.js / WebGL",
+              ].map((stack, idx) => (
+                <div
+                  key={idx}
+                  className="px-4 py-2.5 rounded-full bg-[#1c1c1f] border border-zinc-800 text-xs font-semibold text-zinc-400 hover:border-zinc-300 hover:text-white transition-all duration-300 cursor-default"
+                >
+                  {stack}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Right Column: Statistics & Action Links */}

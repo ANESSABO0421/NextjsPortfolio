@@ -139,7 +139,7 @@
 
   /* Hide default cursor on desktop devices to avoid double cursors */
   @media (pointer: fine) {
-    body, html, a, button, [role="button"], [data-cursor] {
+    *, body, html, a, button, [role="button"], [data-cursor] {
       cursor: none !important;
     }
   }

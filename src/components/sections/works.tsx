@@ -129,6 +129,7 @@ export default function Works() {
               onClick={(e) => handleProjectTransition(e, project.id, project.title)}
               onMouseEnter={() => setActiveIndex(index)}
               onMouseLeave={() => setActiveIndex(null)}
+              data-cursor="view"
               className="group relative flex flex-col sm:flex-row sm:items-center justify-between py-10 border-b border-zinc-800 transition-all duration-350 cursor-pointer animate-[opacity_0.5s_ease-out_forwards]"
             >
               {/* Backlit highlight bar that expands on hover */}

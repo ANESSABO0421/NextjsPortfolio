@@ -10,7 +10,12 @@ import Contact from "@/components/sections/contact";
 import { useLenis } from "@/components/providers/smooth-scroll-provider";
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => {
+    if (typeof window !== "undefined") {
+      return !sessionStorage.getItem("preloader-shown");
+    }
+    return true;
+  });
   const { lenis } = useLenis();
 
   // Scroll lock orchestration during preloading
@@ -39,7 +44,16 @@ export default function Home() {
   return (
     <main className="relative min-h-screen bg-[#0f0f10] text-white">
       {/* 1. Curved Liquid Preloader Overlay */}
-      {isLoading && <Preloader onComplete={() => setIsLoading(false)} />}
+      {isLoading && (
+        <Preloader
+          onComplete={() => {
+            if (typeof window !== "undefined") {
+              sessionStorage.setItem("preloader-shown", "true");
+            }
+            setIsLoading(false);
+          }}
+        />
+      )}
       
       {/* 2. Primary Page Components */}
       <Header />
