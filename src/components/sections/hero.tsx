@@ -1,18 +1,20 @@
 "use client";
 
 import React, { useRef } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Magnetic from "@/components/ui/magnetic";
-import { ArrowDownRight } from "lucide-react";
+import { ArrowDownRight, Globe } from "lucide-react";
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
   const firstTextRef = useRef<HTMLSpanElement>(null);
   const secondTextRef = useRef<HTMLSpanElement>(null);
+  const portraitRef = useRef<HTMLDivElement>(null);
 
-  // Kinetic marquee animation vars
+  // Kinetic marquee animation parameters
   let xPercent = 0;
   let direction = -1;
 
@@ -21,33 +23,50 @@ export default function Hero() {
       const container = containerRef.current;
       if (!container) return;
 
-      // 1. Entrance animation (Title sliding up from clip path)
+      // 1. Entrance animations
       gsap.fromTo(
-        ".hero-title-line span",
-        { y: "100%" },
+        portraitRef.current,
+        { scale: 1.08, opacity: 0, y: 80 },
         {
-          y: "0%",
-          duration: 1.2,
-          stagger: 0.1,
+          scale: 1.0,
+          opacity: 1,
+          y: 0,
+          duration: 1.5,
           ease: "power4.out",
-          delay: 0.2, // trigger right after preloader curve morphs out
+          delay: 0.25,
         }
       );
 
       gsap.fromTo(
-        ".hero-fade-in",
+        ".hero-floating-element",
         { opacity: 0, y: 30 },
         {
           opacity: 1,
           y: 0,
-          duration: 1.0,
+          duration: 1.2,
           stagger: 0.15,
           ease: "power3.out",
           delay: 0.8,
         }
       );
 
-      // 2. Map scroll speed to marquee scroll direction
+      // 2. Parallax effect on the portrait card based on cursor movement
+      const handleMouseMove = (e: MouseEvent) => {
+        const { clientX, clientY } = e;
+        const x = (clientX - window.innerWidth / 2) * 0.035;
+        const y = (clientY - window.innerHeight / 2) * 0.035;
+
+        gsap.to(portraitRef.current, {
+          x: x,
+          y: y,
+          duration: 0.5,
+          ease: "power2.out",
+        });
+      };
+
+      window.addEventListener("mousemove", handleMouseMove);
+
+      // 3. Map scroll direction to marquee direction
       gsap.to(marqueeRef.current, {
         scrollTrigger: {
           trigger: document.documentElement,
@@ -60,7 +79,7 @@ export default function Hero() {
         },
       });
 
-      // 3. Infinite looping ticker function
+      // 4. Infinite loop scroll marquee
       let isCancelled = false;
       const animateMarquee = () => {
         if (isCancelled || !firstTextRef.current || !secondTextRef.current) return;
@@ -71,19 +90,19 @@ export default function Hero() {
         if (xPercent > 0) {
           xPercent = -100;
         }
-        
-        // Update both texts for double text looping width
+
         gsap.set(firstTextRef.current, { xPercent: xPercent });
         gsap.set(secondTextRef.current, { xPercent: xPercent });
-        
+
         xPercent += 0.075 * direction;
         requestAnimationFrame(animateMarquee);
       };
-      
+
       requestAnimationFrame(animateMarquee);
 
       return () => {
         isCancelled = true;
+        window.removeEventListener("mousemove", handleMouseMove);
       };
     },
     { scope: containerRef }
@@ -93,65 +112,60 @@ export default function Hero() {
     <section
       id="hero"
       ref={containerRef}
-      className="relative h-screen w-full bg-[#0f0f10] overflow-hidden flex flex-col justify-between text-white"
+      className="relative h-screen w-full bg-[#9c9e9f] overflow-hidden flex items-center justify-center select-none"
     >
-      {/* Visual background atmospheric elements */}
-      <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] rounded-full bg-[#c9fd34]/5 blur-[120px] pointer-events-none" />
-
-      {/* 1. Header margin spacing spacer */}
-      <div className="h-24 sm:h-32" />
-
-      {/* 2. Primary Title Grid */}
-      <div className="px-6 sm:px-12 md:px-24 flex flex-col gap-6 md:gap-8 z-10">
-        <div className="flex flex-col gap-2 max-w-4xl">
-          <div className="hero-title-line overflow-hidden h-14 sm:h-24 md:h-28">
-            <span className="inline-block font-heading text-5xl sm:text-7xl md:text-8xl font-bold uppercase tracking-tight leading-none text-zinc-400">
-              Creative
-            </span>
-          </div>
-          <div className="hero-title-line overflow-hidden h-14 sm:h-24 md:h-28">
-            <span className="inline-block font-heading text-5xl sm:text-7xl md:text-8xl font-bold uppercase tracking-tight leading-none text-white">
-              Development
-            </span>
-          </div>
-        </div>
-
-        <div className="hero-fade-in flex flex-col md:flex-row md:items-center justify-between gap-6 border-t border-zinc-800 pt-8 mt-4">
-          <p className="text-zinc-400 font-light text-sm max-w-sm leading-relaxed">
-            Delivering award-winning personal websites, interactive systems, and premium interface designs with peak optimization and smooth scroll orchestration.
-          </p>
-          <div className="flex items-center gap-8 text-zinc-500 text-xs tracking-wider uppercase font-semibold">
-            <span>© 2026</span>
-            <span>Based in London, UK</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Large Kinetic Scrolling Marquee Text */}
-      <div className="relative flex overflow-hidden py-4 border-b border-t border-zinc-900 bg-[#0f0f10]/80 z-10">
-        <div ref={marqueeRef} className="flex whitespace-nowrap text-[12vw] sm:text-[10vw] font-heading font-extrabold uppercase leading-none select-none text-zinc-800/25">
-          <span ref={firstTextRef} className="inline-block pr-8">
-            Anessa Bo — Frontend Architect — Motion Designer —
+      {/* 1. Large Kinetic Scrolling Marquee Text (Layered BEHIND the portrait) */}
+      <div className="absolute bottom-[12%] left-0 w-full overflow-hidden whitespace-nowrap z-0 pointer-events-none">
+        <div
+          ref={marqueeRef}
+          className="flex whitespace-nowrap text-[15vw] font-heading font-extrabold uppercase leading-none text-white select-none"
+        >
+          <span ref={firstTextRef} className="inline-block pr-12">
+            Anessa Bo — Creative Architect —
           </span>
-          <span ref={secondTextRef} className="inline-block pr-8">
-            Anessa Bo — Frontend Architect — Motion Designer —
+          <span ref={secondTextRef} className="inline-block pr-12">
+            Anessa Bo — Creative Architect —
           </span>
         </div>
       </div>
 
-      {/* 4. Scroll Indicator floating badge (Magnetic circular scroll explorer) */}
-      <div className="absolute bottom-[20%] right-6 sm:right-12 md:right-24 z-20 hero-fade-in">
-        <Magnetic actionStrength={0.35} hoverAreaPadding="p-0">
-          <div
-            data-cursor="view"
-            className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-[#c9fd34] text-black flex flex-col items-center justify-center gap-1 hover:scale-105 transition-transform duration-300"
-          >
-            <ArrowDownRight className="w-6 h-6 animate-bounce" />
-            <span className="font-heading text-[10px] font-bold tracking-widest uppercase">
-              Explore
-            </span>
-          </div>
-        </Magnetic>
+      {/* 2. Center Portrait Image (Layered ABOVE the marquee) */}
+      <div
+        ref={portraitRef}
+        className="w-[300px] h-[380px] sm:w-[380px] sm:h-[480px] md:w-[440px] md:h-[540px] relative z-10 transition-transform duration-75 ease-out"
+      >
+        <Image
+          src="/developer-portrait.png"
+          alt="Anessa Bo"
+          fill
+          sizes="(max-width: 768px) 380px, 440px"
+          priority
+          className="object-contain object-bottom transform scale-105"
+        />
+      </div>
+
+      {/* 3. Floating Location Badge (Bottom Left) */}
+      <div className="hero-floating-element absolute bottom-12 left-6 sm:left-12 z-20">
+        <div className="bg-[#1c1c1f] text-white pl-6 pr-4 py-4 rounded-full flex items-center gap-4 shadow-xl border border-white/5">
+          <span className="text-[10px] sm:text-xs tracking-wider uppercase font-medium leading-relaxed">
+            Located in <br />
+            <span className="text-zinc-400 font-light font-sans">London, United Kingdom</span>
+          </span>
+          <Magnetic actionStrength={0.25} hoverAreaPadding="p-0">
+            <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-[#c9fd34] animate-[spin_12s_linear_infinite]">
+              <Globe className="w-5 h-5" />
+            </div>
+          </Magnetic>
+        </div>
+      </div>
+
+      {/* 4. Intro Text Block with Arrow (Right Side) */}
+      <div className="hero-floating-element absolute top-[35%] right-6 sm:right-12 md:right-24 z-20 flex flex-col gap-6 text-[#1c1c1f] max-w-[200px] sm:max-w-[240px]">
+        <ArrowDownRight className="w-8 h-8 stroke-[1.5px] text-[#1c1c1f] animate-bounce" />
+        <p className="font-heading text-lg sm:text-2xl font-bold uppercase leading-tight tracking-tight">
+          Freelance <br />
+          Designer & Developer
+        </p>
       </div>
     </section>
   );

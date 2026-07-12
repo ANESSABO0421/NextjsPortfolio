@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Magnetic from "@/components/ui/magnetic";
@@ -9,16 +10,19 @@ import { MoveUpRight } from "lucide-react";
 
 const projects = [
   {
+    id: "aura-luxury",
     title: "Aura Luxury",
     category: "Design / E-Commerce",
     src: "/project-1.png",
   },
   {
+    id: "apex-chronograph",
     title: "Apex Chronograph",
     category: "Motion / 3D Display",
     src: "/project-2.png",
   },
   {
+    id: "structura-brutalist",
     title: "Structura Brutalist",
     category: "Brutalist Agency",
     src: "/project-3.png",
@@ -113,11 +117,12 @@ export default function Works() {
         {/* Project List */}
         <div className="flex flex-col border-t border-zinc-800">
           {projects.map((project, index) => (
-            <div
+            <Link
               key={index}
+              href={`/work/${project.id}`}
               onMouseEnter={() => setActiveIndex(index)}
               onMouseLeave={() => setActiveIndex(null)}
-              className="group relative flex flex-col sm:flex-row sm:items-center justify-between py-10 border-b border-zinc-800 transition-all duration-350 cursor-pointer"
+              className="group relative flex flex-col sm:flex-row sm:items-center justify-between py-10 border-b border-zinc-800 transition-all duration-350 cursor-pointer animate-[opacity_0.5s_ease-out_forwards]"
             >
               {/* Backlit highlight bar that expands on hover */}
               <div className="absolute inset-0 w-0 bg-white/2 transition-all duration-500 ease-out group-hover:w-full" />
@@ -139,7 +144,7 @@ export default function Works() {
                   <MoveUpRight className="w-4 h-4 transition-transform duration-300 group-hover:rotate-45" />
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
