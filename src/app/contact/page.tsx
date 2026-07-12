@@ -190,7 +190,7 @@ export default function ContactPage() {
           <div className="flex items-center gap-8">
             <div className="w-20 h-20 rounded-full overflow-hidden relative border border-zinc-800 shadow-xl bg-zinc-900">
               <Image
-                src="/anees-aboo.png"
+                src="/anees-aboo3.png"
                 alt="Anessa Bo"
                 fill
                 sizes="80px"

@@ -30,11 +30,11 @@ export default function TransitionProvider({ children }: { children: React.React
 
   // SVG morphing curves relative to viewBox="0 0 100 100"
   const curves = {
-    initialBottom: "M 0 100 L 0 100 Q 50 100 100 100 L 100 100 Z",
-    slideUpCurved: "M 0 100 L 0 60 Q 50 0 100 60 L 100 100 Z",
-    flatFill: "M 0 100 L 0 0 Q 50 0 100 0 L 100 100 Z",
-    slideOutCurved: "M 0 0 L 0 40 Q 50 100 100 40 L 100 0 Z",
-    finalTop: "M 0 0 L 0 0 Q 50 0 100 0 L 100 0 Z",
+    initialBottom: "M 0 100 L 0 100 Q 50 100 100 100 L 100 100 Q 50 100 0 100 Z",
+    slideUpCurved: "M 0 100 L 0 60 Q 50 0 100 60 L 100 100 Q 50 100 0 100 Z",
+    flatFill: "M 0 100 L 0 0 Q 50 0 100 0 L 100 100 Q 50 100 0 100 Z",
+    slideOutCurved: "M 0 40 L 0 0 Q 50 0 100 0 L 100 40 Q 50 100 0 40 Z",
+    finalTop: "M 0 0 L 0 0 Q 50 0 100 0 L 100 0 Q 50 0 0 0 Z",
   };
 
   const transitionTo = (href: string, title: string) => {

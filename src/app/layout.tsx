@@ -18,8 +18,62 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "Anessa Bo — Senior Frontend Architect & Interactive Developer",
-  description: "Immersive digital portfolio showcasing award-winning motion design, WebGL interactive engineering, and custom web architectures.",
+  metadataBase: new URL("https://anessaboo.com"),
+  title: {
+    default: "Anessa Bo - Senior Frontend Architect & Interactive Developer",
+    template: "%s | Anessa Bo",
+  },
+  description:
+    "Portfolio of Anessa Bo, a senior frontend architect and interactive developer building fast, responsive, motion-rich digital experiences with Next.js, React, GSAP, and WebGL.",
+  keywords: [
+    "Anessa Bo",
+    "frontend architect",
+    "interactive developer",
+    "Next.js portfolio",
+    "React developer",
+    "GSAP animation",
+    "creative developer",
+  ],
+  authors: [{ name: "Anessa Bo" }],
+  creator: "Anessa Bo",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Anessa Bo - Senior Frontend Architect & Interactive Developer",
+    description:
+      "Fast, responsive, motion-rich portfolio work across frontend architecture, interactive development, and premium web experiences.",
+    url: "/",
+    siteName: "Anessa Bo Portfolio",
+    images: [
+      {
+        url: "/anees-aboo3.png",
+        width: 1200,
+        height: 1200,
+        alt: "Anessa Bo portrait",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Anessa Bo - Senior Frontend Architect & Interactive Developer",
+    description:
+      "Senior frontend architecture, interactive development, and high-performance motion design.",
+    images: ["/anees-aboo3.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 export default function RootLayout({

@@ -17,27 +17,49 @@ export default function About() {
     () => {
       const textElement = textRef.current;
       if (!textElement) return;
+      const shouldReduceTextAnimation =
+        window.matchMedia("(max-width: 767px)").matches ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      // 1. Split text into individual word tags manually
-      const words = paragraphText.split(" ");
-      textElement.innerHTML = words
-        .map((word) => `<span class="inline-block opacity-[0.15] mr-[0.25em] transition-opacity duration-300">${word}</span>`)
-        .join("");
+      if (shouldReduceTextAnimation) {
+        textElement.textContent = paragraphText;
+        gsap.fromTo(
+          textElement,
+          { opacity: 0.35, y: 24 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: textElement,
+              start: "top 85%",
+            },
+          }
+        );
+      } else {
 
-      const spans = textElement.querySelectorAll("span");
+        // 1. Split text into individual word tags manually
+        const words = paragraphText.split(" ");
+        textElement.innerHTML = words
+          .map((word) => `<span class="inline-block opacity-[0.15] mr-[0.25em] transition-opacity duration-300">${word}</span>`)
+          .join("");
 
-      // 2. Animate opacity on scroll
-      gsap.to(spans, {
-        opacity: 1,
-        stagger: 0.1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: textElement,
-          start: "top 80%",
-          end: "bottom 55%",
-          scrub: 0.5,
-        },
-      });
+        const spans = textElement.querySelectorAll("span");
+
+        // 2. Animate opacity on scroll
+        gsap.to(spans, {
+          opacity: 1,
+          stagger: 0.1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: textElement,
+            start: "top 80%",
+            end: "bottom 55%",
+            scrub: 0.5,
+          },
+        });
+      }
 
       // 3. Stagger reveal info blocks
       gsap.fromTo(
@@ -63,9 +85,9 @@ export default function About() {
     <section
       id="about"
       ref={containerRef}
-      className="relative min-h-screen w-full bg-[#111112] py-24 sm:py-32 flex flex-col justify-center text-white overflow-hidden"
+      className="relative min-h-screen w-full bg-[#111112] py-20 sm:py-28 lg:py-32 flex flex-col justify-center text-white overflow-hidden"
     >
-      <div className="px-6 sm:px-12 md:px-24 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 z-10">
+      <div className="px-6 sm:px-10 md:px-16 lg:px-24 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-14 md:gap-16 lg:gap-24 z-10">
         
         {/* Left Column: Interactive Paragraph & Tech Stack */}
         <div className="lg:col-span-8 flex flex-col gap-12">
@@ -76,7 +98,7 @@ export default function About() {
             </span>
             <p
               ref={textRef}
-              className="font-sans text-2xl sm:text-4xl font-light leading-relaxed text-zinc-200 tracking-tight"
+              className="font-sans text-2xl sm:text-3xl lg:text-4xl font-light leading-relaxed text-zinc-200 tracking-tight"
             >
               {paragraphText}
             </p>
@@ -89,7 +111,7 @@ export default function About() {
             </span>
             <div className="flex flex-wrap gap-2 pt-2">
               {[
-                "Next.js 15",
+                "Next.js 16",
                 "React 19",
                 "TypeScript",
                 "GSAP & ScrollTrigger",

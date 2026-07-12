@@ -4,7 +4,6 @@ import React, { useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import Magnetic from "@/components/ui/magnetic";
 import { useTransition } from "@/components/providers/transition-provider";
 import { MoveUpRight } from "lucide-react";
 
@@ -46,6 +45,12 @@ export default function Works() {
       const container = containerRef.current;
       const hoverContainer = hoverContainerRef.current;
       if (!container || !hoverContainer) return;
+      const canUseHoverPreview =
+        window.matchMedia("(min-width: 768px)").matches &&
+        window.matchMedia("(pointer: fine)").matches &&
+        !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (!canUseHoverPreview) return;
 
       // Interpolated translation for high performance
       const xTo = gsap.quickTo(hoverContainer, "x", { duration: 0.45, ease: "power3.out" });
@@ -60,7 +65,7 @@ export default function Works() {
         yTo(y);
       };
 
-      container.addEventListener("mousemove", handleMouseMove);
+      container.addEventListener("mousemove", handleMouseMove, { passive: true });
 
       return () => {
         container.removeEventListener("mousemove", handleMouseMove);
@@ -74,6 +79,12 @@ export default function Works() {
     () => {
       const hoverContainer = hoverContainerRef.current;
       if (!hoverContainer) return;
+      const canUseHoverPreview =
+        window.matchMedia("(min-width: 768px)").matches &&
+        window.matchMedia("(pointer: fine)").matches &&
+        !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (!canUseHoverPreview) return;
 
       if (activeIndex !== null) {
         gsap.to(hoverContainer, {
@@ -105,9 +116,9 @@ export default function Works() {
     <section
       id="works"
       ref={containerRef}
-      className="relative min-h-screen w-full bg-[#0f0f10] py-24 sm:py-32 text-white overflow-hidden"
+      className="relative min-h-screen w-full bg-[#0f0f10] py-20 sm:py-28 lg:py-32 text-white overflow-hidden"
     >
-      <div className="px-6 sm:px-12 md:px-24 max-w-7xl mx-auto w-full flex flex-col gap-16 relative z-10">
+      <div className="px-6 sm:px-10 md:px-16 lg:px-24 max-w-7xl mx-auto w-full flex flex-col gap-12 sm:gap-16 relative z-10">
         
         {/* Section Header */}
         <div className="flex flex-col gap-4">
@@ -115,7 +126,7 @@ export default function Works() {
             <span className="w-1.5 h-1.5 rounded-full bg-[#c9fd34]" />
             Selected Works
           </span>
-          <h2 className="font-heading text-4xl sm:text-6xl font-bold tracking-tight">
+          <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
             Crafting Premium Code.
           </h2>
         </div>
@@ -130,21 +141,21 @@ export default function Works() {
               onMouseEnter={() => setActiveIndex(index)}
               onMouseLeave={() => setActiveIndex(null)}
               data-cursor="view"
-              className="group relative flex flex-col sm:flex-row sm:items-center justify-between py-10 border-b border-zinc-800 transition-all duration-350 cursor-pointer animate-[opacity_0.5s_ease-out_forwards]"
+              className="group relative flex flex-col md:flex-row md:items-center justify-between py-8 sm:py-10 border-b border-zinc-800 transition-all duration-350 cursor-pointer animate-[opacity_0.5s_ease-out_forwards]"
             >
               {/* Backlit highlight bar that expands on hover */}
               <div className="absolute inset-0 w-0 bg-white/2 transition-all duration-500 ease-out group-hover:w-full" />
 
-              <div className="relative flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-12 z-10 pl-4 transition-transform duration-350 group-hover:translate-x-4">
+              <div className="relative flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8 lg:gap-12 z-10 pl-0 sm:pl-4 transition-transform duration-350 md:group-hover:translate-x-4">
                 <span className="text-zinc-600 font-heading text-lg font-medium tracking-tight">
                   0{index + 1}
                 </span>
-                <h3 className="font-heading text-3xl sm:text-4xl font-light tracking-tight transition-colors duration-300 group-hover:text-[#c9fd34]">
+                <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-light tracking-tight transition-colors duration-300 group-hover:text-[#c9fd34]">
                   {project.title}
                 </h3>
               </div>
 
-              <div className="relative flex items-center justify-between sm:justify-end gap-12 z-10 pr-4 mt-4 sm:mt-0 pl-4 sm:pl-0 transition-transform duration-350 group-hover:-translate-x-4">
+              <div className="relative flex items-center justify-between md:justify-end gap-6 lg:gap-12 z-10 pr-0 sm:pr-4 mt-4 md:mt-0 pl-0 sm:pl-4 md:pl-0 transition-transform duration-350 md:group-hover:-translate-x-4">
                 <span className="text-zinc-400 font-light text-sm">
                   {project.category}
                 </span>
@@ -160,7 +171,7 @@ export default function Works() {
       {/* Floating Project Image Hover Follow Card (Hardware accelerated, scaled out initially) */}
       <div
         ref={hoverContainerRef}
-        className="absolute top-0 left-0 w-[320px] h-[240px] z-20 pointer-events-none rounded-2xl overflow-hidden shadow-2xl opacity-0 scale-50 border border-white/10 select-none hidden sm:block bg-[#1f1f21]"
+        className="absolute top-0 left-0 w-[320px] h-[240px] z-20 pointer-events-none rounded-2xl overflow-hidden shadow-2xl opacity-0 scale-50 border border-white/10 select-none hidden md:block bg-[#1f1f21]"
       >
         <div className="works-image-stack w-full h-full flex flex-col">
           {projects.map((project, index) => (

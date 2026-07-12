@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
@@ -17,6 +19,7 @@ const navItems = [
 export default function Header() {
   const [menuActive, setMenuActive] = useState(false);
   const [showFloatingButton, setShowFloatingButton] = useState(false);
+  const [useLightMenuMotion, setUseLightMenuMotion] = useState(false);
   const { lenis } = useLenis();
   const pathname = usePathname();
   const { transitionTo } = useTransition();
@@ -26,18 +29,34 @@ export default function Header() {
 
   // 1. Scroll-based display of the floating magnetic menu trigger button
   useEffect(() => {
+    const lightMotionQuery = window.matchMedia(
+      "(max-width: 767px), (pointer: coarse), (prefers-reduced-motion: reduce)"
+    );
+    const updateMotionMode = () => setUseLightMenuMotion(lightMotionQuery.matches);
+    updateMotionMode();
+
+    let ticking = false;
     const handleScroll = () => {
-      if (window.scrollY > 300) {
-        setShowFloatingButton(true);
-      } else {
-        setShowFloatingButton(false);
-        // Force-close menu if user scrolls back to top
-        setMenuActive(false);
-      }
+      if (ticking) return;
+      ticking = true;
+
+      requestAnimationFrame(() => {
+        const shouldShow = window.scrollY > 300;
+        setShowFloatingButton((current) => (current === shouldShow ? current : shouldShow));
+        if (!shouldShow) {
+          setMenuActive(false);
+        }
+        ticking = false;
+      });
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    lightMotionQuery.addEventListener("change", updateMotionMode);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      lightMotionQuery.removeEventListener("change", updateMotionMode);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   // 2. Floating action button entrance/exit (Show on scroll OR when menu is open)
@@ -83,6 +102,28 @@ export default function Header() {
 
         const tl = gsap.timeline();
 
+        if (useLightMenuMotion) {
+          tl.to(menu, {
+            x: 0,
+            duration: 0.32,
+            ease: "power2.out",
+          });
+
+          tl.fromTo(
+            ".menu-link-item",
+            { x: 28, opacity: 0 },
+            {
+              x: 0,
+              opacity: 1,
+              stagger: 0.04,
+              duration: 0.28,
+              ease: "power2.out",
+            },
+            "-=0.16"
+          );
+          return;
+        }
+
         // 2. Slide container in from right
         tl.to(menu, {
           x: 0,
@@ -123,6 +164,27 @@ export default function Header() {
           },
         });
 
+        if (useLightMenuMotion) {
+          tl.to(".menu-link-item", {
+            x: 28,
+            opacity: 0,
+            stagger: 0.025,
+            duration: 0.18,
+            ease: "power2.in",
+          });
+
+          tl.to(
+            menu,
+            {
+              x: "100%",
+              duration: 0.28,
+              ease: "power2.inOut",
+            },
+            "-=0.08"
+          );
+          return;
+        }
+
         // Slide links out
         tl.to(".menu-link-item", {
           x: 80,
@@ -155,7 +217,7 @@ export default function Header() {
         );
       }
     },
-    { dependencies: [menuActive], scope: menuContainerRef }
+    { dependencies: [menuActive, useLightMenuMotion], scope: menuContainerRef }
   );
 
   // Optimized dynamic navigation callback
@@ -244,6 +306,8 @@ export default function Header() {
         {/* Mobile menu trigger */}
         <div className="md:hidden">
           <button
+            type="button"
+            aria-label="Open navigation menu"
             onClick={() => setMenuActive(true)}
             className="flex items-center gap-2 text-sm font-semibold tracking-wider uppercase hover:text-[#c9fd34]"
           >
@@ -259,6 +323,8 @@ export default function Header() {
       >
         <Magnetic actionStrength={0.4} hoverAreaPadding="p-0">
           <button
+            type="button"
+            aria-label={menuActive ? "Close navigation menu" : "Open navigation menu"}
             onClick={() => setMenuActive((prev) => !prev)}
             className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg border border-white/10 transition-colors duration-300 cursor-pointer
               ${menuActive ? "bg-[#c9fd34] text-black" : "bg-[#1f1f21] text-white hover:bg-[#c9fd34] hover:text-black"}
@@ -272,15 +338,15 @@ export default function Header() {
       {/* Fullscreen Overlay Menu (Curved Morphing slide panel) */}
       <div
         ref={menuContainerRef}
-        className="fixed top-0 right-0 h-full w-[380px] max-w-full z-45 hidden bg-[#1c1c1f]"
+        className="fixed top-0 right-0 h-full w-full sm:w-[420px] md:w-[380px] max-w-full z-45 hidden bg-[#1c1c1f]"
       >
         {/* Curved boundary graphic using morphing SVG path */}
-        <svg className="absolute top-0 left-[-99px] w-[100px] h-full fill-[#1c1c1f] pointer-events-none">
+        <svg className="absolute top-0 left-[-99px] hidden md:block w-[100px] h-full fill-[#1c1c1f] pointer-events-none">
           <path ref={menuPathRef} />
         </svg>
 
-        <div className="flex flex-col h-full justify-between p-16 sm:p-20 text-white font-sans">
-          <div className="flex flex-col gap-12 mt-12">
+        <div className="flex flex-col h-full justify-between p-8 sm:p-14 md:p-20 text-white font-sans">
+          <div className="flex flex-col gap-10 sm:gap-12 mt-16 sm:mt-12">
             <span className="text-[10px] text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-4">
               Navigation
             </span>
@@ -289,7 +355,7 @@ export default function Header() {
                 <div key={i} className="menu-link-item overflow-hidden">
                   <span
                     onClick={() => handleNavigation(item.label, item.href)}
-                    className="block font-heading text-4xl sm:text-5xl font-light hover:text-[#c9fd34] transition-colors duration-300 cursor-pointer"
+                    className="block font-heading text-3xl sm:text-5xl font-light hover:text-[#c9fd34] transition-colors duration-300 cursor-pointer"
                   >
                     {item.label}
                   </span>
@@ -302,7 +368,7 @@ export default function Header() {
             <span className="text-[10px] text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">
               Socials
             </span>
-            <div className="flex gap-4 text-xs font-light text-zinc-400">
+            <div className="flex flex-wrap gap-4 text-xs font-light text-zinc-400">
               <a href="https://linkedin.com" target="_blank" className="hover:text-white transition-colors duration-200">LinkedIn</a>
               <a href="https://github.com" target="_blank" className="hover:text-white transition-colors duration-200">GitHub</a>
               <a href="https://dribbble.com" target="_blank" className="hover:text-white transition-colors duration-200">Dribbble</a>

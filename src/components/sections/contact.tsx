@@ -27,7 +27,7 @@ export default function Contact() {
     };
 
     updateTime();
-    const interval = setInterval(updateTime, 1000);
+    const interval = setInterval(updateTime, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -62,41 +62,41 @@ export default function Contact() {
     <footer
       id="contact"
       ref={containerRef}
-      className="relative min-h-[90vh] w-full bg-[#0c0c0d] pt-28 pb-10 text-white flex flex-col justify-between overflow-hidden"
+      className="relative min-h-[82vh] w-full bg-[#0c0c0d] pt-24 sm:pt-28 pb-10 text-white flex flex-col justify-between overflow-hidden"
     >
       {/* Background glow atmospheric overlay */}
       <div className="absolute bottom-0 right-0 w-[50vw] h-[50vw] rounded-full bg-[#3c5df6]/2 blur-[150px] pointer-events-none" />
 
-      <div className="px-6 sm:px-12 md:px-24 max-w-7xl mx-auto w-full flex flex-col relative z-10">
-        
+      <div className="px-6 sm:px-10 md:px-16 lg:px-24 max-w-7xl mx-auto w-full flex flex-col relative z-10">
+
         {/* Core CTA */}
         <div className="flex flex-col gap-6 sm:gap-8">
-          
+
           <div className="flex items-center gap-4 sm:gap-6">
             {/* Small portrait icon */}
             <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full overflow-hidden relative border border-zinc-800 bg-zinc-900 shadow-xl">
               <Image
-                src="/anees-aboo.png"
+                src="/anees-aboo3.png"
                 alt="Anessa Bo"
                 fill
                 sizes="(max-width: 640px) 56px, 80px"
                 className="object-cover object-center"
               />
             </div>
-            
-            <h2 className="font-heading text-4xl sm:text-7xl md:text-8xl font-bold tracking-tight uppercase leading-none text-zinc-100">
+
+            <h2 className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight uppercase leading-none text-zinc-100">
               Let&apos;s work
             </h2>
           </div>
 
-          <h2 className="font-heading text-4xl sm:text-7xl md:text-8xl font-bold tracking-tight uppercase leading-none text-zinc-100">
+          <h2 className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight uppercase leading-none text-zinc-100">
             together
           </h2>
         </div>
 
         {/* 3. Seam dividing line with massive floating Get in Touch button */}
         <div className="relative w-full h-[1px] bg-zinc-800/80 mt-16 sm:mt-24 flex items-center justify-end">
-          
+
           {/* Circular Magnetic button aligned directly on the line seam */}
           <div className="absolute right-0 sm:right-12 lg:right-24 z-20">
             <Magnetic actionStrength={0.35} hoverAreaPadding="p-0">
@@ -131,9 +131,9 @@ export default function Contact() {
       </div>
 
       {/* 5. Footer Metadata Bottom bar (VERSION, CLOCK, SOCIALS) */}
-      <div className="px-6 sm:px-12 md:px-24 max-w-7xl mx-auto w-full pt-16 mt-16 flex flex-col gap-8 text-[10px] tracking-wider uppercase font-semibold text-zinc-500 relative z-10 border-t border-zinc-900/60">
-        
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div className="px-6 sm:px-10 md:px-16 lg:px-24 max-w-7xl mx-auto w-full pt-14 sm:pt-16 mt-14 sm:mt-16 flex flex-col gap-8 text-[10px] tracking-wider uppercase font-semibold text-zinc-500 relative z-10 border-t border-zinc-900/60">
+
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-1.5">
             <span className="text-zinc-600">Version</span>
             <p className="text-zinc-400 font-medium">2026 © Edition</p>

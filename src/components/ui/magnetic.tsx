@@ -20,6 +20,12 @@ export default function Magnetic({
 
   useGSAP(
     () => {
+      const canUseMagnetic =
+        window.matchMedia("(pointer: fine)").matches &&
+        !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (!canUseMagnetic) return;
+
       const outer = outerRef.current;
       const inner = innerRef.current;
       if (!outer || !inner) return;
