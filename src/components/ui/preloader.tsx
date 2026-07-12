@@ -19,6 +19,13 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const onCompleteRef = useRef(onComplete);
+  const hasCompletedRef = useRef(false);
+
+  const finishPreloader = React.useCallback(() => {
+    if (hasCompletedRef.current) return;
+    hasCompletedRef.current = true;
+    onCompleteRef.current();
+  }, []);
 
   // Keep ref updated with latest onComplete callback
   useEffect(() => {
@@ -27,13 +34,10 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
 
   // 1. Text cycle animation with a guaranteed onComplete fallback
   useEffect(() => {
-    console.log("Preloader useEffect triggered, index:", index);
     if (index === words.length - 1) {
-      console.log("Reached last word, starting exit animation timeline timeout");
       // Fallback timeout to guarantee onComplete is called even if GSAP is interrupted/reverted (e.g. by React StrictMode)
       const exitTimeout = setTimeout(() => {
-        console.log("Exit animation timeout fired, calling onComplete");
-        onCompleteRef.current();
+        finishPreloader();
       }, 1500); // 1.5s matches the exit animation timeline duration
       return () => {
         clearTimeout(exitTimeout);
@@ -42,17 +46,25 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     
     const timeout = setTimeout(
       () => {
-        console.log("Preloader timeout fired, setting index to:", index + 1);
         setIndex((prev) => prev + 1);
       },
       index === 0 ? 1000 : 150
     );
 
     return () => {
-      console.log("Preloader useEffect cleanup, clearing timeout for index:", index);
       clearTimeout(timeout);
     };
-  }, [index]);
+  }, [finishPreloader, index]);
+
+  useEffect(() => {
+    const maxDurationTimeout = setTimeout(() => {
+      finishPreloader();
+    }, 3200);
+
+    return () => {
+      clearTimeout(maxDurationTimeout);
+    };
+  }, [finishPreloader]);
 
   // 2. Set initial curve on client mount to prevent SSR hydration mismatch
   useGSAP(
@@ -80,12 +92,11 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       const height = window.innerHeight;
 
       // Curve descriptors
-      const initialPath = `M0 0 L${width} 0 L${width} ${height} Q${width / 2} ${height + 300} 0 ${height} Z`;
       const targetPath = `M0 0 L${width} 0 L${width} ${height} Q${width / 2} ${height} 0 ${height} Z`;
 
       const tl = gsap.timeline({
         onComplete: () => {
-          onComplete();
+          finishPreloader();
         },
       });
 
@@ -122,13 +133,13 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       // Remove component from view entirely
       tl.set(container, { display: "none" });
     },
-    { dependencies: [index] }
+    { dependencies: [finishPreloader, index] }
   );
 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-[#141414] select-none touch-none"
+      className="preloader-shell fixed inset-0 z-[100] flex items-center justify-center bg-[#141414] select-none touch-none"
     >
       {/* 3D-ish fluid curve bottom border */}
       <svg className="absolute top-0 left-0 w-full h-[calc(100%+300px)] fill-[#141414] pointer-events-none">

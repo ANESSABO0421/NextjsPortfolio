@@ -166,3 +166,20 @@ html.lenis body {
 .lenis-scrolling iframe {
   pointer-events: none;
 }
+
+.preloader-shell {
+  animation: preloader-failsafe-hide 4s linear forwards;
+}
+
+@keyframes preloader-failsafe-hide {
+  0%,
+  96% {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
