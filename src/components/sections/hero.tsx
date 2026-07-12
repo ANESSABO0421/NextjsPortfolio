@@ -50,18 +50,16 @@ export default function Hero() {
         }
       );
 
-      // 2. Parallax effect on the portrait card based on cursor movement
+      // 2. Optimized Parallax quickTo triggers for mouse tracking
+      const xTo = gsap.quickTo(portraitRef.current, "x", { duration: 0.6, ease: "power3.out" });
+      const yTo = gsap.quickTo(portraitRef.current, "y", { duration: 0.6, ease: "power3.out" });
+
       const handleMouseMove = (e: MouseEvent) => {
         const { clientX, clientY } = e;
         const x = (clientX - window.innerWidth / 2) * 0.035;
         const y = (clientY - window.innerHeight / 2) * 0.035;
-
-        gsap.to(portraitRef.current, {
-          x: x,
-          y: y,
-          duration: 0.5,
-          ease: "power2.out",
-        });
+        xTo(x);
+        yTo(y);
       };
 
       window.addEventListener("mousemove", handleMouseMove);
@@ -118,12 +116,12 @@ export default function Hero() {
       <div className="absolute bottom-[12%] left-0 w-full overflow-hidden whitespace-nowrap z-0 pointer-events-none">
         <div
           ref={marqueeRef}
-          className="flex whitespace-nowrap text-[15vw] font-heading font-extrabold uppercase leading-none text-white select-none"
+          className="flex whitespace-nowrap text-[12vw] sm:text-[15vw] font-heading font-extrabold uppercase leading-none text-white select-none"
         >
-          <span ref={firstTextRef} className="inline-block pr-12">
+          <span ref={firstTextRef} className="inline-block pr-12 will-change-transform">
             Anessa Bo — Creative Architect —
           </span>
-          <span ref={secondTextRef} className="inline-block pr-12">
+          <span ref={secondTextRef} className="inline-block pr-12 will-change-transform">
             Anessa Bo — Creative Architect —
           </span>
         </div>
@@ -132,35 +130,35 @@ export default function Hero() {
       {/* 2. Center Portrait Image (Layered ABOVE the marquee) */}
       <div
         ref={portraitRef}
-        className="w-[300px] h-[380px] sm:w-[380px] sm:h-[480px] md:w-[440px] md:h-[540px] relative z-10 transition-transform duration-75 ease-out"
+        className="absolute bottom-0 left-0 right-0 mx-auto w-[100vh] max-w-full h-screen z-10 transition-transform duration-75 ease-out"
       >
         <Image
-          src="/developer-portrait.png"
+          src="/anees-aboo.png"
           alt="Anessa Bo"
           fill
-          sizes="(max-width: 768px) 380px, 440px"
+          sizes="100vh"
           priority
-          className="object-contain object-bottom transform scale-105"
+          className="object-contain object-bottom"
         />
       </div>
 
       {/* 3. Floating Location Badge (Bottom Left) */}
-      <div className="hero-floating-element absolute bottom-12 left-6 sm:left-12 z-20">
-        <div className="bg-[#1c1c1f] text-white pl-6 pr-4 py-4 rounded-full flex items-center gap-4 shadow-xl border border-white/5">
-          <span className="text-[10px] sm:text-xs tracking-wider uppercase font-medium leading-relaxed">
+      <div className="hero-floating-element absolute bottom-20 left-4 sm:bottom-12 sm:left-12 z-20">
+        <div className="bg-[#1c1c1f]/95 backdrop-blur-md text-white pl-4 pr-3 py-3 sm:pl-6 sm:pr-4 sm:py-4 rounded-full flex items-center gap-3 sm:gap-4 shadow-xl border border-white/5 whitespace-nowrap">
+          <span className="text-[9px] sm:text-xs tracking-wider uppercase font-medium leading-relaxed">
             Located in <br />
             <span className="text-zinc-400 font-light font-sans">London, United Kingdom</span>
           </span>
           <Magnetic actionStrength={0.25} hoverAreaPadding="p-0">
-            <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-[#c9fd34] animate-[spin_12s_linear_infinite]">
-              <Globe className="w-5 h-5" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-zinc-800 flex items-center justify-center text-[#c9fd34] animate-[spin_12s_linear_infinite]">
+              <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </Magnetic>
         </div>
       </div>
 
       {/* 4. Intro Text Block with Arrow (Right Side) */}
-      <div className="hero-floating-element absolute top-[35%] right-6 sm:right-12 md:right-24 z-20 flex flex-col gap-6 text-[#1c1c1f] max-w-[200px] sm:max-w-[240px]">
+      <div className="hero-floating-element absolute top-[35%] right-6 sm:right-12 md:right-24 z-20 hidden sm:flex flex-col gap-6 text-[#1c1c1f] max-w-[200px] sm:max-w-[240px]">
         <ArrowDownRight className="w-8 h-8 stroke-[1.5px] text-[#1c1c1f] animate-bounce" />
         <p className="font-heading text-lg sm:text-2xl font-bold uppercase leading-tight tracking-tight">
           Freelance <br />

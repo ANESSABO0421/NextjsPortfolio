@@ -1,10 +1,10 @@
-"use client";
-
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Magnetic from "@/components/ui/magnetic";
 import { useLenis } from "@/components/providers/smooth-scroll-provider";
+import { useTransition } from "@/components/providers/transition-provider";
 import { Menu, X } from "lucide-react";
 
 const navItems = [
@@ -18,6 +18,8 @@ export default function Header() {
   const [menuActive, setMenuActive] = useState(false);
   const [showFloatingButton, setShowFloatingButton] = useState(false);
   const { lenis } = useLenis();
+  const pathname = usePathname();
+  const { transitionTo } = useTransition();
   const menuContainerRef = useRef<HTMLDivElement>(null);
   const menuPathRef = useRef<SVGPathElement>(null);
   const floatingButtonRef = useRef<HTMLDivElement>(null);
@@ -156,19 +158,31 @@ export default function Header() {
     { dependencies: [menuActive], scope: menuContainerRef }
   );
 
-  // Smooth scroll handler
-  const handleScrollTo = (selector: string) => {
+  // Optimized dynamic navigation callback
+  const handleNavigation = useCallback((label: string, href: string) => {
     setMenuActive(false);
-    setTimeout(() => {
-      const el = document.querySelector(selector) as HTMLElement;
+
+    // If Contact click, transition to contact page
+    if (label === "Contact" || href === "#contact") {
+      transitionTo("/contact", "Contact");
+      return;
+    }
+
+    // Scroll to section directly if already on home page
+    if (pathname === "/") {
+      const el = document.querySelector(href) as HTMLElement;
       if (el) {
         lenis?.scrollTo(el, {
           duration: 1.8,
-          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Snellenberg-inspired smooth snapping
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         });
       }
-    }, 300);
-  };
+    } else {
+      // Transition to homepage with hash target
+      const targetUrl = href === "#hero" ? "/" : `/${href}`;
+      transitionTo(targetUrl, label);
+    }
+  }, [pathname, lenis, transitionTo]);
 
   return (
     <>
@@ -176,7 +190,7 @@ export default function Header() {
       <header className="absolute top-0 left-0 w-full z-40 flex items-center justify-between px-6 sm:px-12 py-8 mix-blend-difference text-white">
         {/* Kinetic rolling brand logo */}
         <div
-          onClick={() => handleScrollTo("#hero")}
+          onClick={() => handleNavigation("Home", "#hero")}
           className="group flex cursor-pointer items-center gap-1 font-heading text-lg font-bold uppercase select-none"
         >
           <span className="inline-block transition-transform duration-500 ease-out group-hover:rotate-360">
@@ -197,7 +211,7 @@ export default function Header() {
           {navItems.map((item, i) => (
             <Magnetic key={i} actionStrength={0.25} hoverAreaPadding="px-4 py-2">
               <span
-                onClick={() => handleScrollTo(item.href)}
+                onClick={() => handleNavigation(item.label, item.href)}
                 className="relative text-sm font-light tracking-wide uppercase transition-colors duration-300 hover:text-[#c9fd34] cursor-pointer"
               >
                 {item.label}
@@ -253,7 +267,7 @@ export default function Header() {
               {navItems.map((item, i) => (
                 <div key={i} className="menu-link-item overflow-hidden">
                   <span
-                    onClick={() => handleScrollTo(item.href)}
+                    onClick={() => handleNavigation(item.label, item.href)}
                     className="block font-heading text-4xl sm:text-5xl font-light hover:text-[#c9fd34] transition-colors duration-300 cursor-pointer"
                   >
                     {item.label}

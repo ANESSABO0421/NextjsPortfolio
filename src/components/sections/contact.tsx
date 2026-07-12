@@ -1,13 +1,16 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Magnetic from "@/components/ui/magnetic";
+import { useTransition } from "@/components/providers/transition-provider";
 import { ArrowUpRight } from "lucide-react";
 
 export default function Contact() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { transitionTo } = useTransition();
   const [londonTime, setLondonTime] = useState("");
 
   // 1. Live London Clock for premium detail
@@ -28,12 +31,12 @@ export default function Contact() {
     return () => clearInterval(interval);
   }, []);
 
-  // 2. Entrance parallax scroll triggers
+  // 2. Entrance triggers
   useGSAP(
     () => {
       gsap.fromTo(
         ".contact-slide-in",
-        { opacity: 0, y: 50 },
+        { opacity: 0, y: 30 },
         {
           opacity: 1,
           y: 0,
@@ -50,103 +53,113 @@ export default function Contact() {
     { scope: containerRef }
   );
 
+  const handleContactTransition = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    transitionTo("/contact", "Contact");
+  }, [transitionTo]);
+
   return (
     <footer
       id="contact"
       ref={containerRef}
-      className="relative min-h-[90vh] w-full bg-[#0c0c0d] pt-24 pb-12 text-white flex flex-col justify-between overflow-hidden"
+      className="relative min-h-[90vh] w-full bg-[#0c0c0d] pt-28 pb-10 text-white flex flex-col justify-between overflow-hidden"
     >
-      {/* Dynamic background glow */}
-      <div className="absolute bottom-0 right-0 w-[50vw] h-[50vw] rounded-full bg-[#c9fd34]/2 blur-[150px] pointer-events-none" />
+      {/* Background glow atmospheric overlay */}
+      <div className="absolute bottom-0 right-0 w-[50vw] h-[50vw] rounded-full bg-[#3c5df6]/2 blur-[150px] pointer-events-none" />
 
-      <div className="px-6 sm:px-12 md:px-24 max-w-7xl mx-auto w-full flex flex-col gap-16 relative z-10">
+      <div className="px-6 sm:px-12 md:px-24 max-w-7xl mx-auto w-full flex flex-col relative z-10">
         
         {/* Core CTA */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
+        <div className="flex flex-col gap-6 sm:gap-8">
           
-          <div className="lg:col-span-8 flex flex-col gap-6">
-            <span className="text-xs uppercase tracking-widest text-zinc-500 font-semibold flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#c9fd34]" />
-              Get In Touch
-            </span>
-            <h2 className="font-heading text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight uppercase leading-none">
-              Let&apos;s Work <br />
-              <span className="text-zinc-600">Together.</span>
+          <div className="flex items-center gap-4 sm:gap-6">
+            {/* Small portrait icon */}
+            <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full overflow-hidden relative border border-zinc-800 bg-zinc-900 shadow-xl">
+              <Image
+                src="/anees-aboo.png"
+                alt="Anessa Bo"
+                fill
+                sizes="(max-width: 640px) 56px, 80px"
+                className="object-cover object-center"
+              />
+            </div>
+            
+            <h2 className="font-heading text-4xl sm:text-7xl md:text-8xl font-bold tracking-tight uppercase leading-none text-zinc-100">
+              Let&apos;s work
             </h2>
           </div>
 
-          {/* Huge Magnetic Circular CTA Button */}
-          <div className="lg:col-span-4 flex justify-start lg:justify-end">
+          <h2 className="font-heading text-4xl sm:text-7xl md:text-8xl font-bold tracking-tight uppercase leading-none text-zinc-100">
+            together
+          </h2>
+        </div>
+
+        {/* 3. Seam dividing line with massive floating Get in Touch button */}
+        <div className="relative w-full h-[1px] bg-zinc-800/80 mt-16 sm:mt-24 flex items-center justify-end">
+          
+          {/* Circular Magnetic button aligned directly on the line seam */}
+          <div className="absolute right-0 sm:right-12 lg:right-24 z-20">
             <Magnetic actionStrength={0.35} hoverAreaPadding="p-0">
               <a
-                href="mailto:hello@anessabo.dev"
-                className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-[#c9fd34] text-black flex flex-col items-center justify-center gap-2 hover:scale-105 transition-transform duration-300 font-heading tracking-widest text-xs font-extrabold uppercase shadow-2xl"
+                href="/contact"
+                onClick={handleContactTransition}
+                className="w-32 h-32 sm:w-44 sm:h-44 rounded-full bg-[#3c5df6] text-white flex flex-col items-center justify-center gap-1 hover:scale-105 transition-transform duration-300 font-heading tracking-widest text-[9px] sm:text-xs font-extrabold uppercase shadow-2xl border border-white/5"
               >
-                <div className="relative overflow-hidden flex h-4">
-                  <span className="inline-block transition-transform duration-300 hover:-translate-y-full">
-                    Start Project
-                  </span>
-                </div>
-                <ArrowUpRight className="w-5 h-5 animate-pulse" />
+                <span>Get in touch</span>
+                <ArrowUpRight className="w-4 h-4" />
               </a>
             </Magnetic>
           </div>
-
         </div>
 
-        {/* Contact details */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pt-16 border-t border-zinc-900 mt-8">
-          <div className="contact-slide-in flex flex-col gap-2">
-            <span className="text-zinc-600 uppercase text-[10px] tracking-widest">Email</span>
-            <a
-              href="mailto:hello@anessabo.dev"
-              className="text-lg font-light hover:text-[#c9fd34] transition-colors duration-200"
-            >
-              hello@anessabo.dev
-            </a>
-          </div>
-          <div className="contact-slide-in flex flex-col gap-2">
-            <span className="text-zinc-600 uppercase text-[10px] tracking-widest">Phone</span>
-            <a
-              href="tel:+447700900077"
-              className="text-lg font-light hover:text-[#c9fd34] transition-colors duration-200"
-            >
-              +44 (0) 7700 900077
-            </a>
-          </div>
-          <div className="contact-slide-in flex flex-col gap-2">
-            <span className="text-zinc-600 uppercase text-[10px] tracking-widest">Socials</span>
-            <div className="flex gap-4 text-sm font-light text-zinc-300">
-              <Magnetic actionStrength={0.2} hoverAreaPadding="px-2 py-1">
-                <a href="https://linkedin.com" target="_blank" className="hover:text-[#c9fd34] transition-colors">LinkedIn</a>
-              </Magnetic>
-              <Magnetic actionStrength={0.2} hoverAreaPadding="px-2 py-1">
-                <a href="https://github.com" target="_blank" className="hover:text-[#c9fd34] transition-colors">GitHub</a>
-              </Magnetic>
-              <Magnetic actionStrength={0.2} hoverAreaPadding="px-2 py-1">
-                <a href="https://dribbble.com" target="_blank" className="hover:text-[#c9fd34] transition-colors">Dribbble</a>
-              </Magnetic>
-            </div>
-          </div>
+        {/* 4. Rounded CTA Detail pills */}
+        <div className="flex flex-wrap gap-4 pt-16 sm:pt-20">
+          <a
+            href="mailto:info@anessaboo.com"
+            className="px-6 py-4 rounded-full border border-zinc-800 text-sm font-light text-zinc-400 hover:bg-white hover:text-black hover:border-transparent transition-all duration-300"
+          >
+            info@anessaboo.com
+          </a>
+          <a
+            href="tel:+447700900077"
+            className="px-6 py-4 rounded-full border border-zinc-800 text-sm font-light text-zinc-400 hover:bg-white hover:text-black hover:border-transparent transition-all duration-300"
+          >
+            +44 7700 900077
+          </a>
         </div>
 
       </div>
 
-      {/* Footer bar with legal notes & clock */}
-      <div className="px-6 sm:px-12 md:px-24 max-w-7xl mx-auto w-full border-t border-zinc-900 pt-8 mt-16 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-light text-zinc-600 relative z-10">
-        <div className="flex items-center gap-6">
-          <span>© 2026 Anessa Bo. All Rights Reserved.</span>
-          <span className="hidden sm:inline">|</span>
-          <a href="#" className="hover:text-white transition-colors duration-200">Privacy Policy</a>
+      {/* 5. Footer Metadata Bottom bar (VERSION, CLOCK, SOCIALS) */}
+      <div className="px-6 sm:px-12 md:px-24 max-w-7xl mx-auto w-full pt-16 mt-16 flex flex-col gap-8 text-[10px] tracking-wider uppercase font-semibold text-zinc-500 relative z-10 border-t border-zinc-900/60">
+        
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-1.5">
+            <span className="text-zinc-600">Version</span>
+            <p className="text-zinc-400 font-medium">2026 © Edition</p>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <span className="text-zinc-600">Local Time</span>
+            <p className="text-zinc-300 font-mono font-medium">
+              {londonTime || "00:00:00 GMT+1"}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {["Awwwards", "Instagram", "Twitter", "LinkedIn"].map((social, index) => (
+              <a
+                key={index}
+                href={`https://${social.toLowerCase()}.com`}
+                target="_blank"
+                className="hover:text-white transition-colors text-zinc-400"
+              >
+                {social}
+              </a>
+            ))}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c9fd34] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#c9fd34]"></span>
-          </span>
-          <span>London, UK:</span>
-          <span className="font-mono text-zinc-400 font-semibold">{londonTime || "00:00:00 GMT+1"}</span>
-        </div>
+
       </div>
     </footer>
   );

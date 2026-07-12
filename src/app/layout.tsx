@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, Syne } from "next/font/google";
 import SmoothScrollProvider from "@/components/providers/smooth-scroll-provider";
+import TransitionProvider from "@/components/providers/transition-provider";
 import CustomCursor from "@/components/ui/custom-cursor";
 import "./globals.css";
 
@@ -33,8 +34,10 @@ export default function RootLayout({
     >
       <body className="min-h-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
         <SmoothScrollProvider>
-          <CustomCursor />
-          {children}
+          <TransitionProvider>
+            <CustomCursor />
+            {children}
+          </TransitionProvider>
         </SmoothScrollProvider>
       </body>
     </html>

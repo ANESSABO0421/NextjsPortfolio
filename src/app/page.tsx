@@ -19,8 +19,20 @@ export default function Home() {
       lenis?.stop();
     } else {
       lenis?.start();
-      // Instantly reset scroll coordinates to top on load completion
-      lenis?.scrollTo(0, { immediate: true });
+      
+      // If navigating with a hash (e.g., from subpages), scroll to the target section
+      if (typeof window !== "undefined" && window.location.hash) {
+        const hash = window.location.hash;
+        setTimeout(() => {
+          const el = document.querySelector(hash) as HTMLElement;
+          if (el) {
+            lenis?.scrollTo(el, { duration: 1.5 });
+          }
+        }, 150);
+      } else {
+        // Otherwise reset to top
+        lenis?.scrollTo(0, { immediate: true });
+      }
     }
   }, [isLoading, lenis]);
 

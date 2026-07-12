@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Magnetic from "@/components/ui/magnetic";
+import { useTransition } from "@/components/providers/transition-provider";
 import { MoveUpRight } from "lucide-react";
 
 const projects = [
@@ -33,6 +33,12 @@ export default function Works() {
   const containerRef = useRef<HTMLDivElement>(null);
   const hoverContainerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const { transitionTo } = useTransition();
+
+  const handleProjectTransition = useCallback((e: React.MouseEvent, id: string, title: string) => {
+    e.preventDefault();
+    transitionTo(`/work/${id}`, title);
+  }, [transitionTo]);
 
   // 1. Core cursor tracking for the floating preview card
   useGSAP(
@@ -117,9 +123,10 @@ export default function Works() {
         {/* Project List */}
         <div className="flex flex-col border-t border-zinc-800">
           {projects.map((project, index) => (
-            <Link
+            <a
               key={index}
               href={`/work/${project.id}`}
+              onClick={(e) => handleProjectTransition(e, project.id, project.title)}
               onMouseEnter={() => setActiveIndex(index)}
               onMouseLeave={() => setActiveIndex(null)}
               className="group relative flex flex-col sm:flex-row sm:items-center justify-between py-10 border-b border-zinc-800 transition-all duration-350 cursor-pointer animate-[opacity_0.5s_ease-out_forwards]"
@@ -144,7 +151,7 @@ export default function Works() {
                   <MoveUpRight className="w-4 h-4 transition-transform duration-300 group-hover:rotate-45" />
                 </div>
               </div>
-            </Link>
+            </a>
           ))}
         </div>
       </div>
