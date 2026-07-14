@@ -46,6 +46,7 @@ export default function Magnetic({
           y: y * actionStrength,
           duration: 0.3,
           ease: "power2.out",
+          force3D: true,
         });
       };
 
@@ -56,6 +57,7 @@ export default function Magnetic({
           y: 0,
           duration: 0.8,
           ease: "elastic.out(1, 0.4)",
+          force3D: true,
         });
       };
 
@@ -72,7 +74,7 @@ export default function Magnetic({
 
   return (
     <div ref={outerRef} className={`relative inline-block cursor-pointer ${hoverAreaPadding}`}>
-      <div ref={innerRef} className="relative z-10 transition-transform duration-75">
+      <div ref={innerRef} className="relative z-10">
         {children}
       </div>
     </div>

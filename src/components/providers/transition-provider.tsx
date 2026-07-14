@@ -3,7 +3,13 @@
 import React, { createContext, useContext, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "@/components/providers/smooth-scroll-provider";
+
+// Register ScrollTrigger if in client env
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 interface TransitionContextType {
   transitionTo: (href: string, title: string) => void;
@@ -50,19 +56,25 @@ export default function TransitionProvider({ children }: { children: React.React
         // Unlock scroll and reset state
         lenis?.start();
         setIsActive(false);
+
+        // Crucial for Safari: force ScrollTrigger recalculation after page change/hydration finishes
+        setTimeout(() => {
+          ScrollTrigger.refresh();
+        }, 100);
       }
     });
 
     // 1. Reset overlay positions
-    gsap.set(overlayRef.current, { display: "flex", yPercent: 100 });
+    gsap.set(overlayRef.current, { display: "flex", yPercent: 100, force3D: true });
     gsap.set(pathRef.current, { attr: { d: curves.initialBottom } });
-    gsap.set(textRef.current, { y: 50, opacity: 0 });
+    gsap.set(textRef.current, { y: 50, opacity: 0, force3D: true });
 
     // 2. Slide overlay up and morph path to dome
     tl.to(overlayRef.current, {
       yPercent: 0,
       duration: 0.8,
-      ease: "power4.inOut"
+      ease: "power4.inOut",
+      force3D: true,
     });
 
     tl.to(pathRef.current, {
@@ -83,7 +95,8 @@ export default function TransitionProvider({ children }: { children: React.React
       y: 0,
       opacity: 1,
       duration: 0.5,
-      ease: "power3.out"
+      ease: "power3.out",
+      force3D: true,
     }, "-=0.2");
 
     // 5. Midpoint Route Navigation swap (at full flat screen coverage)
@@ -99,14 +112,16 @@ export default function TransitionProvider({ children }: { children: React.React
       y: -50,
       opacity: 0,
       duration: 0.4,
-      ease: "power3.in"
+      ease: "power3.in",
+      force3D: true,
     });
 
     // 7. Slide overlay up out of screen and morph bottom edge
     tl.to(overlayRef.current, {
       yPercent: -100,
       duration: 0.8,
-      ease: "power4.inOut"
+      ease: "power4.inOut",
+      force3D: true,
     });
 
     tl.to(pathRef.current, {
@@ -115,6 +130,7 @@ export default function TransitionProvider({ children }: { children: React.React
       ease: "power2.in"
     }, "-=0.8");
 
+    // tl.to(pathRef.current, {
     tl.to(pathRef.current, {
       attr: { d: curves.finalTop },
       duration: 0.4,

@@ -37,6 +37,7 @@ export default function Hero() {
           duration: 1.5,
           ease: "power4.out",
           delay: 0.25,
+          force3D: true,
         }
       );
 
@@ -50,14 +51,15 @@ export default function Hero() {
           stagger: 0.15,
           ease: "power3.out",
           delay: 0.8,
+          force3D: true,
         }
       );
 
       const xTo = canUseHeavyMotion
-        ? gsap.quickTo(portraitRef.current, "x", { duration: 0.6, ease: "power3.out" })
+        ? gsap.quickTo(portraitRef.current, "x", { duration: 0.6, ease: "power3.out", force3D: true })
         : null;
       const yTo = canUseHeavyMotion
-        ? gsap.quickTo(portraitRef.current, "y", { duration: 0.6, ease: "power3.out" })
+        ? gsap.quickTo(portraitRef.current, "y", { duration: 0.6, ease: "power3.out", force3D: true })
         : null;
 
       const handleMouseMove = (e: MouseEvent) => {
@@ -159,19 +161,21 @@ export default function Hero() {
       </div>
 
       {/* 3. Sliding Location Badge (Left Edge) */}
-      <div className="hero-floating-element absolute bottom-[22%] left-0 z-20 transform transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] -translate-x-[calc(100%-60px)] hover:translate-x-0">
-        <div className="bg-[#1c1c1f]/95 backdrop-blur-md text-white pl-8 pr-4 py-3 sm:py-3.5 rounded-r-full flex items-center gap-4 sm:gap-6 shadow-2xl border-y border-r border-white/5 cursor-pointer whitespace-nowrap">
-          <span className="text-[9px] sm:text-xs tracking-wider uppercase font-medium leading-relaxed text-left">
-            Located in <br />
-            <span className="text-zinc-400 font-light font-sans normal-case">London, UK</span>
-          </span>
-          <Magnetic actionStrength={0.25} hoverAreaPadding="p-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-zinc-800 flex items-center justify-center text-[#c9fd34] shrink-0">
-              <div className="animate-[spin_12s_linear_infinite]">
-                <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+      <div className="hero-floating-element absolute bottom-[22%] left-0 z-20">
+        <div className="transform transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] -translate-x-[calc(100%-60px)] hover:translate-x-0">
+          <div className="bg-[#1c1c1f]/95 backdrop-blur-md text-white pl-8 pr-4 py-3 sm:py-3.5 rounded-r-full flex items-center gap-4 sm:gap-6 shadow-2xl border-y border-r border-white/5 cursor-pointer whitespace-nowrap">
+            <span className="text-[9px] sm:text-xs tracking-wider uppercase font-medium leading-relaxed text-left">
+              Located in <br />
+              <span className="text-zinc-400 font-light font-sans normal-case">London, UK</span>
+            </span>
+            <Magnetic actionStrength={0.25} hoverAreaPadding="p-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-zinc-800 flex items-center justify-center text-[#c9fd34] shrink-0">
+                <div className="animate-[spin_12s_linear_infinite]">
+                  <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+                </div>
               </div>
-            </div>
-          </Magnetic>
+            </Magnetic>
+          </div>
         </div>
       </div>
 

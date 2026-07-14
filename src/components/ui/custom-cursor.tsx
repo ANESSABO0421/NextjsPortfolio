@@ -6,7 +6,7 @@ import { useGSAP } from "@gsap/react";
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const [cursorState, setCursorState] = useState<"default" | "hover" | "view" | "drag">("default");
+  const cursorStateRef = useRef<"default" | "hover" | "view" | "drag">("default");
   const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
@@ -15,14 +15,17 @@ export default function CustomCursor() {
     setIsTouch(isTouchDevice);
   }, []);
 
+  // Single unified GSAP effect — no React state changes on mouseover (avoids re-renders)
   useGSAP(
     () => {
       if (isTouch) return;
       const cursor = cursorRef.current;
       if (!cursor) return;
 
+      const textEl = cursor.querySelector(".cursor-text") as HTMLElement;
+
       // Initial cursor placement offscreen
-      gsap.set(cursor, { xPercent: -50, yPercent: -50, x: -100, y: -100 });
+      gsap.set(cursor, { xPercent: -50, yPercent: -50, x: -100, y: -100, scale: 0.15, force3D: true });
 
       // Highly optimized position trackers using GSAP quickTo
       const xTo = gsap.quickTo(cursor, "x", { duration: 0.35, ease: "power3.out" });
@@ -33,22 +36,51 @@ export default function CustomCursor() {
         yTo(e.clientY);
       };
 
+      const animateToState = (state: "default" | "hover" | "view" | "drag") => {
+        if (cursorStateRef.current === state) return;
+        cursorStateRef.current = state;
+
+        let targetScale = 0.15;
+        let text = "";
+
+        if (state === "hover") {
+          targetScale = 0.7;
+        } else if (state === "view") {
+          targetScale = 1.0;
+          text = "VIEW";
+        } else if (state === "drag") {
+          targetScale = 1.0;
+          text = "DRAG";
+        }
+
+        gsap.to(cursor, {
+          scale: targetScale,
+          duration: 0.3,
+          ease: "power2.out",
+          overwrite: "auto",
+          force3D: true,
+        });
+
+        if (textEl) {
+          textEl.textContent = text;
+        }
+      };
+
       const handleMouseOver = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
-        // Search upward in DOM for interactive tags or custom cursor attributes
         const interactiveEl = target.closest("[data-cursor], a, button, [role='button']");
 
         if (interactiveEl) {
           const type = interactiveEl.getAttribute("data-cursor");
           if (type === "view") {
-            setCursorState("view");
+            animateToState("view");
           } else if (type === "drag") {
-            setCursorState("drag");
+            animateToState("drag");
           } else {
-            setCursorState("hover");
+            animateToState("hover");
           }
         } else {
-          setCursorState("default");
+          animateToState("default");
         }
       };
 
@@ -60,8 +92,8 @@ export default function CustomCursor() {
         gsap.to(cursor, { opacity: 1, duration: 0.2 });
       };
 
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseover", handleMouseOver);
+      window.addEventListener("mousemove", handleMouseMove, { passive: true });
+      window.addEventListener("mouseover", handleMouseOver, { passive: true });
       document.addEventListener("mouseleave", handleMouseLeaveWindow);
       document.addEventListener("mouseenter", handleMouseEnterWindow);
 
@@ -77,27 +109,16 @@ export default function CustomCursor() {
 
   if (isTouch) return null;
 
-  // Render a dual circle layer cursor with hardware acceleration styles
+  // Fixed-size container scaled via GPU transforms.
+  // mix-blend-mode: difference REMOVED — it causes catastrophic recompositing on Safari.
+  // The white cursor is perfectly visible on the dark portfolio backgrounds.
   return (
     <div
       ref={cursorRef}
-      className={`fixed top-0 left-0 z-[9999] pointer-events-none rounded-full flex items-center justify-center font-heading text-[10px] font-bold tracking-widest uppercase transition-[width,height,background-color] duration-300 ease-out will-change-transform mix-blend-difference
-        ${cursorState === "default" && "w-3 h-3 bg-white"}
-        ${cursorState === "hover" && "w-14 h-14 bg-white text-black"}
-        ${cursorState === "view" && "w-20 h-20 bg-white text-black"}
-        ${cursorState === "drag" && "w-20 h-20 bg-white text-black"}
-      `}
+      className="fixed top-0 left-0 z-[9999] pointer-events-none rounded-full flex items-center justify-center font-heading text-[10px] font-bold tracking-widest uppercase will-change-transform w-20 h-20 bg-white/90"
     >
-      {cursorState === "view" && (
-        <span className="text-black font-bold select-none animate-[opacity_0.2s_ease-out_forwards]">
-          VIEW
-        </span>
-      )}
-      {cursorState === "drag" && (
-        <span className="text-black font-bold select-none animate-[opacity_0.2s_ease-out_forwards]">
-          DRAG
-        </span>
-      )}
+      <span className="cursor-text text-black font-bold select-none" />
     </div>
   );
 }
+

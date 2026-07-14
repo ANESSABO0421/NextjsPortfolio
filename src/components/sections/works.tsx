@@ -53,11 +53,17 @@ export default function Works() {
       if (!canUseHoverPreview) return;
 
       // Interpolated translation for high performance
-      const xTo = gsap.quickTo(hoverContainer, "x", { duration: 0.45, ease: "power3.out" });
-      const yTo = gsap.quickTo(hoverContainer, "y", { duration: 0.45, ease: "power3.out" });
+      const xTo = gsap.quickTo(hoverContainer, "x", { duration: 0.45, ease: "power3.out", force3D: true });
+      const yTo = gsap.quickTo(hoverContainer, "y", { duration: 0.45, ease: "power3.out", force3D: true });
+
+      // Cache bounding rect to prevent layout thrashing (Safari performance bottleneck)
+      let rect = container.getBoundingClientRect();
+
+      const updateRect = () => {
+        rect = container.getBoundingClientRect();
+      };
 
       const handleMouseMove = (e: MouseEvent) => {
-        const rect = container.getBoundingClientRect();
         // Offset coords so cursor centers on the 320x240 image card
         const x = e.clientX - rect.left - 160;
         const y = e.clientY - rect.top - 120;
@@ -66,9 +72,15 @@ export default function Works() {
       };
 
       container.addEventListener("mousemove", handleMouseMove, { passive: true });
+      container.addEventListener("mouseenter", updateRect, { passive: true });
+      window.addEventListener("resize", updateRect, { passive: true });
+      window.addEventListener("scroll", updateRect, { passive: true });
 
       return () => {
         container.removeEventListener("mousemove", handleMouseMove);
+        container.removeEventListener("mouseenter", updateRect);
+        window.removeEventListener("resize", updateRect);
+        window.removeEventListener("scroll", updateRect);
       };
     },
     { scope: containerRef }
@@ -92,6 +104,7 @@ export default function Works() {
           opacity: 1,
           duration: 0.35,
           ease: "power2.out",
+          force3D: true,
         });
         
         // Vertically slide the active image into frame
@@ -99,6 +112,7 @@ export default function Works() {
           yPercent: -activeIndex * 100,
           duration: 0.45,
           ease: "power3.out",
+          force3D: true,
         });
       } else {
         gsap.to(hoverContainer, {
@@ -106,6 +120,7 @@ export default function Works() {
           opacity: 0,
           duration: 0.35,
           ease: "power2.inOut",
+          force3D: true,
         });
       }
     },
@@ -141,10 +156,10 @@ export default function Works() {
               onMouseEnter={() => setActiveIndex(index)}
               onMouseLeave={() => setActiveIndex(null)}
               data-cursor="view"
-              className="group relative flex flex-col md:flex-row md:items-center justify-between py-8 sm:py-10 border-b border-zinc-800 transition-all duration-350 cursor-pointer animate-[opacity_0.5s_ease-out_forwards]"
+              className="group relative flex flex-col md:flex-row md:items-center justify-between py-8 sm:py-10 border-b border-zinc-800 transition-colors duration-300 cursor-pointer animate-[opacity_0.5s_ease-out_forwards]"
             >
-              {/* Backlit highlight bar that expands on hover */}
-              <div className="absolute inset-0 w-0 bg-white/2 transition-all duration-500 ease-out group-hover:w-full" />
+              {/* Backlit highlight bar that expands on hover - hardware accelerated scale-x */}
+              <div className="absolute inset-0 bg-white/2 scale-x-0 origin-left transition-transform duration-500 ease-out group-hover:scale-x-100" />
 
               <div className="relative flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8 lg:gap-12 z-10 pl-0 sm:pl-4 transition-transform duration-350 md:group-hover:translate-x-4">
                 <span className="text-zinc-600 font-heading text-lg font-medium tracking-tight">
@@ -171,9 +186,9 @@ export default function Works() {
       {/* Floating Project Image Hover Follow Card (Hardware accelerated, scaled out initially) */}
       <div
         ref={hoverContainerRef}
-        className="absolute top-0 left-0 w-[320px] h-[240px] z-20 pointer-events-none rounded-2xl overflow-hidden shadow-2xl opacity-0 scale-50 border border-white/10 select-none hidden md:block bg-[#1f1f21]"
+        className="absolute top-0 left-0 w-[320px] h-[240px] z-20 pointer-events-none rounded-xl overflow-hidden opacity-0 scale-50 select-none hidden md:block bg-[#1f1f21] will-change-transform"
       >
-        <div className="works-image-stack w-full h-full flex flex-col">
+        <div className="works-image-stack w-full h-full flex flex-col will-change-transform">
           {projects.map((project, index) => (
             <div key={index} className="w-full h-full relative flex-shrink-0">
               <Image
@@ -181,7 +196,7 @@ export default function Works() {
                 alt={project.title}
                 fill
                 sizes="320px"
-                className="object-cover object-center filter grayscale-[30%] brightness-[90%]"
+                className="object-cover object-center"
                 priority={index === 0}
               />
             </div>
