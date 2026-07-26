@@ -9,22 +9,28 @@ import { MoveUpRight } from "lucide-react";
 
 const projects = [
   {
-    id: "aura-luxury",
-    title: "Aura Luxury",
-    category: "Design / E-Commerce",
+    id: "devpulse",
+    title: "DevPulse",
+    category: "AI / Developer Tools",
     src: "/project-1.png",
   },
   {
-    id: "apex-chronograph",
-    title: "Apex Chronograph",
-    category: "Motion / 3D Display",
+    id: "malappuram-fc",
+    title: "Malappuram FC Ultras",
+    category: "Full Stack / Community",
     src: "/project-2.png",
   },
   {
-    id: "structura-brutalist",
-    title: "Structura Brutalist",
-    category: "Brutalist Agency",
+    id: "synapse",
+    title: "Synapse",
+    category: "Node.js / Platform",
     src: "/project-3.png",
+  },
+  {
+    id: "lumio",
+    title: "Lumio",
+    category: "React / Social Media",
+    src: "/project-1.png",
   },
 ];
 

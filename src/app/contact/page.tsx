@@ -160,7 +160,7 @@ export default function ContactPage() {
                   name="message"
                   value={form.message}
                   onChange={handleInputChange}
-                  placeholder="Hello Anessa, can you help me with... *"
+                  placeholder="Hello Anees, can you help me with... *"
                   required
                   rows={4}
                   className="w-full bg-transparent border-none text-zinc-100 placeholder-zinc-700 text-lg sm:text-2xl font-light focus:outline-none focus:ring-0 py-2 resize-none"
@@ -191,7 +191,7 @@ export default function ContactPage() {
             <div className="w-20 h-20 rounded-full overflow-hidden relative border border-zinc-800 shadow-xl bg-zinc-900">
               <Image
                 src="/anees-aboo3.png"
-                alt="Anessa Bo"
+                alt="Anees Aboobacker"
                 fill
                 sizes="80px"
                 className="object-cover object-center"
@@ -204,11 +204,11 @@ export default function ContactPage() {
           <div className="flex flex-col gap-4 border-t border-zinc-800 pt-8 mt-4">
             <span className="text-[10px] tracking-wider uppercase text-zinc-500 font-bold">Contact Details</span>
             <div className="flex flex-col gap-1.5 text-sm font-light text-zinc-300">
-              <a href="mailto:info@anessaboo.com" className="hover:text-white transition-colors">
-                info@anessaboo.com
+              <a href="mailto:aneesaboo123@gmail.com" className="hover:text-white transition-colors">
+                aneesaboo123@gmail.com
               </a>
-              <a href="tel:+447700900077" className="hover:text-white transition-colors">
-                +44 7700 900077
+              <a href="tel:+917592089970" className="hover:text-white transition-colors">
+                +91 75920 89970
               </a>
             </div>
           </div>
@@ -217,9 +217,8 @@ export default function ContactPage() {
           <div className="flex flex-col gap-4 border-t border-zinc-800 pt-8">
             <span className="text-[10px] tracking-wider uppercase text-zinc-500 font-bold">Business Details</span>
             <div className="flex flex-col gap-1 text-sm font-light text-zinc-400">
-              <p>Anessa Bo B.V.</p>
-              <p>London, United Kingdom</p>
-              <p className="text-zinc-600 text-xs">CoC: 92411711</p>
+              <p>Anees Aboobacker</p>
+              <p>Kerala, India</p>
             </div>
           </div>
         </div>
@@ -239,21 +238,17 @@ export default function ContactPage() {
           <div className="flex items-center gap-1.5">
             <span className="text-zinc-600">Local Time</span>
             <p className="text-zinc-300 font-mono font-medium">
-              12:12 PM GMT+1
+              12:12 PM IST
             </p>
           </div>
 
           <div className="flex items-center gap-4">
-            {["Awwwards", "Instagram", "Twitter", "LinkedIn"].map((social, index) => (
-              <a
-                key={index}
-                href={`https://${social.toLowerCase()}.com`}
-                target="_blank"
-                className="hover:text-white transition-colors text-zinc-400"
-              >
-                {social}
-              </a>
-            ))}
+            <a href="https://www.linkedin.com/in/anees-aboobacker-4842b627a/" target="_blank" className="hover:text-white transition-colors text-zinc-400">
+              LinkedIn
+            </a>
+            <a href="https://github.com/ANESSABO0421" target="_blank" className="hover:text-white transition-colors text-zinc-400">
+              GitHub
+            </a>
           </div>
         </div>
       </footer>

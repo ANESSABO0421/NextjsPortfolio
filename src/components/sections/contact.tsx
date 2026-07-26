@@ -17,13 +17,13 @@ export default function Contact() {
   useEffect(() => {
     const updateTime = () => {
       const formatted = new Date().toLocaleTimeString("en-GB", {
-        timeZone: "Europe/London",
+        timeZone: "Asia/Kolkata",
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
         hour12: false,
       });
-      setLondonTime(formatted + " GMT+1");
+      setLondonTime(formatted + " IST");
     };
 
     updateTime();
@@ -77,7 +77,7 @@ export default function Contact() {
             <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full overflow-hidden relative border border-zinc-800 bg-zinc-900 shadow-xl">
               <Image
                 src="/anees-aboo3.png"
-                alt="Anessa Bo"
+                alt="Anees Aboobacker"
                 fill
                 sizes="(max-width: 640px) 56px, 80px"
                 className="object-cover object-center"
@@ -115,16 +115,16 @@ export default function Contact() {
         {/* 4. Rounded CTA Detail pills */}
         <div className="flex flex-wrap gap-4 pt-16 sm:pt-20">
           <a
-            href="mailto:info@anessaboo.com"
+            href="mailto:aneesaboo123@gmail.com"
             className="px-6 py-4 rounded-full border border-zinc-800 text-sm font-light text-zinc-400 hover:bg-white hover:text-black hover:border-transparent transition-all duration-300"
           >
-            info@anessaboo.com
+            aneesaboo123@gmail.com
           </a>
           <a
-            href="tel:+447700900077"
+            href="tel:+917592089970"
             className="px-6 py-4 rounded-full border border-zinc-800 text-sm font-light text-zinc-400 hover:bg-white hover:text-black hover:border-transparent transition-all duration-300"
           >
-            +44 7700 900077
+            +91 75920 89970
           </a>
         </div>
 
@@ -142,21 +142,25 @@ export default function Contact() {
           <div className="flex items-center gap-1.5">
             <span className="text-zinc-600">Local Time</span>
             <p className="text-zinc-300 font-mono font-medium">
-              {londonTime || "00:00:00 GMT+1"}
+              {londonTime || "00:00:00 IST"}
             </p>
           </div>
 
           <div className="flex items-center gap-4">
-            {["Awwwards", "Instagram", "Twitter", "LinkedIn"].map((social, index) => (
-              <a
-                key={index}
-                href={`https://${social.toLowerCase()}.com`}
-                target="_blank"
-                className="hover:text-white transition-colors text-zinc-400"
-              >
-                {social}
-              </a>
-            ))}
+            <a
+              href="https://linkedin.com/in/anees-aboobacker"
+              target="_blank"
+              className="hover:text-white transition-colors text-zinc-400"
+            >
+              LinkedIn
+            </a>
+            <a
+              href="https://github.com/ANESSABO0421"
+              target="_blank"
+              className="hover:text-white transition-colors text-zinc-400"
+            >
+              GitHub
+            </a>
           </div>
         </div>
 

@@ -11,7 +11,7 @@ export default function About() {
   const textRef = useRef<HTMLParagraphElement>(null);
 
   const paragraphText =
-    "I partner with forward-thinking designers, startups, and agencies to engineer digital experiences that are not only visual masterpieces but also highly functional. By blending smooth motion design, rich graphics, and bleeding-edge front-end optimization, I build websites that set new standards in performance, accessibility, and interactive storytelling.";
+    "Junior MERN Stack Developer with 1 year of production experience building scalable web and mobile applications. Delivered end-to-end ERP modules, reusable React components, RESTful APIs, and third-party API integrations across two professional roles. Proficient in JavaScript (ES6+), clean architecture, JWT authentication, RBAC, MongoDB query optimization, and responsive UI development.";
 
   useGSAP(
     () => {
@@ -111,15 +111,15 @@ export default function About() {
             </span>
             <div className="flex flex-wrap gap-2 pt-2">
               {[
-                "Next.js 16",
-                "React 19",
+                "MongoDB",
+                "Express.js",
+                "React.js",
+                "Node.js",
+                "Next.js",
+                "React Native",
+                "Tailwind CSS",
                 "TypeScript",
-                "GSAP & ScrollTrigger",
-                "Lenis Smooth Scroll",
-                "Framer Motion",
-                "Tailwind CSS v4",
-                "shadcn/ui",
-                "Three.js / WebGL",
+                "Socket.io",
               ].map((stack, idx) => (
                 <div
                   key={idx}
@@ -136,21 +136,21 @@ export default function About() {
         <div className="lg:col-span-4 flex flex-col justify-between gap-12 lg:border-l lg:border-zinc-800 lg:pl-16">
           <div className="about-stats-container flex flex-col gap-10">
             <div className="about-stat-card flex flex-col gap-2">
-              <h3 className="font-heading text-5xl font-extrabold text-[#c9fd34]">15+</h3>
+              <h3 className="font-heading text-5xl font-extrabold text-[#c9fd34]">1+</h3>
               <span className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
-                Design & Tech Awards
+                Years Experience
               </span>
             </div>
             <div className="about-stat-card flex flex-col gap-2">
-              <h3 className="font-heading text-5xl font-extrabold text-white">100%</h3>
+              <h3 className="font-heading text-5xl font-extrabold text-white">2</h3>
               <span className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
-                Core Web Vitals Standard
+                Professional Roles
               </span>
             </div>
             <div className="about-stat-card flex flex-col gap-2">
-              <h3 className="font-heading text-5xl font-extrabold text-zinc-400">8+ Yrs</h3>
+              <h3 className="font-heading text-5xl font-extrabold text-zinc-400">4</h3>
               <span className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
-                Interactive Engineering Experience
+                Full Stack Projects
               </span>
             </div>
           </div>

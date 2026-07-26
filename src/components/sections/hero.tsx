@@ -137,10 +137,10 @@ export default function Hero() {
           className="flex whitespace-nowrap text-[18vw] sm:text-[15vw] lg:text-[12vw] font-heading font-extrabold uppercase leading-none text-white select-none"
         >
           <span ref={firstTextRef} className="inline-block pr-12 will-change-transform">
-            Anessa Bo — Creative Architect —
+            Anees Aboobacker — MERN Stack Developer —
           </span>
           <span ref={secondTextRef} className="inline-block pr-12 will-change-transform">
-            Anessa Bo — Creative Architect —
+            Anees Aboobacker — MERN Stack Developer —
           </span>
         </div>
       </div>
@@ -152,7 +152,7 @@ export default function Hero() {
       >
         <Image
           src="/anees-aboo3.png"
-          alt="Anessa Bo"
+          alt="Anees Aboobacker"
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 78vh, 100vh"
           priority
@@ -166,7 +166,7 @@ export default function Hero() {
           <div className="bg-[#1c1c1f]/95 backdrop-blur-md text-white pl-8 pr-4 py-3 sm:py-3.5 rounded-r-full flex items-center gap-4 sm:gap-6 shadow-2xl border-y border-r border-white/5 cursor-pointer whitespace-nowrap">
             <span className="text-[9px] sm:text-xs tracking-wider uppercase font-medium leading-relaxed text-left">
               Located in <br />
-              <span className="text-zinc-400 font-light font-sans normal-case">London, UK</span>
+              <span className="text-zinc-400 font-light font-sans normal-case">Kerala, India</span>
             </span>
             <Magnetic actionStrength={0.25} hoverAreaPadding="p-0">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-zinc-800 flex items-center justify-center text-[#c9fd34] shrink-0">
@@ -183,8 +183,8 @@ export default function Hero() {
       <div className="hero-floating-element absolute top-[25%] sm:top-[32%] lg:top-[35%] left-6 sm:left-auto sm:right-12 lg:right-24 z-20 flex flex-col gap-4 sm:gap-6 text-[#1c1c1f] max-w-[150px] sm:max-w-[220px] lg:max-w-[240px]">
         <ArrowDownRight className="w-6 h-6 sm:w-8 sm:h-8 stroke-[1.5px] text-[#1c1c1f] animate-bounce" />
         <p className="font-heading text-sm sm:text-2xl font-bold uppercase leading-tight tracking-tight">
-          Freelance <br />
-          Designer & Developer
+          Full Stack <br />
+          MERN Developer
         </p>
       </div>
     </section>

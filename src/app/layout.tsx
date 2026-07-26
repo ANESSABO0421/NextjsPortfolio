@@ -18,39 +18,38 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://anessaboo.com"),
+  metadataBase: new URL("https://anees-portofolio.vercel.app"),
   title: {
-    default: "Anessa Bo - Senior Frontend Architect & Interactive Developer",
-    template: "%s | Anessa Bo",
+    default: "Anees Aboobacker - MERN Stack Developer",
+    template: "%s | Anees Aboobacker",
   },
   description:
-    "Portfolio of Anessa Bo, a senior frontend architect and interactive developer building fast, responsive, motion-rich digital experiences with Next.js, React, GSAP, and WebGL.",
+    "Portfolio of Anees Aboobacker, a Junior MERN Stack Developer building scalable web and mobile applications using MongoDB, Express.js, React.js, and Node.js.",
   keywords: [
-    "Anessa Bo",
-    "frontend architect",
-    "interactive developer",
-    "Next.js portfolio",
+    "Anees Aboobacker",
+    "MERN Stack Developer",
     "React developer",
-    "GSAP animation",
-    "creative developer",
+    "Node.js developer",
+    "Next.js portfolio",
+    "Full stack developer",
   ],
-  authors: [{ name: "Anessa Bo" }],
-  creator: "Anessa Bo",
+  authors: [{ name: "Anees Aboobacker" }],
+  creator: "Anees Aboobacker",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Anessa Bo - Senior Frontend Architect & Interactive Developer",
+    title: "Anees Aboobacker - MERN Stack Developer",
     description:
-      "Fast, responsive, motion-rich portfolio work across frontend architecture, interactive development, and premium web experiences.",
+      "Junior MERN Stack Developer building scalable web and mobile applications.",
     url: "/",
-    siteName: "Anessa Bo Portfolio",
+    siteName: "Anees Aboobacker Portfolio",
     images: [
       {
         url: "/anees-aboo3.png",
         width: 1200,
         height: 1200,
-        alt: "Anessa Bo portrait",
+        alt: "Anees Aboobacker portrait",
       },
     ],
     locale: "en_US",
@@ -58,9 +57,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Anessa Bo - Senior Frontend Architect & Interactive Developer",
+    title: "Anees Aboobacker - MERN Stack Developer",
     description:
-      "Senior frontend architecture, interactive development, and high-performance motion design.",
+      "Junior MERN Stack Developer building scalable web and mobile applications.",
     images: ["/anees-aboo3.png"],
   },
   robots: {

@@ -26,38 +26,49 @@ const projectDetails: Record<
     nextTitle: string;
   }
 > = {
-  "aura-luxury": {
-    title: "AURA LUXURY",
-    category: "Design / E-Commerce",
+  "devpulse": {
+    title: "DEVPULSE",
+    category: "AI / Developer Tools",
     src: "/project-1.png",
-    role: "Front-End Development & UX Design",
-    credits: "Design: Aura Studio / Development: Anessa Bo",
-    locationYear: "United Kingdom © 2026",
-    liveUrl: "https://aura.studio",
-    nextId: "apex-chronograph",
-    nextTitle: "Apex Chronograph",
+    role: "Full-Stack Development & AI Integration",
+    credits: "Development: Anees Aboobacker",
+    locationYear: "Kerala, India © 2026",
+    liveUrl: "https://devpulse.vercel.app", // placeholder
+    nextId: "malappuram-fc",
+    nextTitle: "Malappuram FC Ultras",
   },
-  "apex-chronograph": {
-    title: "APEX CHRONO",
-    category: "Motion / 3D Display",
+  "malappuram-fc": {
+    title: "MALAPPURAM FC",
+    category: "Full Stack / Community",
     src: "/project-2.png",
-    role: "WebGL Integration & Motion Design",
-    credits: "Design & Art: Apex Studio / Development: Anessa Bo",
-    locationYear: "Switzerland © 2026",
-    liveUrl: "https://apex.chrono",
-    nextId: "structura-brutalist",
-    nextTitle: "Structura Brutalist",
+    role: "MERN Stack Development",
+    credits: "Development: Anees Aboobacker",
+    locationYear: "Kerala, India © 2026",
+    liveUrl: "https://malappuramfc.vercel.app", // placeholder
+    nextId: "synapse",
+    nextTitle: "Synapse",
   },
-  "structura-brutalist": {
-    title: "STRUCTURA",
-    category: "Brutalist Agency",
+  "synapse": {
+    title: "SYNAPSE",
+    category: "Node.js / Platform",
     src: "/project-3.png",
-    role: "Creative Direction & Architecture Portal",
-    credits: "Concept: Structura Agency / Development: Anessa Bo",
-    locationYear: "United States © 2026",
-    liveUrl: "https://structura.agency",
-    nextId: "aura-luxury",
-    nextTitle: "Aura Luxury",
+    role: "Backend & WebSockets",
+    credits: "Development: Anees Aboobacker",
+    locationYear: "Kerala, India © 2026",
+    liveUrl: "https://synapse.vercel.app", // placeholder
+    nextId: "lumio",
+    nextTitle: "Lumio",
+  },
+  "lumio": {
+    title: "LUMIO",
+    category: "React / Social Media",
+    src: "/project-1.png",
+    role: "Frontend & Animation",
+    credits: "Development: Anees Aboobacker",
+    locationYear: "Kerala, India © 2026",
+    liveUrl: "https://lumio.vercel.app", // placeholder
+    nextId: "devpulse",
+    nextTitle: "DevPulse",
   },
 };
 
@@ -73,7 +84,7 @@ export default function ProjectPage({ params }: PageProps) {
   const nextCaseRef = useRef<HTMLDivElement>(null);
 
   // Match URL params
-  const project = projectDetails[id] || projectDetails["aura-luxury"];
+  const project = projectDetails[id] || projectDetails["devpulse"];
 
   useGSAP(
     () => {

@@ -97,13 +97,14 @@ export default function Header() {
         lenis?.stop();
 
         // 1. Set panels initial slide-in coordinates
-        gsap.set(menu, { x: "100%", display: "block" });
+        gsap.set(menu, { xPercent: 100, x: 100, display: "block" });
         gsap.set(path, { attr: { d: initialPath } });
 
         const tl = gsap.timeline();
 
         if (useLightMenuMotion) {
           tl.to(menu, {
+            xPercent: 0,
             x: 0,
             duration: 0.32,
             ease: "power2.out",
@@ -126,6 +127,7 @@ export default function Header() {
 
         // 2. Slide container in from right
         tl.to(menu, {
+          xPercent: 0,
           x: 0,
           duration: 0.85,
           ease: "power4.inOut",
@@ -176,7 +178,8 @@ export default function Header() {
           tl.to(
             menu,
             {
-              x: "100%",
+              xPercent: 100,
+              x: 100,
               duration: 0.28,
               ease: "power2.inOut",
             },
@@ -209,7 +212,8 @@ export default function Header() {
         tl.to(
           menu,
           {
-            x: "100%",
+            xPercent: 100,
+            x: 100,
             duration: 0.75,
             ease: "power4.inOut",
           },
@@ -281,10 +285,10 @@ export default function Header() {
           </span>
           <div className="relative overflow-hidden flex h-6">
             <span className="inline-block transition-transform duration-500 ease-out group-hover:-translate-y-full">
-              Anessa Bo
+              Anees Aboobacker
             </span>
             <span className="absolute left-0 top-full inline-block transition-transform duration-500 ease-out group-hover:-translate-y-full text-[#c9fd34]">
-              Developer
+              MERN Dev
             </span>
           </div>
         </div>
@@ -369,9 +373,8 @@ export default function Header() {
               Socials
             </span>
             <div className="flex flex-wrap gap-4 text-xs font-light text-zinc-400">
-              <a href="https://linkedin.com" target="_blank" className="hover:text-white transition-colors duration-200">LinkedIn</a>
-              <a href="https://github.com" target="_blank" className="hover:text-white transition-colors duration-200">GitHub</a>
-              <a href="https://dribbble.com" target="_blank" className="hover:text-white transition-colors duration-200">Dribbble</a>
+              <a href="https://www.linkedin.com/in/anees-aboobacker-4842b627a/" target="_blank" className="hover:text-white transition-colors duration-200">LinkedIn</a>
+              <a href="https://github.com/ANESSABO0421" target="_blank" className="hover:text-white transition-colors duration-200">GitHub</a>
             </div>
           </div>
         </div>
