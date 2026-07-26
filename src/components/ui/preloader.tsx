@@ -5,13 +5,13 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
 const words = [
-  "Hello",     // English
-  "Bonjour",   // French
-  "Ciao",      // Italian
-  "Olá",       // Portuguese
-  "Hallo",     // German
-  "Hola",      // Spanish
-  "Anessa Bo"  // Portfolio Brand Name
+  "Hello",             // English
+  "नमस्ते",              // Hindi
+  "നമസ്കാരം",          // Malayalam
+  "مرحباً",              // Arabic
+  "Bonjour",           // French
+  "Hola",              // Spanish
+  "Anees Aboobacker",  // Portfolio Brand Name
 ];
 
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
@@ -48,7 +48,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       () => {
         setIndex((prev) => prev + 1);
       },
-      index === 0 ? 1000 : 150
+      index === 0 ? 1000 : 250
     );
 
     return () => {
@@ -59,7 +59,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
   useEffect(() => {
     const maxDurationTimeout = setTimeout(() => {
       finishPreloader();
-    }, 3200);
+    }, 4500);
 
     return () => {
       clearTimeout(maxDurationTimeout);
