@@ -57,14 +57,14 @@ export default function ContactPage() {
         <div className="lg:col-span-8 flex flex-col gap-16">
           
           {/* Back Home link */}
-          <a
+          <Link
             href="/"
             onClick={handleHomeClick}
             className="group inline-flex items-center gap-2 text-xs tracking-wider uppercase text-zinc-500 hover:text-white transition-colors duration-200"
           >
             <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-1" />
             Go Back
-          </a>
+          </Link>
 
           {/* Form Header */}
           <div className="overflow-hidden">

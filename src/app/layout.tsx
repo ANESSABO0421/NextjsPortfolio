@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Outfit, Syne } from "next/font/google";
 import SmoothScrollProvider from "@/components/providers/smooth-scroll-provider";
 import TransitionProvider from "@/components/providers/transition-provider";
@@ -75,6 +75,35 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#111112",
+  colorScheme: "dark",
+};
+
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Anees Aboobacker",
+  jobTitle: "MERN Stack Developer",
+  url: "https://anees-portofolio.vercel.app",
+  image: "https://anees-portofolio.vercel.app/anees-aboo3.png",
+  sameAs: [
+    "https://linkedin.com/in/anees-aboobacker",
+    "https://github.com/ANESSABO0421",
+  ],
+  knowsAbout: [
+    "MongoDB",
+    "Express.js",
+    "React.js",
+    "Node.js",
+    "Next.js",
+    "React Native",
+    "TypeScript",
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -86,6 +115,12 @@ export default function RootLayout({
       className={`${outfit.variable} ${syne.variable} h-full antialiased dark`}
     >
       <body className="min-h-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(personJsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
         <SmoothScrollProvider>
           <TransitionProvider>
             <CustomCursor />

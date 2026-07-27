@@ -18,9 +18,15 @@ export default function Hero() {
     () => {
       const container = containerRef.current;
       if (!container) return;
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      // Mouse-only affordances (parallax, scroll-linked direction reversal)
       const canUseHeavyMotion =
-        window.matchMedia("(pointer: fine)").matches &&
-        !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        window.matchMedia("(pointer: fine)").matches && !prefersReducedMotion;
+      // The marquee itself should keep scrolling on touch devices too —
+      // only respect the user's reduced-motion preference.
+      const canAnimateMarquee = !prefersReducedMotion;
 
       // Kinetic marquee animation parameters (encapsulated within GSAP scope)
       let xPercent = 0;
@@ -94,7 +100,7 @@ export default function Hero() {
       let isCancelled = false;
       const animateMarquee = () => {
         if (isCancelled || !firstTextRef.current || !secondTextRef.current) return;
-        if (!canUseHeavyMotion) return;
+        if (!canAnimateMarquee) return;
 
         if (xPercent <= -100) {
           xPercent = 0;
@@ -110,7 +116,7 @@ export default function Hero() {
         requestAnimationFrame(animateMarquee);
       };
 
-      if (canUseHeavyMotion) {
+      if (canAnimateMarquee) {
         requestAnimationFrame(animateMarquee);
       }
 

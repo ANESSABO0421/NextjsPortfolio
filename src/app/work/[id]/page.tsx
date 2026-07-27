@@ -2,6 +2,7 @@
 
 import React, { use, useRef, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -10,67 +11,7 @@ import { useTransition } from "@/components/providers/transition-provider";
 import Magnetic from "@/components/ui/magnetic";
 import Header from "@/components/layout/header";
 import { ArrowUpRight, ArrowLeft } from "lucide-react";
-
-// Project detail config dictionary
-const projectDetails: Record<
-  string,
-  {
-    title: string;
-    category: string;
-    src: string;
-    role: string;
-    credits: string;
-    locationYear: string;
-    liveUrl: string;
-    nextId: string;
-    nextTitle: string;
-  }
-> = {
-  "devpulse": {
-    title: "DEVPULSE",
-    category: "AI / Developer Tools",
-    src: "/project-1.png",
-    role: "Full-Stack Development & AI Integration",
-    credits: "Development: Anees Aboobacker",
-    locationYear: "Kerala, India © 2026",
-    liveUrl: "https://devpulse.vercel.app", // placeholder
-    nextId: "malappuram-fc",
-    nextTitle: "Malappuram FC Ultras",
-  },
-  "malappuram-fc": {
-    title: "MALAPPURAM FC",
-    category: "Full Stack / Community",
-    src: "/project-2.png",
-    role: "MERN Stack Development",
-    credits: "Development: Anees Aboobacker",
-    locationYear: "Kerala, India © 2026",
-    liveUrl: "https://malappuramfc.vercel.app", // placeholder
-    nextId: "synapse",
-    nextTitle: "Synapse",
-  },
-  "synapse": {
-    title: "SYNAPSE",
-    category: "Node.js / Platform",
-    src: "/project-3.png",
-    role: "Backend & WebSockets",
-    credits: "Development: Anees Aboobacker",
-    locationYear: "Kerala, India © 2026",
-    liveUrl: "https://synapse.vercel.app", // placeholder
-    nextId: "lumio",
-    nextTitle: "Lumio",
-  },
-  "lumio": {
-    title: "LUMIO",
-    category: "React / Social Media",
-    src: "/project-1.png",
-    role: "Frontend & Animation",
-    credits: "Development: Anees Aboobacker",
-    locationYear: "Kerala, India © 2026",
-    liveUrl: "https://lumio.vercel.app", // placeholder
-    nextId: "devpulse",
-    nextTitle: "DevPulse",
-  },
-};
+import { projectDetails } from "@/lib/projects";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -153,7 +94,7 @@ export default function ProjectPage({ params }: PageProps) {
       <div className="px-6 sm:px-12 md:px-24 pt-36 pb-16 max-w-7xl mx-auto w-full flex flex-col gap-12">
         
         {/* Return link */}
-        <a
+        <Link
           href="/"
           onClick={(e) => {
             e.preventDefault();
@@ -163,7 +104,7 @@ export default function ProjectPage({ params }: PageProps) {
         >
           <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-1" />
           Back to works
-        </a>
+        </Link>
 
         {/* Dynamic Project Title */}
         <div className="overflow-hidden h-auto min-h-16 sm:min-h-28 md:min-h-36 border-b border-zinc-300 pb-2 sm:pb-4">
@@ -235,9 +176,12 @@ export default function ProjectPage({ params }: PageProps) {
             {/* Screen Content Wrapper */}
             <div className="w-full h-full relative overflow-hidden bg-zinc-950">
               <div className="w-full h-full relative">
-                <img
+                <Image
                   src={project.src}
                   alt={project.title}
+                  width={1024}
+                  height={1024}
+                  sizes="(max-width: 900px) 100vw, 900px"
                   className="w-full h-auto absolute top-0 left-0 animate-mockup-scroll"
                 />
               </div>
@@ -306,7 +250,7 @@ export default function ProjectPage({ params }: PageProps) {
           </div>
 
           {/* Return pill button */}
-          <a
+          <Link
             href="/"
             onClick={(e) => {
               e.preventDefault();
@@ -316,7 +260,7 @@ export default function ProjectPage({ params }: PageProps) {
             className="mt-8 px-6 py-2.5 rounded-full border border-zinc-800 text-xs tracking-wider uppercase hover:bg-white hover:text-black hover:border-transparent transition-all duration-300 text-zinc-400"
           >
             All work
-          </a>
+          </Link>
         </div>
       </div>
     </div>
