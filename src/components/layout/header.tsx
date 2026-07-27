@@ -282,9 +282,6 @@ export default function Header() {
           onClick={() => handleNavigation("Home", "#hero")}
           className="group flex cursor-pointer items-center gap-1 font-heading text-lg font-bold uppercase select-none"
         >
-          <span className="inline-block transition-transform duration-500 ease-out group-hover:rotate-360">
-            ©
-          </span>
           <div className="relative overflow-hidden flex h-6">
             <span className="inline-block transition-transform duration-500 ease-out group-hover:-translate-y-full">
               Anees Aboobacker
@@ -315,9 +312,9 @@ export default function Header() {
             type="button"
             aria-label="Open navigation menu"
             onClick={() => setMenuActive(true)}
-            className="flex items-center gap-2 text-sm font-semibold tracking-wider uppercase hover:text-[#c9fd34]"
+            className="flex items-center justify-center hover:text-[#c9fd34]"
           >
-            Menu <Menu className="w-4 h-4" />
+            <Menu className="w-5 h-5" />
           </button>
         </div>
       </header>
