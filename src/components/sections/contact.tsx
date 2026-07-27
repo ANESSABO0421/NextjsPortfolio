@@ -7,6 +7,8 @@ import { useGSAP } from "@gsap/react";
 import Magnetic from "@/components/ui/magnetic";
 import { useTransition } from "@/components/providers/transition-provider";
 import { ArrowUpRight } from "lucide-react";
+import { SiGithub } from "react-icons/si";
+import { FaLinkedin } from "react-icons/fa6";
 
 export default function Contact() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -16,12 +18,12 @@ export default function Contact() {
   // 1. Live London Clock for premium detail
   useEffect(() => {
     const updateTime = () => {
-      const formatted = new Date().toLocaleTimeString("en-GB", {
+      const formatted = new Date().toLocaleTimeString("en-US", {
         timeZone: "Asia/Kolkata",
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
-        hour12: false,
+        hour12: true,
       });
       setLondonTime(formatted + " IST");
     };
@@ -141,25 +143,27 @@ export default function Contact() {
 
           <div className="flex items-center gap-1.5">
             <span className="text-zinc-600">Local Time</span>
-            <p className="text-zinc-300 font-mono font-medium">
-              {londonTime || "00:00:00 IST"}
+            <p className="text-zinc-300 font-mono font-medium normal-case">
+              {londonTime || "12:00:00 AM IST"}
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <a
               href="https://linkedin.com/in/anees-aboobacker"
               target="_blank"
-              className="hover:text-white transition-colors text-zinc-400"
+              aria-label="LinkedIn"
+              className="w-9 h-9 rounded-full border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-black hover:bg-[#c9fd34] hover:border-transparent transition-all duration-300"
             >
-              LinkedIn
+              <FaLinkedin className="w-4 h-4" />
             </a>
             <a
               href="https://github.com/ANESSABO0421"
               target="_blank"
-              className="hover:text-white transition-colors text-zinc-400"
+              aria-label="GitHub"
+              className="w-9 h-9 rounded-full border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-black hover:bg-[#c9fd34] hover:border-transparent transition-all duration-300"
             >
-              GitHub
+              <SiGithub className="w-4 h-4" />
             </a>
           </div>
         </div>

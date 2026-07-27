@@ -8,6 +8,8 @@ import Magnetic from "@/components/ui/magnetic";
 import { useLenis } from "@/components/providers/smooth-scroll-provider";
 import { useTransition } from "@/components/providers/transition-provider";
 import { Menu, X } from "lucide-react";
+import { SiGithub } from "react-icons/si";
+import { FaLinkedin } from "react-icons/fa6";
 
 const navItems = [
   { label: "Home", href: "#hero" },
@@ -372,9 +374,23 @@ export default function Header() {
             <span className="text-[10px] text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">
               Socials
             </span>
-            <div className="flex flex-wrap gap-4 text-xs font-light text-zinc-400">
-              <a href="https://www.linkedin.com/in/anees-aboobacker-4842b627a/" target="_blank" className="hover:text-white transition-colors duration-200">LinkedIn</a>
-              <a href="https://github.com/ANESSABO0421" target="_blank" className="hover:text-white transition-colors duration-200">GitHub</a>
+            <div className="flex items-center gap-3">
+              <a
+                href="https://www.linkedin.com/in/anees-aboobacker-4842b627a/"
+                target="_blank"
+                aria-label="LinkedIn"
+                className="w-10 h-10 rounded-full border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-black hover:bg-[#c9fd34] hover:border-transparent transition-all duration-300"
+              >
+                <FaLinkedin className="w-4 h-4" />
+              </a>
+              <a
+                href="https://github.com/ANESSABO0421"
+                target="_blank"
+                aria-label="GitHub"
+                className="w-10 h-10 rounded-full border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-black hover:bg-[#c9fd34] hover:border-transparent transition-all duration-300"
+              >
+                <SiGithub className="w-4 h-4" />
+              </a>
             </div>
           </div>
         </div>

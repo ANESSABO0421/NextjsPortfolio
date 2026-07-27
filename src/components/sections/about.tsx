@@ -151,20 +151,35 @@ export default function About() {
               <span className="w-1.5 h-1.5 rounded-full bg-[#c9fd34]" />
               Tech Stack &amp; Expertise
             </span>
-            <div className="tech-chip-container flex flex-wrap gap-3 pt-2">
+            <div className="tech-chip-container grid grid-cols-3 sm:grid-cols-4 gap-3 pt-2">
               {techStack.map(({ name, Icon, color }, idx) => (
                 <div
                   key={idx}
                   style={{ "--accent": color } as React.CSSProperties}
-                  className="tech-chip group relative flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#1c1c1f]/80 backdrop-blur-sm border border-zinc-800 text-xs font-semibold text-zinc-400 cursor-default overflow-hidden transition-all duration-300 hover:border-[color:var(--accent)]/40 hover:-translate-y-0.5 hover:text-white hover:shadow-[0_0_0_1px_var(--accent),0_0_18px_2px_var(--accent)]"
+                  className="tech-chip group relative flex flex-col items-center justify-center gap-3 rounded-2xl px-3 py-5 bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/[0.06] cursor-default overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:border-[color:var(--accent)]/50 hover:shadow-[0_8px_30px_-8px_var(--accent)]"
                 >
-                  {/* Soft radial glow fill */}
+                  {/* Animated top-edge accent line */}
                   <span
-                    className="pointer-events-none absolute inset-0 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-md"
-                    style={{ background: "radial-gradient(circle at 30% 30%, var(--accent), transparent 70%)" }}
+                    className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-px w-0 group-hover:w-4/5 transition-all duration-500 ease-out"
+                    style={{ background: `linear-gradient(90deg, transparent, var(--accent), transparent)` }}
                   />
-                  <Icon className="relative w-4 h-4 shrink-0 text-zinc-500 transition-all duration-300 group-hover:scale-110 group-hover:text-[color:var(--accent)] group-hover:drop-shadow-[0_0_6px_var(--accent)]" />
-                  <span className="relative">{name}</span>
+                  {/* Ambient wash, always faintly present */}
+                  <span
+                    className="pointer-events-none absolute inset-0 opacity-[0.06] group-hover:opacity-25 transition-opacity duration-500"
+                    style={{ background: "radial-gradient(circle at 50% 0%, var(--accent), transparent 65%)" }}
+                  />
+                  {/* Icon badge */}
+                  <span
+                    className="relative flex items-center justify-center w-11 h-11 rounded-xl border border-white/[0.06] transition-all duration-500 group-hover:scale-110 group-hover:border-[color:var(--accent)]/40"
+                    style={{ background: "color-mix(in srgb, var(--accent) 12%, transparent)" }}
+                  >
+                    <Icon
+                      className="w-5 h-5 shrink-0 text-zinc-400 transition-all duration-500 group-hover:text-[color:var(--accent)] group-hover:drop-shadow-[0_0_8px_var(--accent)]"
+                    />
+                  </span>
+                  <span className="relative text-[11px] font-semibold uppercase tracking-wide text-zinc-500 group-hover:text-white transition-colors duration-500 text-center leading-tight">
+                    {name}
+                  </span>
                 </div>
               ))}
             </div>
