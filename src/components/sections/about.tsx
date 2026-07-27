@@ -5,6 +5,29 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Magnetic from "@/components/ui/magnetic";
 import { MoveRight } from "lucide-react";
+import {
+  SiMongodb,
+  SiExpress,
+  SiReact,
+  SiNodedotjs,
+  SiNextdotjs,
+  SiTailwindcss,
+  SiTypescript,
+  SiSocketdotio,
+} from "react-icons/si";
+import { TbBrandReactNative } from "react-icons/tb";
+
+const techStack = [
+  { name: "MongoDB", Icon: SiMongodb, color: "#00ED64" },
+  { name: "Express.js", Icon: SiExpress, color: "#ffffff" },
+  { name: "React.js", Icon: SiReact, color: "#61DAFB" },
+  { name: "Node.js", Icon: SiNodedotjs, color: "#5FA04E" },
+  { name: "Next.js", Icon: SiNextdotjs, color: "#ffffff" },
+  { name: "React Native", Icon: TbBrandReactNative, color: "#61DAFB" },
+  { name: "Tailwind CSS", Icon: SiTailwindcss, color: "#38BDF8" },
+  { name: "TypeScript", Icon: SiTypescript, color: "#3178C6" },
+  { name: "Socket.io", Icon: SiSocketdotio, color: "#c9fd34" },
+];
 
 export default function About() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -77,6 +100,24 @@ export default function About() {
           },
         }
       );
+
+      // 4. Stagger reveal tech stack chips
+      gsap.fromTo(
+        ".tech-chip",
+        { opacity: 0, y: 16, scale: 0.9 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          stagger: 0.06,
+          duration: 0.6,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".tech-chip-container",
+            start: "top 88%",
+          },
+        }
+      );
     },
     { scope: containerRef }
   );
@@ -105,27 +146,25 @@ export default function About() {
           </div>
 
           {/* Interactive Tech Stack */}
-          <div className="flex flex-col gap-4 border-t border-zinc-800/60 pt-8 mt-4">
-            <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">
-              Tech Stack & Expertise
+          <div className="flex flex-col gap-5 border-t border-zinc-800/60 pt-8 mt-4">
+            <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#c9fd34]" />
+              Tech Stack &amp; Expertise
             </span>
-            <div className="flex flex-wrap gap-2 pt-2">
-              {[
-                "MongoDB",
-                "Express.js",
-                "React.js",
-                "Node.js",
-                "Next.js",
-                "React Native",
-                "Tailwind CSS",
-                "TypeScript",
-                "Socket.io",
-              ].map((stack, idx) => (
+            <div className="tech-chip-container flex flex-wrap gap-3 pt-2">
+              {techStack.map(({ name, Icon, color }, idx) => (
                 <div
                   key={idx}
-                  className="px-4 py-2.5 rounded-full bg-[#1c1c1f] border border-zinc-800 text-xs font-semibold text-zinc-400 hover:border-zinc-300 hover:text-white transition-all duration-300 cursor-default"
+                  style={{ "--accent": color } as React.CSSProperties}
+                  className="tech-chip group relative flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#1c1c1f]/80 backdrop-blur-sm border border-zinc-800 text-xs font-semibold text-zinc-400 cursor-default overflow-hidden transition-all duration-300 hover:border-[color:var(--accent)]/40 hover:-translate-y-0.5 hover:text-white hover:shadow-[0_0_0_1px_var(--accent),0_0_18px_2px_var(--accent)]"
                 >
-                  {stack}
+                  {/* Soft radial glow fill */}
+                  <span
+                    className="pointer-events-none absolute inset-0 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-md"
+                    style={{ background: "radial-gradient(circle at 30% 30%, var(--accent), transparent 70%)" }}
+                  />
+                  <Icon className="relative w-4 h-4 shrink-0 text-zinc-500 transition-all duration-300 group-hover:scale-110 group-hover:text-[color:var(--accent)] group-hover:drop-shadow-[0_0_6px_var(--accent)]" />
+                  <span className="relative">{name}</span>
                 </div>
               ))}
             </div>
