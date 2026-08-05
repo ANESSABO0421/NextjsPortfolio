@@ -10,6 +10,7 @@ import { useLenis } from "@/components/providers/smooth-scroll-provider";
 import { useTransition } from "@/components/providers/transition-provider";
 import Magnetic from "@/components/ui/magnetic";
 import Header from "@/components/layout/header";
+import PhoneMockup from "@/components/ui/phone-mockup";
 import { ArrowUpRight, ArrowLeft } from "lucide-react";
 import { projectDetails } from "@/lib/projects";
 
@@ -55,13 +56,13 @@ export default function ProjectPage({ params }: PageProps) {
         }
       );
 
-      // 2. Parallax scroll effect on the laptop mockup container
+      // 2. Parallax scroll effect on the device mockup container
       gsap.fromTo(
-        ".laptop-mockup-container",
+        ".device-mockup-container",
         { y: 50 },
         {
           scrollTrigger: {
-            trigger: ".laptop-section",
+            trigger: ".device-section",
             start: "top bottom",
             end: "bottom top",
             scrub: true,
@@ -135,13 +136,21 @@ export default function ProjectPage({ params }: PageProps) {
         <div className="md:col-span-7 flex flex-col gap-6">
           <h3 className="text-xs uppercase text-zinc-400 tracking-wider font-bold">About the Project</h3>
           <p className="font-heading text-2xl sm:text-3xl font-light leading-snug tracking-tight text-zinc-800">
-            Crafting a luxury experience using responsive vector components, custom physics, and motion frameworks. We designed this portal to handle fluid screen changes, immersive media playback, and high-contrast editorial structures.
+            {project.about}
           </p>
+          <ul className="flex flex-col gap-3 pt-2">
+            {project.highlights.map((highlight, i) => (
+              <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-zinc-600">
+                <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#3c5df6]" />
+                {highlight}
+              </li>
+            ))}
+          </ul>
         </div>
         <div className="md:col-span-5 flex flex-col gap-6">
           <h3 className="text-xs uppercase text-zinc-400 tracking-wider font-bold">Stack & Services</h3>
           <div className="flex flex-wrap gap-2 pt-2">
-            {["Next.js 15", "React 19", "TypeScript", "Tailwind CSS v4", "GSAP ScrollTrigger", "Lenis Scroll", "SVG Curved Morphing", "Chroma keying"].map((tech, i) => (
+            {project.stack.map((tech, i) => (
               <span
                 key={i}
                 className="px-4 py-2 text-xs font-semibold rounded-full bg-zinc-200 text-zinc-800 border border-zinc-300/40 hover:bg-black hover:text-white hover:border-transparent transition-all duration-300 cursor-pointer"
@@ -153,8 +162,13 @@ export default function ProjectPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* 3. MacBook Laptop Mockup and Video-style Auto-Scroll Simulation with GSAP Parallax */}
-      <div className="laptop-section px-6 sm:px-12 md:px-24 py-24 sm:py-32 bg-[#e8e8e8] border-t border-b border-zinc-300 flex items-center justify-center relative overflow-hidden">
+      {/* 3. Device mockup — a phone UI for mobile cases, a laptop for web cases (GSAP parallax) */}
+      <div
+        className={`device-section px-6 sm:px-12 md:px-24 pt-24 sm:pt-32 bg-[#e8e8e8] border-t border-b border-zinc-300 flex items-center justify-center relative overflow-hidden ${
+          // The handset is tall — keep it clear of the floating live-link button.
+          project.device === "phone" ? "pb-44 sm:pb-32" : "pb-24 sm:pb-32"
+        }`}
+      >
         <style>{`
           @keyframes webMockupScroll {
             0%, 15% { transform: translateY(0); }
@@ -164,10 +178,16 @@ export default function ProjectPage({ params }: PageProps) {
           .animate-mockup-scroll {
             animation: webMockupScroll 18s ease-in-out infinite;
           }
+          @media (prefers-reduced-motion: reduce) {
+            .animate-mockup-scroll { animation: none; }
+          }
         `}</style>
-        
-        {/* Mockup Outer Container */}
-        <div className="laptop-mockup-container w-full max-w-[900px] flex flex-col items-center z-10 transition-transform duration-100 ease-out">
+
+        {project.device === "phone" ? (
+          <PhoneMockup appName={project.listTitle} tagline={project.category} />
+        ) : (
+        /* Mockup Outer Container */
+        <div className="device-mockup-container w-full max-w-[900px] flex flex-col items-center z-10 transition-transform duration-100 ease-out">
           {/* Laptop Screen */}
           <div className="w-full aspect-[16/10] bg-black border-[10px] sm:border-[14px] border-zinc-900 rounded-t-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative overflow-hidden flex items-start">
             {/* Camera dot & sensor */}
@@ -199,16 +219,18 @@ export default function ProjectPage({ params }: PageProps) {
           {/* Rubber Foot Shadow */}
           <div className="w-[102%] h-[4px] bg-black/15 blur-[2px] rounded-full mt-[2px]" />
         </div>
+        )}
 
-        {/* Floating Circular Live Link button beside the laptop */}
+        {/* Floating Circular Live Link button beside the device */}
         <div className="absolute bottom-12 right-6 sm:bottom-16 sm:right-12 md:right-24 z-20">
           <Magnetic actionStrength={0.35} hoverAreaPadding="p-0">
             <a
               href={project.liveUrl}
               target="_blank"
+              rel="noopener noreferrer"
               className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-[#3c5df6] text-white flex flex-col items-center justify-center gap-1 hover:scale-105 transition-transform duration-300 shadow-2xl font-heading tracking-widest text-[9px] font-extrabold uppercase"
             >
-              <span>Live Site</span>
+              <span>{project.liveLabel}</span>
               <ArrowUpRight className="w-4 h-4" />
             </a>
           </Magnetic>

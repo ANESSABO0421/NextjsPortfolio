@@ -6,33 +6,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useTransition } from "@/components/providers/transition-provider";
 import { MoveUpRight } from "lucide-react";
-
-const projects = [
-  {
-    id: "devpulse",
-    title: "DevPulse",
-    category: "AI / Developer Tools",
-    src: "/project-1.png",
-  },
-  {
-    id: "malappuram-fc",
-    title: "Malappuram FC Ultras",
-    category: "Full Stack / Community",
-    src: "/project-2.png",
-  },
-  {
-    id: "synapse",
-    title: "Synapse",
-    category: "Node.js / Platform",
-    src: "/project-3.png",
-  },
-  {
-    id: "lumio",
-    title: "Lumio",
-    category: "React / Social Media",
-    src: "/project-1.png",
-  },
-];
+import { projectList as projects } from "@/lib/projects";
 
 export default function Works() {
   const containerRef = useRef<HTMLDivElement>(null);

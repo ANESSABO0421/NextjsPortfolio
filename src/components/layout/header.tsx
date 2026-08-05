@@ -14,6 +14,7 @@ import { FaLinkedin } from "react-icons/fa6";
 const navItems = [
   { label: "Home", href: "#hero" },
   { label: "About", href: "#about" },
+  { label: "Experience", href: "#experience" },
   { label: "Selected Works", href: "#works" },
   { label: "Contact", href: "#contact" },
 ];

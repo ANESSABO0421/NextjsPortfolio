@@ -5,6 +5,7 @@ import Preloader from "@/components/ui/preloader";
 import Header from "@/components/layout/header";
 import Hero from "@/components/sections/hero";
 import About from "@/components/sections/about";
+import Experience from "@/components/sections/experience";
 import Works from "@/components/sections/works";
 import Contact from "@/components/sections/contact";
 import { useLenis } from "@/components/providers/smooth-scroll-provider";
@@ -64,6 +65,7 @@ export default function Home() {
       <Header />
       <Hero />
       <About />
+      <Experience />
       <Works />
       <Contact />
     </main>

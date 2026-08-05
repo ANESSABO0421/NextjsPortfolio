@@ -150,7 +150,7 @@ export default function Contact() {
 
           <div className="flex items-center gap-3">
             <a
-              href="https://linkedin.com/in/anees-aboobacker"
+              href="https://www.linkedin.com/in/anees-aboobacker-4842b627a/"
               target="_blank"
               aria-label="LinkedIn"
               className="w-9 h-9 rounded-full border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-black hover:bg-[#c9fd34] hover:border-transparent transition-all duration-300"

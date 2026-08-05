@@ -4,7 +4,7 @@ import React, { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Magnetic from "@/components/ui/magnetic";
-import { MoveRight } from "lucide-react";
+import { MoveRight, Download } from "lucide-react";
 import {
   SiMongodb,
   SiExpress,
@@ -14,6 +14,9 @@ import {
   SiTailwindcss,
   SiTypescript,
   SiSocketdotio,
+  SiPostgresql,
+  SiRedux,
+  SiDocker,
 } from "react-icons/si";
 import { TbBrandReactNative } from "react-icons/tb";
 
@@ -27,6 +30,9 @@ const techStack = [
   { name: "Tailwind CSS", Icon: SiTailwindcss, color: "#38BDF8" },
   { name: "TypeScript", Icon: SiTypescript, color: "#3178C6" },
   { name: "Socket.io", Icon: SiSocketdotio, color: "#c9fd34" },
+  { name: "PostgreSQL", Icon: SiPostgresql, color: "#4169E1" },
+  { name: "Redux Toolkit", Icon: SiRedux, color: "#764ABC" },
+  { name: "Docker", Icon: SiDocker, color: "#2496ED" },
 ];
 
 export default function About() {
@@ -34,7 +40,7 @@ export default function About() {
   const textRef = useRef<HTMLParagraphElement>(null);
 
   const paragraphText =
-    "Junior MERN Stack Developer with 1 year of production experience building scalable web and mobile applications. Delivered end-to-end ERP modules, reusable React components, RESTful APIs, and third-party API integrations across two professional roles. Proficient in JavaScript (ES6+), clean architecture, JWT authentication, RBAC, MongoDB query optimization, and responsive UI development.";
+    "Full Stack (MERN) Developer building production ERP, HRMS, and real-time platforms. Currently developing a multi-tenant HRMS serving 6 role-based dashboards, where I own the Leave Management module and lead frontend and backend architecture refactoring. Skilled in REST API design, JWT authentication, RBAC, Socket.io, and MongoDB query optimization.";
 
   useGSAP(
     () => {
@@ -196,24 +202,35 @@ export default function About() {
               </span>
             </div>
             <div className="about-stat-card flex flex-col gap-2">
-              <h3 className="font-heading text-5xl font-extrabold text-white">2</h3>
+              <h3 className="font-heading text-5xl font-extrabold text-white">3</h3>
               <span className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
                 Professional Roles
               </span>
             </div>
             <div className="about-stat-card flex flex-col gap-2">
-              <h3 className="font-heading text-5xl font-extrabold text-zinc-400">4</h3>
+              <h3 className="font-heading text-5xl font-extrabold text-zinc-400">5</h3>
               <span className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
-                Full Stack Projects
+                Shipped Projects
               </span>
             </div>
           </div>
 
-          <div className="about-stat-card">
+          <div className="about-stat-card flex flex-col items-start gap-4">
+            <Magnetic actionStrength={0.25} hoverAreaPadding="p-0">
+              <a
+                href="/Anees_Resume.pdf"
+                download="Anees-Aboobacker-Resume.pdf"
+                className="group inline-flex items-center gap-3 text-sm font-semibold tracking-wider uppercase bg-[#c9fd34] text-black rounded-full px-8 py-4 hover:bg-white transition-all duration-300"
+              >
+                Download Resume
+                <Download className="w-4 h-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+              </a>
+            </Magnetic>
+
             <Magnetic actionStrength={0.25} hoverAreaPadding="p-0">
               <a
                 href="#works"
-                className="group inline-flex items-center gap-3 text-sm font-semibold tracking-wider uppercase border border-zinc-700 rounded-full px-8 py-4 hover:bg-[#c9fd34] hover:text-black hover:border-transparent transition-all duration-300"
+                className="group inline-flex items-center gap-3 text-sm font-semibold tracking-wider uppercase border border-zinc-700 rounded-full px-8 py-4 hover:bg-white hover:text-black hover:border-transparent transition-all duration-300"
               >
                 Selected Works
                 <MoveRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-2" />
