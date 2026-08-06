@@ -342,14 +342,14 @@ export default function Header() {
       {/* Fullscreen Overlay Menu (Curved Morphing slide panel) */}
       <div
         ref={menuContainerRef}
-        className="fixed top-0 right-0 h-full w-full sm:w-[420px] md:w-[380px] max-w-full z-45 hidden bg-[#1c1c1f]"
+        className="fixed top-0 right-0 h-full w-full sm:w-[440px] md:w-[420px] max-w-full z-45 hidden bg-[#1c1c1f]"
       >
         {/* Curved boundary graphic using morphing SVG path */}
         <svg className="absolute top-0 left-[-99px] hidden md:block w-[100px] h-full fill-[#1c1c1f] pointer-events-none">
           <path ref={menuPathRef} />
         </svg>
 
-        <div className="flex flex-col h-full justify-between p-8 sm:p-14 md:p-20 text-white font-sans">
+        <div className="flex flex-col h-full justify-between p-8 sm:p-12 md:p-14 text-white font-sans">
           <div className="flex flex-col gap-10 sm:gap-12 mt-16 sm:mt-12">
             <span className="text-[10px] text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-4">
               Navigation
@@ -359,7 +359,7 @@ export default function Header() {
                 <div key={i} className="menu-link-item overflow-hidden">
                   <span
                     onClick={() => handleNavigation(item.label, item.href)}
-                    className="block font-heading text-3xl sm:text-5xl font-light hover:text-[#c9fd34] transition-colors duration-300 cursor-pointer"
+                    className="block font-heading text-2xl sm:text-3xl font-light leading-tight tracking-tight hover:text-[#c9fd34] transition-colors duration-300 cursor-pointer"
                   >
                     {item.label}
                   </span>
