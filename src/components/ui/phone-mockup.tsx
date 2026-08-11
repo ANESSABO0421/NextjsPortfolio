@@ -16,14 +16,18 @@ interface PhoneMockupProps {
   appName: string;
   /** Short line under the app name — usually the project category. */
   tagline: string;
+  /** Optional screen-recording (e.g. /video/Spendova.mp4) that plays inside the handset instead of the hand-rendered UI. */
+  videoSrc?: string;
 }
 
 /**
- * Hand-rendered handset for mobile case studies. The screen mirrors the
- * Spendova expense-tracker UI (balance, voice entry, transaction feed) rather
- * than embedding a screenshot, so it stays crisp at any viewport size.
+ * Hand-rendered handset for mobile case studies. When a `videoSrc` is
+ * provided, an actual screen recording of the app plays behind the hardware
+ * chrome (dynamic island, home indicator). Otherwise the screen falls back to
+ * a hand-drawn mirror of the Spendova expense-tracker UI (balance, voice
+ * entry, transaction feed), so it stays crisp at any viewport size.
  */
-export default function PhoneMockup({ appName, tagline }: PhoneMockupProps) {
+export default function PhoneMockup({ appName, tagline, videoSrc }: PhoneMockupProps) {
   return (
     <div className="device-mockup-container relative flex items-center justify-center z-10">
       <style>{`
@@ -55,6 +59,22 @@ export default function PhoneMockup({ appName, tagline }: PhoneMockupProps) {
           {/* Dynamic island */}
           <div className="absolute top-2 left-1/2 -translate-x-1/2 h-6 w-[86px] rounded-full bg-black z-30" />
 
+          {videoSrc ? (
+            <>
+              {/* App screen recording fills the handset behind the hardware chrome */}
+              <video
+                src={videoSrc}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              {/* Home indicator, kept above the video */}
+              <div className="absolute bottom-1.5 left-1/2 z-30 h-1 w-24 -translate-x-1/2 rounded-full bg-white/70" />
+            </>
+          ) : (
+          <>
           {/* Status bar */}
           <div className="flex items-center justify-between px-6 pt-3 pb-1 text-[9px] font-semibold text-zinc-400 z-20">
             <span>9:41</span>
@@ -158,6 +178,8 @@ export default function PhoneMockup({ appName, tagline }: PhoneMockupProps) {
 
           {/* Home indicator */}
           <div className="absolute bottom-1.5 left-1/2 h-1 w-24 -translate-x-1/2 rounded-full bg-zinc-700" />
+          </>
+          )}
         </div>
       </div>
     </div>

@@ -6,6 +6,8 @@ export interface ProjectEntry {
   listTitle: string;
   category: string;
   src: string;
+  /** Optional screen-recording that plays inside the device mockup instead of the static screenshot. */
+  video?: string;
   device: ProjectDevice;
   role: string;
   credits: string;
@@ -31,6 +33,7 @@ const projects: ProjectEntry[] = [
     listTitle: "Spendova",
     category: "React Native / AI Mobile",
     src: "/project-1.png",
+    video: "/video/Spendova.mp4",
     device: "phone",
     role: "Mobile App & REST API Development",
     credits: "Development: Anees Aboobacker",
@@ -63,6 +66,7 @@ const projects: ProjectEntry[] = [
     listTitle: "Malappuram FC Ultras",
     category: "Next.js / Community Platform",
     src: "/project-2.png",
+    video: "/video/Ultrasmalappuram.mp4",
     device: "laptop",
     role: "Full Stack Development",
     credits: "Development: Anees Aboobacker — SkiaFlow",
@@ -95,6 +99,7 @@ const projects: ProjectEntry[] = [
     listTitle: "KrisCorp",
     category: "Next.js / Corporate Site",
     src: "/project-3.png",
+    video: "/video/Kriscorp.mp4",
     device: "laptop",
     role: "Full Stack Development & SEO",
     credits: "Development: Anees Aboobacker — SkiaFlow",
@@ -127,6 +132,7 @@ const projects: ProjectEntry[] = [
     listTitle: "DevPulse",
     category: "AI / Developer Tools",
     src: "/project-2.png",
+    video: "/video/Devpulse.mp4",
     device: "laptop",
     role: "Full-Stack Development & AI Integration",
     credits: "Development: Anees Aboobacker",
@@ -200,9 +206,10 @@ export const projectDetails: Record<string, ProjectDetail> = Object.fromEntries(
 export const projectIds = projects.map((project) => project.id);
 
 // Shape the works list consumes — keeps the section and the detail pages in sync.
-export const projectList = projects.map(({ id, listTitle, category, src }) => ({
+export const projectList = projects.map(({ id, listTitle, category, src, video }) => ({
   id,
   title: listTitle,
   category,
   src,
+  video,
 }));

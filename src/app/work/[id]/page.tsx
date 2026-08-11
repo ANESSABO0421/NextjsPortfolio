@@ -184,7 +184,11 @@ export default function ProjectPage({ params }: PageProps) {
         `}</style>
 
         {project.device === "phone" ? (
-          <PhoneMockup appName={project.listTitle} tagline={project.category} />
+          <PhoneMockup
+            appName={project.listTitle}
+            tagline={project.category}
+            videoSrc={project.video}
+          />
         ) : (
         /* Mockup Outer Container */
         <div className="device-mockup-container w-full max-w-[900px] flex flex-col items-center z-10 transition-transform duration-100 ease-out">
@@ -195,16 +199,27 @@ export default function ProjectPage({ params }: PageProps) {
             
             {/* Screen Content Wrapper */}
             <div className="w-full h-full relative overflow-hidden bg-zinc-950">
-              <div className="w-full h-full relative">
-                <Image
-                  src={project.src}
-                  alt={project.title}
-                  width={1024}
-                  height={1024}
-                  sizes="(max-width: 900px) 100vw, 900px"
-                  className="w-full h-auto absolute top-0 left-0 animate-mockup-scroll"
+              {project.video ? (
+                <video
+                  src={project.video}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full absolute top-0 left-0 object-cover"
                 />
-              </div>
+              ) : (
+                <div className="w-full h-full relative">
+                  <Image
+                    src={project.src}
+                    alt={project.title}
+                    width={1024}
+                    height={1024}
+                    sizes="(max-width: 900px) 100vw, 900px"
+                    className="w-full h-auto absolute top-0 left-0 animate-mockup-scroll"
+                  />
+                </div>
+              )}
             </div>
           </div>
           

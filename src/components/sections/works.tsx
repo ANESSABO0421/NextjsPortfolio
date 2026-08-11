@@ -171,14 +171,25 @@ export default function Works() {
         <div className="works-image-stack w-full h-full flex flex-col will-change-transform">
           {projects.map((project, index) => (
             <div key={index} className="w-full h-full relative flex-shrink-0">
-              <Image
-                src={project.src}
-                alt={project.title}
-                fill
-                sizes="320px"
-                className="object-cover object-center"
-                priority={index === 0}
-              />
+              {project.video ? (
+                <video
+                  src={project.video}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="absolute inset-0 h-full w-full object-cover object-center"
+                />
+              ) : (
+                <Image
+                  src={project.src}
+                  alt={project.title}
+                  fill
+                  sizes="320px"
+                  className="object-cover object-center"
+                  priority={index === 0}
+                />
+              )}
             </div>
           ))}
         </div>
