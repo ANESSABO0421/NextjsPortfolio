@@ -192,47 +192,52 @@ export default function ProjectPage({ params }: PageProps) {
         ) : (
         /* Mockup Outer Container */
         <div className="device-mockup-container w-full max-w-[900px] flex flex-col items-center z-10 transition-transform duration-100 ease-out">
-          {/* Laptop Screen */}
-          <div className="w-full aspect-[16/10] bg-black border-[10px] sm:border-[14px] border-zinc-900 rounded-t-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative overflow-hidden flex items-start">
-            {/* Camera dot & sensor */}
-            <div className="absolute top-[3px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-zinc-800 z-30" />
-            
-            {/* Screen Content Wrapper */}
-            <div className="w-full h-full relative overflow-hidden bg-zinc-950">
-              {project.video ? (
-                <video
-                  src={project.video}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full absolute top-0 left-0 object-cover"
-                />
-              ) : (
-                <div className="w-full h-full relative">
-                  <Image
-                    src={project.src}
-                    alt={project.title}
-                    width={1024}
-                    height={1024}
-                    sizes="(max-width: 900px) 100vw, 900px"
-                    className="w-full h-auto absolute top-0 left-0 animate-mockup-scroll"
+          {/* MacBook lid — aluminum unibody frame around the display */}
+          <div className="w-full rounded-t-[1.4rem] bg-gradient-to-b from-zinc-200 via-zinc-300 to-zinc-400 p-[3px] sm:p-[5px] shadow-[0_20px_50px_rgba(0,0,0,0.18)]">
+            <div className="w-full aspect-[16/10] bg-black rounded-t-[1.1rem] relative overflow-hidden flex items-start ring-1 ring-black/60">
+              {/* Camera notch housing the FaceTime sensor */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[16%] sm:w-[12%] h-[14px] sm:h-[18px] bg-black rounded-b-xl z-30 flex items-center justify-center">
+                <span className="h-1 w-1 rounded-full bg-zinc-800" />
+              </div>
+
+              {/* Screen Content Wrapper */}
+              <div className="w-full h-full relative overflow-hidden bg-zinc-950">
+                {project.video ? (
+                  <video
+                    src={project.video}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full absolute top-0 left-0 object-cover"
                   />
-                </div>
-              )}
+                ) : (
+                  <div className="w-full h-full relative">
+                    <Image
+                      src={project.src}
+                      alt={project.title}
+                      width={1024}
+                      height={1024}
+                      sizes="(max-width: 900px) 100vw, 900px"
+                      className="w-full h-auto absolute top-0 left-0 animate-mockup-scroll"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          
-          {/* Sleek integrated laptop keyboard base */}
-          <div className="w-[108%] h-[12px] sm:h-[14px] bg-gradient-to-b from-zinc-300 via-zinc-300 to-zinc-400 border-t border-zinc-100 rounded-b-xl relative z-10 shadow-2xl flex justify-center">
-            {/* Hinge groove recess */}
-            <div className="absolute top-0 w-full h-[3px] bg-zinc-950" />
-            {/* Notch Recess for trackpad opening */}
-            <div className="w-[14%] h-[5px] sm:h-[7px] bg-zinc-800 rounded-b-md relative z-20" />
+
+          {/* Hinge seam */}
+          <div className="w-[101%] h-[3px] bg-gradient-to-b from-zinc-400 to-zinc-500 relative z-10" />
+
+          {/* Aluminum keyboard deck / wedge base */}
+          <div className="w-[105%] h-[14px] sm:h-[18px] bg-gradient-to-b from-zinc-200 via-zinc-300 to-zinc-400 rounded-b-[1.4rem] relative z-10 shadow-[0_16px_30px_rgba(0,0,0,0.22)] flex justify-center overflow-hidden">
+            {/* Trackpad cutout on the front lip */}
+            <div className="w-[16%] h-[6px] sm:h-[8px] bg-zinc-400/70 rounded-b-md" />
           </div>
-          
-          {/* Rubber Foot Shadow */}
-          <div className="w-[102%] h-[4px] bg-black/15 blur-[2px] rounded-full mt-[2px]" />
+
+          {/* Rubber foot / ground contact shadow */}
+          <div className="w-[96%] h-[6px] bg-black/20 blur-md rounded-full mt-1" />
         </div>
         )}
 
