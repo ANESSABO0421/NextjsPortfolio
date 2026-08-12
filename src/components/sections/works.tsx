@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useTransition } from "@/components/providers/transition-provider";
 import { MoveUpRight } from "lucide-react";
+import PreviewVideo from "@/components/ui/preview-video";
 import { projectList as projects } from "@/lib/projects";
 
 export default function Works() {
@@ -172,12 +173,10 @@ export default function Works() {
           {projects.map((project, index) => (
             <div key={index} className="w-full h-full relative flex-shrink-0">
               {project.video ? (
-                <video
+                <PreviewVideo
                   src={project.video}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
+                  label={`${project.title} preview`}
+                  active={activeIndex === index}
                   className="absolute inset-0 h-full w-full object-cover object-center"
                 />
               ) : (

@@ -11,6 +11,7 @@ import { useTransition } from "@/components/providers/transition-provider";
 import Magnetic from "@/components/ui/magnetic";
 import Header from "@/components/layout/header";
 import PhoneMockup from "@/components/ui/phone-mockup";
+import PreviewVideo from "@/components/ui/preview-video";
 import { ArrowUpRight, ArrowLeft } from "lucide-react";
 import { projectDetails } from "@/lib/projects";
 
@@ -27,6 +28,7 @@ export default function ProjectPage({ params }: PageProps) {
 
   // Match URL params
   const project = projectDetails[id] || projectDetails["devpulse"];
+  const nextProject = projectDetails[project.nextId];
 
   useGSAP(
     () => {
@@ -203,12 +205,9 @@ export default function ProjectPage({ params }: PageProps) {
               {/* Screen Content Wrapper */}
               <div className="w-full h-full relative overflow-hidden bg-zinc-950">
                 {project.video ? (
-                  <video
+                  <PreviewVideo
                     src={project.video}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
+                    label={`${project.title} walkthrough`}
                     className="w-full h-full absolute top-0 left-0 object-cover"
                   />
                 ) : (
@@ -280,13 +279,21 @@ export default function ProjectPage({ params }: PageProps) {
 
           {/* Centered Next Project Preview Card */}
           <div className="w-[280px] h-[160px] sm:w-[400px] sm:h-[240px] relative rounded-2xl overflow-hidden shadow-2xl mt-6 border border-zinc-800 transition-all duration-500 transform group-hover:scale-105 group-hover:-translate-y-2 bg-zinc-900">
-            <Image
-              src={projectDetails[project.nextId]?.src || "/project-1.png"}
-              alt={project.nextTitle}
-              fill
-              sizes="(max-width: 640px) 280px, 400px"
-              className="object-cover object-center transition-transform duration-700 group-hover:scale-110"
-            />
+            {nextProject?.video ? (
+              <PreviewVideo
+                src={nextProject.video}
+                label={`${project.nextTitle} preview`}
+                className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
+              />
+            ) : (
+              <Image
+                src={nextProject?.src || "/project-1.png"}
+                alt={project.nextTitle}
+                fill
+                sizes="(max-width: 640px) 280px, 400px"
+                className="object-cover object-center transition-transform duration-700 group-hover:scale-110"
+              />
+            )}
             {/* Vignette mask overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
           </div>

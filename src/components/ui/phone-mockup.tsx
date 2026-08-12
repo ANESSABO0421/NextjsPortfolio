@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Mic, TrendingUp, TrendingDown, Home, PieChart, Plus, User } from "lucide-react";
+import PreviewVideo from "@/components/ui/preview-video";
 
 const transactions = [
   { label: "Groceries", note: "Added by voice", amount: "-₹1,240", tone: "out" },
@@ -62,12 +63,9 @@ export default function PhoneMockup({ appName, tagline, videoSrc }: PhoneMockupP
           {videoSrc ? (
             <>
               {/* App screen recording fills the handset behind the hardware chrome */}
-              <video
+              <PreviewVideo
                 src={videoSrc}
-                autoPlay
-                loop
-                muted
-                playsInline
+                label={`${appName} app walkthrough`}
                 className="absolute inset-0 h-full w-full object-cover"
               />
               {/* Home indicator, kept above the video */}
