@@ -32,8 +32,11 @@ export default function PreviewVideo({ src, label, className = "", active }: Pre
     if (!video) return;
 
     if (active) {
-      setShouldLoad(true);
-      void video.play().catch(() => {});
+      if (video.src) {
+        void video.play().catch(() => {});
+      } else {
+        setShouldLoad(true);
+      }
     } else {
       video.pause();
     }
@@ -48,8 +51,11 @@ export default function PreviewVideo({ src, label, className = "", active }: Pre
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setShouldLoad(true);
-          void video.play().catch(() => {});
+          if (video.src) {
+            void video.play().catch(() => {});
+          } else {
+            setShouldLoad(true);
+          }
         } else {
           video.pause();
         }
@@ -61,6 +67,18 @@ export default function PreviewVideo({ src, label, className = "", active }: Pre
     return () => observer.disconnect();
   }, [isHoverDriven]);
 
+  // Once the source is attached (after setShouldLoad triggers a re-render),
+  // actually start playback — the effects above can't do it in the same tick
+  // because the <video>'s src attribute isn't in the DOM yet at that point.
+  useEffect(() => {
+    if (!shouldLoad) return;
+    const video = videoRef.current;
+    if (!video) return;
+    if (isHoverDriven ? active : true) {
+      void video.play().catch(() => {});
+    }
+  }, [shouldLoad, active, isHoverDriven]);
+
   return (
     <video
       ref={videoRef}
@@ -69,7 +87,7 @@ export default function PreviewVideo({ src, label, className = "", active }: Pre
       muted
       loop
       playsInline
-      preload="none"
+      preload={shouldLoad ? "auto" : "none"}
       className={className}
     />
   );
