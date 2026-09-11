@@ -307,13 +307,13 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* Mobile menu trigger */}
-        <div className="md:hidden">
+        {/* Mobile menu trigger — padded to a full 44px touch target */}
+        <div className="md:hidden -mr-2.5">
           <button
             type="button"
             aria-label="Open navigation menu"
             onClick={() => setMenuActive(true)}
-            className="flex items-center justify-center hover:text-[#c9fd34]"
+            className="flex items-center justify-center p-2.5 hover:text-[#c9fd34]"
           >
             <Menu className="w-5 h-5" />
           </button>

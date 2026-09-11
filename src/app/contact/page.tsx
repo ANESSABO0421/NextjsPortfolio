@@ -152,7 +152,7 @@ export default function ContactPage() {
             </div>
 
             {/* 05. Message */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-12 items-baseline border-b border-zinc-800 pb-6 sm:pb-8 relative">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-12 items-baseline border-b border-zinc-800 pb-6 sm:pb-8 sm:relative">
               <span className="text-xs font-mono text-zinc-600">05</span>
               <div className="flex-1 w-full flex flex-col gap-2">
                 <label className="text-sm font-medium text-zinc-400">Your message</label>
@@ -167,8 +167,11 @@ export default function ContactPage() {
                 />
               </div>
 
-              {/* Massive Magnetic Circular Submit Button floats over the dividing line */}
-              <div className="absolute right-0 bottom-[-60px] sm:bottom-[-80px] z-20">
+              {/* Massive Magnetic Circular Submit Button — floats over the dividing
+                  line from sm: up; on mobile it stays in normal flow (centered
+                  below the field) so it can't overlap the profile column that
+                  follows once the grid stacks to a single column. */}
+              <div className="flex justify-center sm:block sm:absolute sm:right-0 sm:bottom-[-80px] z-20">
                 <Magnetic actionStrength={0.35} hoverAreaPadding="p-0">
                   <button
                     type="submit"
@@ -224,8 +227,10 @@ export default function ContactPage() {
         </div>
       </div>
 
-      {/* Spacing spacer */}
-      <div className="h-36 sm:h-48" />
+      {/* Spacing spacer — only needs to be tall on sm:+, where the submit
+          button floats absolutely below the grid; on mobile the button is
+          already in normal flow so the grid's own height covers it. */}
+      <div className="h-12 sm:h-48" />
 
       {/* 3. Footer Section (VERSION, CLOCK, SOCIALS) */}
       <footer className="border-t border-zinc-900 bg-[#0c0c0d] py-10 px-6 sm:px-12 md:px-24">

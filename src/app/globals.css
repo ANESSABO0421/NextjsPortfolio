@@ -130,6 +130,15 @@
     scroll-behavior: initial;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
+    overflow-x: hidden;
+  }
+
+  /* Safety net against sub-pixel/transform overflow (marquee text, scaled
+     portraits, magnetic hover offsets) forcing a horizontal scrollbar on
+     narrow viewports. */
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
   }
   
   /* Hide scrollbars globally for a premium clean canvas */
