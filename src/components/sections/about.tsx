@@ -5,35 +5,6 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import Magnetic from "@/components/ui/magnetic";
 import { MoveRight, Download } from "lucide-react";
-import {
-  SiMongodb,
-  SiExpress,
-  SiReact,
-  SiNodedotjs,
-  SiNextdotjs,
-  SiTailwindcss,
-  SiTypescript,
-  SiSocketdotio,
-  SiPostgresql,
-  SiRedux,
-  SiDocker,
-} from "react-icons/si";
-import { TbBrandReactNative } from "react-icons/tb";
-
-const techStack = [
-  { name: "MongoDB", Icon: SiMongodb, color: "#00ED64" },
-  { name: "Express.js", Icon: SiExpress, color: "#ffffff" },
-  { name: "React.js", Icon: SiReact, color: "#61DAFB" },
-  { name: "Node.js", Icon: SiNodedotjs, color: "#5FA04E" },
-  { name: "Next.js", Icon: SiNextdotjs, color: "#ffffff" },
-  { name: "React Native", Icon: TbBrandReactNative, color: "#61DAFB" },
-  { name: "Tailwind CSS", Icon: SiTailwindcss, color: "#38BDF8" },
-  { name: "TypeScript", Icon: SiTypescript, color: "#3178C6" },
-  { name: "Socket.io", Icon: SiSocketdotio, color: "#c9fd34" },
-  { name: "PostgreSQL", Icon: SiPostgresql, color: "#4169E1" },
-  { name: "Redux Toolkit", Icon: SiRedux, color: "#764ABC" },
-  { name: "Docker", Icon: SiDocker, color: "#2496ED" },
-];
 
 export default function About() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -107,23 +78,6 @@ export default function About() {
         }
       );
 
-      // 4. Stagger reveal tech stack chips
-      gsap.fromTo(
-        ".tech-chip",
-        { opacity: 0, y: 16, scale: 0.9 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          stagger: 0.06,
-          duration: 0.6,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: ".tech-chip-container",
-            start: "top 88%",
-          },
-        }
-      );
     },
     { scope: containerRef }
   );
@@ -149,46 +103,6 @@ export default function About() {
             >
               {paragraphText}
             </p>
-          </div>
-
-          {/* Interactive Tech Stack */}
-          <div className="flex flex-col gap-5 border-t border-zinc-800/60 pt-8 mt-4">
-            <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#c9fd34]" />
-              Tech Stack &amp; Expertise
-            </span>
-            <div className="tech-chip-container grid grid-cols-3 sm:grid-cols-4 gap-3 pt-2">
-              {techStack.map(({ name, Icon, color }, idx) => (
-                <div
-                  key={idx}
-                  style={{ "--accent": color } as React.CSSProperties}
-                  className="tech-chip group relative flex flex-col items-center justify-center gap-3 rounded-2xl px-3 py-5 bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/[0.06] cursor-default overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:border-[color:var(--accent)]/50 hover:shadow-[0_8px_30px_-8px_var(--accent)]"
-                >
-                  {/* Animated top-edge accent line */}
-                  <span
-                    className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 h-px w-0 group-hover:w-4/5 transition-all duration-500 ease-out"
-                    style={{ background: `linear-gradient(90deg, transparent, var(--accent), transparent)` }}
-                  />
-                  {/* Ambient wash, always faintly present */}
-                  <span
-                    className="pointer-events-none absolute inset-0 opacity-[0.06] group-hover:opacity-25 transition-opacity duration-500"
-                    style={{ background: "radial-gradient(circle at 50% 0%, var(--accent), transparent 65%)" }}
-                  />
-                  {/* Icon badge */}
-                  <span
-                    className="relative flex items-center justify-center w-11 h-11 rounded-xl border border-white/[0.06] transition-all duration-500 group-hover:scale-110 group-hover:border-[color:var(--accent)]/40"
-                    style={{ background: "color-mix(in srgb, var(--accent) 12%, transparent)" }}
-                  >
-                    <Icon
-                      className="w-5 h-5 shrink-0 text-zinc-400 transition-all duration-500 group-hover:text-[color:var(--accent)] group-hover:drop-shadow-[0_0_8px_var(--accent)]"
-                    />
-                  </span>
-                  <span className="relative text-[11px] font-semibold uppercase tracking-wide text-zinc-500 group-hover:text-white transition-colors duration-500 text-center leading-tight">
-                    {name}
-                  </span>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
 

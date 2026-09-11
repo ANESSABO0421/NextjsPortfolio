@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Preloader from "@/components/ui/preloader";
 import Header from "@/components/layout/header";
 import Hero from "@/components/sections/hero";
@@ -9,6 +10,15 @@ import Experience from "@/components/sections/experience";
 import Works from "@/components/sections/works";
 import Contact from "@/components/sections/contact";
 import { useLenis } from "@/components/providers/smooth-scroll-provider";
+
+// Code-split off the initial bundle — it pulls in a dozen react-icons brand
+// icons plus its own rAF loop, none of which are needed for first paint.
+// Stays server-rendered (no ssr:false) so it's still there without JS and
+// doesn't shift layout in; it just loads as its own parallel chunk instead
+// of bloating the bundle every other section needs immediately.
+const Skills = dynamic(() => import("@/components/sections/skills"), {
+  loading: () => <div className="h-[640px] sm:h-[760px] w-full bg-[#111112]" />,
+});
 
 function hasShownPreloader() {
   try {
@@ -65,6 +75,7 @@ export default function Home() {
       <Header />
       <Hero />
       <About />
+      <Skills />
       <Experience />
       <Works />
       <Contact />
