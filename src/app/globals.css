@@ -131,8 +131,6 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
     overflow-x: hidden;
-    /* Prevent iOS bounce / overscroll jank during Lenis smooth scroll */
-    overscroll-behavior: none;
   }
 
   /* Safety net against sub-pixel/transform overflow (marquee text, scaled
@@ -141,10 +139,6 @@
   body {
     overflow-x: hidden;
     max-width: 100vw;
-    /* Eliminate 300ms tap delay on all mobile browsers */
-    touch-action: manipulation;
-    /* Hint the browser that we'll be scrolling vertically */
-    overscroll-behavior-y: none;
   }
   
   /* Hide scrollbars globally for a premium clean canvas */
@@ -158,12 +152,6 @@
       cursor: none !important;
     }
   }
-}
-
-/* ─── Performance: skip layout/paint for off-screen sections ─── */
-section {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 800px;
 }
 
 /* GPU-promote containers that animate frequently so the compositor
