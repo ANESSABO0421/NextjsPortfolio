@@ -72,32 +72,32 @@ export default function TransitionProvider({ children }: { children: React.React
     // 2. Slide overlay up and morph path to dome
     tl.to(overlayRef.current, {
       yPercent: 0,
-      duration: 0.8,
+      duration: 0.45,
       ease: "power4.inOut",
       force3D: true,
     });
 
     tl.to(pathRef.current, {
       attr: { d: curves.slideUpCurved },
-      duration: 0.4,
+      duration: 0.25,
       ease: "power2.in"
-    }, "-=0.8");
+    }, "-=0.45");
 
     // 3. Morph top edge of path to flat fill
     tl.to(pathRef.current, {
       attr: { d: curves.flatFill },
-      duration: 0.4,
+      duration: 0.2,
       ease: "power2.out"
-    }, "-=0.4");
+    }, "-=0.2");
 
     // 4. Slide text up and fade in
     tl.to(textRef.current, {
       y: 0,
       opacity: 1,
-      duration: 0.5,
+      duration: 0.35,
       ease: "power3.out",
       force3D: true,
-    }, "-=0.2");
+    }, "-=0.15");
 
     // 5. Midpoint Route Navigation swap (at full flat screen coverage)
     tl.add(() => {
@@ -105,13 +105,13 @@ export default function TransitionProvider({ children }: { children: React.React
     });
 
     // Pause briefly to let Next.js render/hydrate the target page
-    tl.to({}, { duration: 0.35 });
+    tl.to({}, { duration: 0.15 });
 
     // 6. Slide text out
     tl.to(textRef.current, {
       y: -50,
       opacity: 0,
-      duration: 0.4,
+      duration: 0.25,
       ease: "power3.in",
       force3D: true,
     });
@@ -119,23 +119,22 @@ export default function TransitionProvider({ children }: { children: React.React
     // 7. Slide overlay up out of screen and morph bottom edge
     tl.to(overlayRef.current, {
       yPercent: -100,
-      duration: 0.8,
+      duration: 0.45,
       ease: "power4.inOut",
       force3D: true,
     });
 
     tl.to(pathRef.current, {
       attr: { d: curves.slideOutCurved },
-      duration: 0.4,
+      duration: 0.25,
       ease: "power2.in"
-    }, "-=0.8");
+    }, "-=0.45");
 
-    // tl.to(pathRef.current, {
     tl.to(pathRef.current, {
       attr: { d: curves.finalTop },
-      duration: 0.4,
+      duration: 0.2,
       ease: "power2.out"
-    }, "-=0.4");
+    }, "-=0.2");
 
     tl.set(overlayRef.current, { display: "none" });
   };
