@@ -122,7 +122,7 @@ export default function About() {
               </span>
             </div>
             <div className="about-stat-card flex flex-col gap-2">
-              <h3 className="font-heading text-5xl font-extrabold text-zinc-400">5</h3>
+              <h3 className="font-heading text-5xl font-extrabold text-zinc-400">6</h3>
               <span className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
                 Shipped Projects
               </span>

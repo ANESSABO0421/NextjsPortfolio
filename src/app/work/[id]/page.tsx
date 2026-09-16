@@ -256,8 +256,98 @@ export default function ProjectPage({ params }: PageProps) {
         </div>
       </div>
 
+      {/* 4. Enterprise Architecture & Functional Modules (if defined on project) */}
+      {project.modules && project.modules.length > 0 && (
+        <section className="px-6 sm:px-12 md:px-24 py-16 sm:py-24 max-w-7xl mx-auto w-full flex flex-col gap-12 sm:gap-16">
+          <div className="flex flex-col gap-3 max-w-3xl">
+            <span className="text-xs uppercase text-zinc-400 tracking-wider font-bold flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#3c5df6]" />
+              Enterprise Architecture
+            </span>
+            <h2 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-zinc-900">
+              Core Functional Modules
+            </h2>
+            <p className="text-sm sm:text-base text-zinc-600 font-light leading-relaxed">
+              Engineered with a decoupled full-stack ecosystem to streamline admissions, geofenced tracking, recording studio scheduling, 3-tier approvals, and automated payroll across multi-branch operations.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {project.modules.map((mod, i) => (
+              <div
+                key={i}
+                className="group relative rounded-2xl border border-zinc-300/80 bg-white/80 backdrop-blur-sm p-6 sm:p-8 shadow-sm hover:shadow-xl hover:border-zinc-400 transition-all duration-300 flex flex-col justify-between gap-6"
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="px-3 py-1 text-[10px] uppercase font-bold tracking-wider rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200 group-hover:bg-[#3c5df6] group-hover:text-white group-hover:border-transparent transition-colors duration-300">
+                      {mod.badge || `Module 0${i + 1}`}
+                    </span>
+                    <span className="text-xs font-mono text-zinc-400 font-medium">0{i + 1}</span>
+                  </div>
+                  <h3 className="font-heading text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">
+                    {mod.title}
+                  </h3>
+                  <p className="text-sm text-zinc-600 leading-relaxed font-light">
+                    {mod.description}
+                  </p>
+                </div>
+
+                {mod.points && mod.points.length > 0 && (
+                  <ul className="flex flex-col gap-2.5 pt-4 border-t border-zinc-100">
+                    {mod.points.map((pt, j) => (
+                      <li key={j} className="flex items-start gap-2.5 text-xs sm:text-sm text-zinc-600 leading-relaxed font-light">
+                        <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#3c5df6]" />
+                        {pt}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Role-Based Access Hierarchy */}
+          {project.rolesMatrix && project.rolesMatrix.length > 0 && (
+            <div className="flex flex-col gap-10 pt-12 border-t border-zinc-300">
+              <div className="flex flex-col gap-3 max-w-3xl">
+                <span className="text-xs uppercase text-zinc-400 tracking-wider font-bold flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#3c5df6]" />
+                  Security & Governance
+                </span>
+                <h2 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-zinc-900">
+                  Role-Based Access Hierarchy
+                </h2>
+                <p className="text-sm sm:text-base text-zinc-600 font-light leading-relaxed">
+                  Dual-layer RBAC architecture combining system roles with dynamic department-head designations and branch-level regional scoping.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {project.rolesMatrix.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-xl border border-zinc-300/80 bg-white/70 p-5 sm:p-6 flex flex-col gap-3 hover:shadow-md transition-shadow duration-200"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <h4 className="font-heading text-lg font-bold text-zinc-900">{item.role}</h4>
+                      <span className="px-2.5 py-0.5 text-[9px] uppercase font-bold tracking-wider rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200">
+                        {item.badge}
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-zinc-600 font-light leading-relaxed">
+                      {item.scope}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
       {/* Spacing gap */}
-      <div className="h-24 sm:h-36" />
+      <div className="h-16 sm:h-24" />
 
       {/* 4. Bottom case switcher ("Next Case" navigator) */}
       <div
