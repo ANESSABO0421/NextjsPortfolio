@@ -48,6 +48,7 @@ const projects: ProjectEntry[] = [
     listTitle: "Obsera",
     category: "Enterprise ERP & Operations Platform",
     src: "/project-1.png",
+    video: "/video/Obsera.mp4",
     device: "laptop",
     role: "Full Stack Architecture & Systems Engineering",
     credits: "Development: Anees Aboobacker — XY-NEX / ALANS",
