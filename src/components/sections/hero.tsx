@@ -96,11 +96,11 @@ export default function Hero() {
         });
       }
 
-      // 4. Infinite loop scroll marquee
-      let isCancelled = false;
-      const animateMarquee = () => {
-        if (isCancelled || !firstTextRef.current || !secondTextRef.current) return;
-        if (!canAnimateMarquee) return;
+      // 4. Infinite marquee — shares the GSAP ticker with Lenis instead of
+      //    running a standalone requestAnimationFrame loop. One unified rAF
+      //    chain for the entire page avoids double frame work.
+      const marqueeTicker = () => {
+        if (!canAnimateMarquee || !firstTextRef.current || !secondTextRef.current) return;
 
         if (xPercent <= -100) {
           xPercent = 0;
@@ -113,15 +113,16 @@ export default function Hero() {
         gsap.set(secondTextRef.current, { xPercent: xPercent });
 
         xPercent += 0.075 * direction;
-        requestAnimationFrame(animateMarquee);
       };
 
       if (canAnimateMarquee) {
-        requestAnimationFrame(animateMarquee);
+        gsap.ticker.add(marqueeTicker);
       }
 
       return () => {
-        isCancelled = true;
+        if (canAnimateMarquee) {
+          gsap.ticker.remove(marqueeTicker);
+        }
         if (canUseHeavyMotion) {
           window.removeEventListener("mousemove", handleMouseMove);
         }

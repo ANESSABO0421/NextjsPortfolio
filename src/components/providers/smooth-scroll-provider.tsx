@@ -36,7 +36,8 @@ export default function SmoothScrollProvider({
       gestureOrientation: "vertical",
       smoothWheel: true,
       wheelMultiplier: 1.0,
-      touchMultiplier: 1.5,
+      touchMultiplier: 1.2, // Lower than 1.5 to prevent jittery over-acceleration on iOS/Android
+      autoResize: true, // Re-measure on orientation change & dynamic viewport resize
     });
 
     setLenisInstance(lenis);

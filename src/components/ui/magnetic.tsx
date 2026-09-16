@@ -30,10 +30,17 @@ export default function Magnetic({
       const inner = innerRef.current;
       if (!outer || !inner) return;
 
+      // Cache bounding rect — only recalculate on mouseenter to avoid
+      // getBoundingClientRect() on every mousemove (layout thrashing).
+      let rect = outer.getBoundingClientRect();
+
+      const handleMouseEnter = () => {
+        rect = outer.getBoundingClientRect();
+      };
+
       const handleMouseMove = (e: MouseEvent) => {
         const { clientX, clientY } = e;
-        const rect = outer.getBoundingClientRect();
-        
+
         // Find distance relative to the center of the static outer container
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
@@ -47,6 +54,7 @@ export default function Magnetic({
           duration: 0.3,
           ease: "power2.out",
           force3D: true,
+          overwrite: "auto",
         });
       };
 
@@ -61,10 +69,12 @@ export default function Magnetic({
         });
       };
 
-      outer.addEventListener("mousemove", handleMouseMove);
+      outer.addEventListener("mouseenter", handleMouseEnter, { passive: true });
+      outer.addEventListener("mousemove", handleMouseMove, { passive: true });
       outer.addEventListener("mouseleave", handleMouseLeave);
 
       return () => {
+        outer.removeEventListener("mouseenter", handleMouseEnter);
         outer.removeEventListener("mousemove", handleMouseMove);
         outer.removeEventListener("mouseleave", handleMouseLeave);
       };

@@ -74,6 +74,42 @@ export default function ProjectPage({ params }: PageProps) {
           force3D: true,
         }
       );
+
+      // 3. Stagger-reveal module cards on scroll
+      gsap.fromTo(
+        ".module-card",
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.1,
+          duration: 0.7,
+          ease: "power3.out",
+          force3D: true,
+          scrollTrigger: {
+            trigger: ".modules-grid",
+            start: "top 85%",
+          },
+        }
+      );
+
+      // 4. Stagger-reveal role cards on scroll
+      gsap.fromTo(
+        ".role-card",
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          stagger: 0.08,
+          duration: 0.6,
+          ease: "power3.out",
+          force3D: true,
+          scrollTrigger: {
+            trigger: ".roles-grid",
+            start: "top 88%",
+          },
+        }
+      );
     },
     { scope: pageContainerRef }
   );
@@ -111,7 +147,7 @@ export default function ProjectPage({ params }: PageProps) {
 
         {/* Dynamic Project Title */}
         <div className="overflow-hidden h-auto min-h-16 sm:min-h-28 md:min-h-36 border-b border-zinc-300 pb-2 sm:pb-4">
-          <h1 className="project-header-title font-heading text-5xl sm:text-7xl md:text-8xl font-bold uppercase tracking-tight leading-none text-zinc-900">
+          <h1 className="project-header-title font-heading text-[11vw] sm:text-7xl md:text-8xl font-bold uppercase tracking-tight leading-[1.1] sm:leading-none text-zinc-900 break-words hyphens-auto">
             {project.title}
           </h1>
         </div>
@@ -137,7 +173,7 @@ export default function ProjectPage({ params }: PageProps) {
       <div className="px-6 sm:px-12 md:px-24 py-16 sm:py-24 max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-12 sm:gap-16 border-t border-zinc-300">
         <div className="md:col-span-7 flex flex-col gap-6">
           <h3 className="text-xs uppercase text-zinc-400 tracking-wider font-bold">About the Project</h3>
-          <p className="font-heading text-2xl sm:text-3xl font-light leading-snug tracking-tight text-zinc-800">
+          <p className="font-heading text-xl sm:text-3xl font-light leading-snug tracking-tight text-zinc-800">
             {project.about}
           </p>
           <ul className="flex flex-col gap-3 pt-2">
@@ -272,11 +308,11 @@ export default function ProjectPage({ params }: PageProps) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          <div className="modules-grid grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
             {project.modules.map((mod, i) => (
               <div
                 key={i}
-                className="group relative rounded-2xl border border-zinc-300/80 bg-white/80 backdrop-blur-sm p-6 sm:p-8 shadow-sm hover:shadow-xl hover:border-zinc-400 transition-all duration-300 flex flex-col justify-between gap-6"
+                className="module-card group relative rounded-2xl border border-zinc-300/80 bg-white/80 backdrop-blur-sm p-5 sm:p-6 md:p-8 shadow-sm hover:shadow-xl hover:border-zinc-400 transition-all duration-300 flex flex-col justify-between gap-4 sm:gap-6"
               >
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center justify-between gap-4">
@@ -323,11 +359,11 @@ export default function ProjectPage({ params }: PageProps) {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="roles-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 {project.rolesMatrix.map((item, idx) => (
                   <div
                     key={idx}
-                    className="rounded-xl border border-zinc-300/80 bg-white/70 p-5 sm:p-6 flex flex-col gap-3 hover:shadow-md transition-shadow duration-200"
+                    className="role-card rounded-xl border border-zinc-300/80 bg-white/70 p-4 sm:p-5 md:p-6 flex flex-col gap-3 hover:shadow-md transition-shadow duration-200"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <h4 className="font-heading text-lg font-bold text-zinc-900">{item.role}</h4>
