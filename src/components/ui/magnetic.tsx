@@ -1,92 +1,63 @@
 "use client";
 
-import React, { useRef } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+import { useRef } from "react";
+import { gsap, useGSAP, hasFinePointer, prefersReducedMotion } from "@/lib/gsap";
+import { cn } from "@/lib/utils";
 
 interface MagneticProps {
   children: React.ReactNode;
-  actionStrength?: number; // Strength of attraction (0 to 1)
-  hoverAreaPadding?: string; // Optional padding class to control hover threshold area
+  /** How far the content follows the pointer, as a fraction of the offset (0–1). */
+  strength?: number;
+  className?: string;
 }
 
-export default function Magnetic({
-  children,
-  actionStrength = 0.35,
-  hoverAreaPadding = "p-4",
-}: MagneticProps) {
-  const outerRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
+/**
+ * Pulls its content towards the pointer and snaps back with an elastic
+ * rebound on leave. The bounding rect is measured on enter only, never per
+ * move, so tracking never forces layout.
+ */
+export default function Magnetic({ children, strength = 0.35, className }: MagneticProps) {
+  const outerRef = useRef<HTMLSpanElement>(null);
+  const innerRef = useRef<HTMLSpanElement>(null);
 
   useGSAP(
     () => {
-      const canUseMagnetic =
-        window.matchMedia("(pointer: fine)").matches &&
-        !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      if (!canUseMagnetic) return;
-
       const outer = outerRef.current;
       const inner = innerRef.current;
-      if (!outer || !inner) return;
+      if (!outer || !inner || !hasFinePointer() || prefersReducedMotion()) return;
 
-      // Cache bounding rect — only recalculate on mouseenter to avoid
-      // getBoundingClientRect() on every mousemove (layout thrashing).
+      const xTo = gsap.quickTo(inner, "x", { duration: 0.45, ease: "power3.out" });
+      const yTo = gsap.quickTo(inner, "y", { duration: 0.45, ease: "power3.out" });
       let rect = outer.getBoundingClientRect();
 
-      const handleMouseEnter = () => {
+      const onEnter = () => {
         rect = outer.getBoundingClientRect();
       };
-
-      const handleMouseMove = (e: MouseEvent) => {
-        const { clientX, clientY } = e;
-
-        // Find distance relative to the center of the static outer container
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const x = clientX - centerX;
-        const y = clientY - centerY;
-
-        // Animate the inner wrapper towards the cursor coords
-        gsap.to(inner, {
-          x: x * actionStrength,
-          y: y * actionStrength,
-          duration: 0.3,
-          ease: "power2.out",
-          force3D: true,
-          overwrite: "auto",
-        });
+      const onMove = (event: PointerEvent) => {
+        xTo((event.clientX - (rect.left + rect.width / 2)) * strength);
+        yTo((event.clientY - (rect.top + rect.height / 2)) * strength);
+      };
+      const onLeave = () => {
+        gsap.to(inner, { x: 0, y: 0, duration: 0.9, ease: "elastic.out(1, 0.4)", overwrite: true });
       };
 
-      const handleMouseLeave = () => {
-        // Elastic rebound to center when leaving bounds
-        gsap.to(inner, {
-          x: 0,
-          y: 0,
-          duration: 0.8,
-          ease: "elastic.out(1, 0.4)",
-          force3D: true,
-        });
-      };
-
-      outer.addEventListener("mouseenter", handleMouseEnter, { passive: true });
-      outer.addEventListener("mousemove", handleMouseMove, { passive: true });
-      outer.addEventListener("mouseleave", handleMouseLeave);
-
+      outer.addEventListener("pointerenter", onEnter);
+      outer.addEventListener("pointermove", onMove);
+      outer.addEventListener("pointerleave", onLeave);
       return () => {
-        outer.removeEventListener("mouseenter", handleMouseEnter);
-        outer.removeEventListener("mousemove", handleMouseMove);
-        outer.removeEventListener("mouseleave", handleMouseLeave);
+        outer.removeEventListener("pointerenter", onEnter);
+        outer.removeEventListener("pointermove", onMove);
+        outer.removeEventListener("pointerleave", onLeave);
       };
     },
-    { scope: outerRef }
+    { scope: outerRef, dependencies: [strength] }
   );
 
   return (
-    <div ref={outerRef} className={`relative inline-block cursor-pointer ${hoverAreaPadding}`}>
-      <div ref={innerRef} className="relative z-10">
+    <span ref={outerRef} className={cn("relative inline-flex", className)}>
+      <span ref={innerRef} className="relative inline-flex will-change-transform">
         {children}
-      </div>
-    </div>
+      </span>
+    </span>
   );
 }

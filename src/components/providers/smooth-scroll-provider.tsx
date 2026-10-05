@@ -1,72 +1,61 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import Lenis from "lenis";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { setLenis, useLenis } from "@/lib/stores";
 
-// Register ScrollTrigger globally for client environment
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+export { useLenis };
 
-interface SmoothScrollContextType {
-  lenis: Lenis | null;
-}
+const easeOutExpo = (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t));
 
-const SmoothScrollContext = createContext<SmoothScrollContextType>({
-  lenis: null,
-});
-
-export const useLenis = () => useContext(SmoothScrollContext);
-
-export default function SmoothScrollProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [lenisInstance, setLenisInstance] = useState<Lenis | null>(null);
-
+/**
+ * Lenis smooth scrolling, driven by GSAP's ticker so Lenis, ScrollTrigger and
+ * every other per-frame animation on the page share one requestAnimationFrame
+ * loop. The instance is published through an external store (not React
+ * state), so consumers can read it without re-render cascades.
+ */
+export default function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    // 1. Initialize Lenis scroll instance
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Snellenberg-inspired easeOutExpo
-      orientation: "vertical",
-      gestureOrientation: "vertical",
-      smoothWheel: true,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 1.2, // Lower than 1.5 to prevent jittery over-acceleration on iOS/Android
-      autoResize: true, // Re-measure on orientation change & dynamic viewport resize
+      autoRaf: false,
+      duration: 1.15,
+      easing: easeOutExpo,
+      smoothWheel: !reduceMotion,
+      // Native momentum on touch — syncing touch through Lenis feels laggy on iOS.
+      syncTouch: false,
+      touchMultiplier: 1.2,
+      wheelMultiplier: 1,
+      autoResize: true,
+      stopInertiaOnNavigate: true,
     });
 
-    setLenisInstance(lenis);
+    lenis.on("scroll", ScrollTrigger.update);
 
-    // 2. Synchronize Lenis scroll events with GSAP ScrollTrigger
-    lenis.on("scroll", () => {
-      ScrollTrigger.update();
-    });
-
-    // 3. Connect Lenis frame updates directly into the GSAP ticker
-    const gsapTicker = (time: number) => {
-      lenis.raf(time * 1000); // Lenis expects milliseconds
-    };
-    gsap.ticker.add(gsapTicker);
-
-    // Disable GSAP lag smoothing to avoid scrolling desync/jumpiness
+    const tick = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(tick);
+    // Lag smoothing would make scroll-linked animations drift from the
+    // actual scroll position after a dropped frame.
     gsap.ticker.lagSmoothing(0);
 
-    // 4. Cleanup function on component unmount
+    setLenis(lenis);
+
+    // Web fonts swapping in change text metrics, which moves every trigger's
+    // start/end — re-measure once they have settled.
+    let cancelled = false;
+    void document.fonts?.ready.then(() => {
+      if (!cancelled) ScrollTrigger.refresh();
+    });
+
     return () => {
-      gsap.ticker.remove(gsapTicker);
+      cancelled = true;
+      gsap.ticker.remove(tick);
       lenis.destroy();
-      setLenisInstance(null);
+      setLenis(null);
     };
   }, []);
 
-  return (
-    <SmoothScrollContext.Provider value={{ lenis: lenisInstance }}>
-      {children}
-    </SmoothScrollContext.Provider>
-  );
+  return <>{children}</>;
 }

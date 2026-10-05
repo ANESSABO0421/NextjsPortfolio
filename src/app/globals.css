@@ -4,51 +4,42 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-outfit), sans-serif;
-  --font-heading: var(--font-syne), sans-serif;
-  --font-mono: monospace;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
-}
+/* ───────────────────────────────────────────────────────────────────────
+   Design tokens
+   ─────────────────────────────────────────────────────────────────────── */
 
 :root {
+  /* Backgrounds */
+  --bg-void: #0a0a0b;
+  --bg-primary: #0f0f10;
+  --bg-surface: #111112;
+  --bg-elevated: #1c1c1f;
+  --bg-subtle: #1f1f21;
+
+  /* Accents — used sparingly */
+  --accent-lime: #c9fd34;
+  --accent-cobalt: #3c5df6;
+  --accent-ember: #ff6b35;
+
+  /* Text hierarchy */
+  --text-primary: #f3f3f3;
+  --text-secondary: oklch(0.708 0 0);
+  --text-muted: oklch(0.556 0 0);
+  --text-ghost: oklch(0.371 0 0);
+
+  /* Borders */
+  --border-subtle: oklch(1 0 0 / 6%);
+  --border-medium: oklch(1 0 0 / 10%);
+  --border-strong: oklch(1 0 0 / 15%);
+
+  /* Case-study pages (light) */
+  --bg-light: #f3f3f3;
+  --bg-light-alt: #e8e8e8;
+
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+
+  /* shadcn/ui primitives (button.tsx) */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -67,20 +58,7 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
 }
 
 .dark {
@@ -102,67 +80,202 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
 }
+
+@theme inline {
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-void: var(--bg-void);
+  --color-night: var(--bg-primary);
+  --color-surface: var(--bg-surface);
+  --color-elevated: var(--bg-elevated);
+  --color-raised: var(--bg-subtle);
+  --color-lime: var(--accent-lime);
+  --color-cobalt: var(--accent-cobalt);
+  --color-ember: var(--accent-ember);
+  --color-fg: var(--text-primary);
+  --color-fg-2: var(--text-secondary);
+  --color-fg-3: var(--text-muted);
+  --color-fg-4: var(--text-ghost);
+  --color-line: var(--border-subtle);
+  --color-line-2: var(--border-medium);
+  --color-line-3: var(--border-strong);
+  --color-paper: var(--bg-light);
+  --color-paper-2: var(--bg-light-alt);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Type scale — Syne's wght axis also drives its width, so headings sit at
+   600–700 by default and swell towards 800 on interaction. */
+@theme {
+  --text-display: clamp(3rem, 8vw, 8rem);
+  --text-display--line-height: 0.92;
+  --text-display--letter-spacing: -0.035em;
+  --text-h1: clamp(2.5rem, 6vw, 6rem);
+  --text-h1--line-height: 0.95;
+  --text-h1--letter-spacing: -0.03em;
+  --text-h2: clamp(2rem, 4vw, 4rem);
+  --text-h2--line-height: 1;
+  --text-h2--letter-spacing: -0.025em;
+  --text-h3: clamp(1.5rem, 3vw, 3rem);
+  --text-h3--line-height: 1.08;
+  --text-h3--letter-spacing: -0.02em;
+  --text-lead: clamp(1.25rem, 2vw, 2rem);
+  --text-lead--line-height: 1.38;
+
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+   Utilities
+   ─────────────────────────────────────────────────────────────────────── */
+
+@utility px-gutter {
+  padding-inline: 1.5rem;
+  @media (width >= 40rem) {
+    padding-inline: 2.5rem;
+  }
+  @media (width >= 48rem) {
+    padding-inline: 4rem;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 6rem;
+  }
+}
+
+/* Small uppercase label — Outfit semibold, wide tracking. */
+@utility caption {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Numbers, indices, coordinates. */
+@utility mono {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.15rem;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--outline-color, var(--border-strong));
+}
+
+/* Variable weight driven by a CSS custom property, so GSAP (or a hover) can
+   animate it without touching font-weight directly. */
+@utility wght {
+  font-variation-settings: "wght" var(--wght, 600);
+}
+
+@utility hairline-x {
+  background-image: linear-gradient(to right, var(--border-subtle), var(--border-subtle));
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+   Base
+   ─────────────────────────────────────────────────────────────────────── */
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-  }
+
   html {
-    @apply font-sans;
-    scroll-behavior: initial;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-    overflow-x: hidden;
+    font-family: var(--font-sans);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: auto;
+    /* Hidden scrollbars for a clean canvas — scrolling is still native. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overflow-x: clip;
   }
 
-  /* Safety net against sub-pixel/transform overflow (marquee text, scaled
-     portraits, magnetic hover offsets) forcing a horizontal scrollbar on
-     narrow viewports. */
-  body {
-    overflow-x: hidden;
-    max-width: 100vw;
-  }
-  
-  /* Hide scrollbars globally for a premium clean canvas */
-  ::-webkit-scrollbar {
+  html::-webkit-scrollbar {
     display: none;
   }
 
-  /* Hide default cursor on desktop devices to avoid double cursors */
-  @media (pointer: fine) {
-    *, body, html, a, button, [role="button"], [data-cursor] {
-      cursor: none !important;
-    }
+  body {
+    min-height: 100%;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "ss01", "cv11";
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--accent-lime);
+    color: #0a0a0b;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent-lime);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  [data-theme="light"] :focus-visible {
+    outline-color: var(--accent-cobalt);
+  }
+
+  /* The native cursor is only hidden once the custom cursor has actually
+     mounted (it adds this class), so a JS failure never leaves the page
+     without a pointer. */
+  html.has-custom-cursor,
+  html.has-custom-cursor * {
+    cursor: none !important;
+  }
+
+  img,
+  video {
+    user-select: none;
+    -webkit-user-drag: none;
   }
 }
 
-/* GPU-promote containers that animate frequently so the compositor
-   handles them instead of triggering main-thread paint. */
-.device-mockup-container,
-.works-image-stack {
-  will-change: transform;
-  transform: translateZ(0);
-}
+/* ───────────────────────────────────────────────────────────────────────
+   Lenis
+   ─────────────────────────────────────────────────────────────────────── */
 
-/* Lenis smooth scrolling rules */
 html.lenis,
 html.lenis body {
   height: auto;
@@ -173,30 +286,309 @@ html.lenis body {
 }
 
 .lenis-smooth [data-lenis-prevent] {
-  scroll-behavior: contain;
+  overscroll-behavior: contain;
 }
 
 .lenis-stopped {
-  overflow: hidden;
+  overflow: clip;
 }
 
 .lenis-scrolling iframe {
   pointer-events: none;
 }
 
-.preloader-shell {
-  animation: preloader-failsafe-hide 4s linear forwards;
+/* ───────────────────────────────────────────────────────────────────────
+   Film grain — one tiled noise texture, moved with transforms only so it
+   stays on the compositor. Static on touch devices to save GPU memory.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.07;
 }
 
-@keyframes preloader-failsafe-hide {
-  0%,
-  96% {
-    opacity: 1;
-    visibility: visible;
-  }
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  animation: grain-shift 0.9s steps(6) infinite;
+  will-change: transform;
+}
 
-  100% {
+@keyframes grain-shift {
+  0% { transform: translate3d(0, 0, 0); }
+  17% { transform: translate3d(-6%, 4%, 0); }
+  34% { transform: translate3d(5%, -7%, 0); }
+  51% { transform: translate3d(-9%, -3%, 0); }
+  68% { transform: translate3d(8%, 6%, 0); }
+  85% { transform: translate3d(-3%, 9%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@media (hover: none) {
+  .grain::before {
+    inset: 0;
+    animation: none;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+   Preloader gating — the inline script in <body> sets data-intro before
+   first paint, so returning visitors never see a flash of the loader and
+   visitors without JS never see it at all.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.preloader {
+  display: none;
+}
+
+html[data-intro="play"] .preloader {
+  display: block;
+  /* Failsafe: if script execution dies mid-intro, get out of the way. */
+  animation: preloader-failsafe 0.3s 9s forwards;
+}
+
+@keyframes preloader-failsafe {
+  to {
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+/* Above-the-fold elements whose entrance is scripted stay hidden until the
+   script has set their start state (it overrides this inline), so nothing
+   paints once and then jumps. Unhides on its own if scripts never run. */
+html.js .intro-hidden {
+  visibility: hidden;
+  animation: intro-unhide 0s 6s forwards;
+}
+
+@keyframes intro-unhide {
+  to {
+    visibility: visible;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+   Hero letters — every glyph is also a window onto a project still.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.hero-letter {
+  position: relative;
+  display: inline-block;
+  font-variation-settings: "wght" var(--wght, 700);
+  color: #ededed;
+}
+
+.hero-letter__solid {
+  display: inline-block;
+  transition: opacity 0.5s var(--ease-expo);
+}
+
+.hero-letter__fill {
+  position: absolute;
+  inset: 0;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background-size: 170% auto;
+  background-position: 50% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-expo);
+}
+
+.hero-letter[data-active="true"] .hero-letter__solid {
+  opacity: 0;
+}
+
+.hero-letter[data-active="true"] .hero-letter__fill {
+  opacity: 1;
+  animation: letter-drift 7s ease-in-out infinite alternate;
+}
+
+@keyframes letter-drift {
+  from { background-position: 22% 35%; }
+  to { background-position: 78% 65%; }
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+   Rolling text — each character slides out and its twin slides in.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.roll {
+  display: inline-flex;
+  white-space: pre;
+}
+
+.roll-char {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.roll-char > span {
+  display: block;
+  transition: transform 0.55s var(--ease-expo);
+  transition-delay: calc(var(--i, 0) * 16ms);
+}
+
+.roll-char > span + span {
+  position: absolute;
+  inset: 0;
+  transform: translateY(105%);
+}
+
+.roll-trigger:hover .roll-char > span,
+.roll-trigger:focus-visible .roll-char > span,
+.roll-trigger[data-rolled="true"] .roll-char > span {
+  transform: translateY(-105%);
+}
+
+.roll-trigger:hover .roll-char > span + span,
+.roll-trigger:focus-visible .roll-char > span + span,
+.roll-trigger[data-rolled="true"] .roll-char > span + span {
+  transform: translateY(0);
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+   Misc. motion primitives
+   ─────────────────────────────────────────────────────────────────────── */
+
+/* Backlit bar that sweeps in from the left behind list rows. */
+.backlit {
+  position: relative;
+  isolation: isolate;
+}
+
+.backlit::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--backlit, oklch(1 0 0 / 4%));
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.6s var(--ease-expo);
+}
+
+.backlit:hover::before,
+.backlit:focus-visible::before,
+.backlit[data-active="true"]::before {
+  transform: scaleX(1);
+}
+
+.caret {
+  display: inline-block;
+  width: 0.5em;
+  height: 1.05em;
+  background: var(--accent-lime);
+  vertical-align: -0.16em;
+  animation: caret-blink 1.05s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  50% { opacity: 0; }
+}
+
+.pulse-dot {
+  position: relative;
+}
+
+.pulse-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: pulse-ring 2.2s var(--ease-expo) infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  80%, 100% { transform: scale(2.8); opacity: 0; }
+}
+
+/* Electron orbits around the focused element in the stack table. */
+.orbit {
+  animation: orbit-spin var(--orbit-speed, 6s) linear infinite;
+}
+
+.orbit-reverse {
+  animation-direction: reverse;
+}
+
+@keyframes orbit-spin {
+  to { transform: rotate(360deg); }
+}
+
+.marquee-track {
+  animation: marquee var(--marquee-speed, 40s) linear infinite;
+}
+
+@keyframes marquee {
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+.typing-dot {
+  animation: typing 1.2s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+  30% { transform: translateY(-3px); opacity: 1; }
+}
+
+.equalizer span {
+  display: block;
+  width: 2px;
+  height: 100%;
+  background: currentColor;
+  transform-origin: bottom;
+  animation: equalize 0.9s ease-in-out infinite alternate;
+}
+
+.equalizer span:nth-child(2) { animation-delay: -0.3s; }
+.equalizer span:nth-child(3) { animation-delay: -0.6s; }
+
+.equalizer[data-on="false"] span {
+  animation: none;
+  transform: scaleY(0.25);
+}
+
+@keyframes equalize {
+  from { transform: scaleY(0.25); }
+  to { transform: scaleY(1); }
+}
+
+/* GPU-promote surfaces that are transformed on every scroll frame. */
+.gpu {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+   Reduced motion — CSS-driven loops stop; GSAP paths check the same query.
+   ─────────────────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

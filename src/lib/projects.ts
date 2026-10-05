@@ -18,13 +18,21 @@ export interface ProjectEntry {
   title: string;
   listTitle: string;
   category: string;
-  src: string;
-  /** Optional screen-recording that plays inside the device mockup instead of the static screenshot. */
+  /** One-line pitch used by the editorial spreads on the home page. */
+  tagline: string;
+  /** A real frame pulled from the project's own screen recording. */
+  poster?: string;
+  /** Optional screen-recording that plays inside the device mockup instead of the static poster. */
   video?: string;
+  /** Image used for social cards — the poster when there is one. */
+  ogImage: string;
+  /** Sampled from the product's own UI; only ever used in small doses. */
+  accent: string;
   device: ProjectDevice;
   role: string;
   credits: string;
   locationYear: string;
+  year: string;
   liveUrl: string;
   liveLabel: string;
   description: string;
@@ -36,23 +44,29 @@ export interface ProjectEntry {
 }
 
 export interface ProjectDetail extends ProjectEntry {
+  index: number;
+  total: number;
   nextId: string;
   nextTitle: string;
 }
 
-// Ordered the same way the works list renders them; "next case" wraps around.
+// Ordered the same way the works section renders them; "next case" wraps around.
 const projects: ProjectEntry[] = [
   {
     id: "obsera",
     title: "OBSERA",
     listTitle: "Obsera",
     category: "Enterprise ERP & Operations Platform",
-    src: "/project-1.png",
+    tagline: "One platform replacing an academy group's legacy software — HR, admissions, payroll and attendance.",
+    poster: "/posters/obsera.jpg",
     video: "/video/Obsera.mp4",
+    ogImage: "/posters/obsera.jpg",
+    accent: "#e2338f",
     device: "laptop",
     role: "Full Stack Architecture & Systems Engineering",
     credits: "Development: Anees Aboobacker — XY-NEX / ALANS",
     locationYear: "Kerala, India © 2026",
+    year: "2026",
     liveUrl: "https://github.com/ANESSABO0421",
     liveLabel: "Source",
     description:
@@ -216,12 +230,16 @@ const projects: ProjectEntry[] = [
     title: "SPENDOVA",
     listTitle: "Spendova",
     category: "React Native / AI Mobile",
-    src: "/project-1.png",
+    tagline: "Speak a transaction, get an insight — a voice-first expense tracker with Gemini analytics.",
+    poster: "/posters/spendova.jpg",
     video: "/video/Spendova.mp4",
+    ogImage: "/posters/spendova.jpg",
+    accent: "#3d7bff",
     device: "phone",
     role: "Mobile App & REST API Development",
     credits: "Development: Anees Aboobacker",
     locationYear: "Kerala, India © 2026",
+    year: "2026",
     liveUrl: "https://github.com/ANESSABO0421",
     liveLabel: "Source",
     description:
@@ -249,12 +267,16 @@ const projects: ProjectEntry[] = [
     title: "MALAPPURAM FC",
     listTitle: "Malappuram FC Ultras",
     category: "Next.js / Community Platform",
-    src: "/project-2.png",
+    tagline: "A home for the Ultras — standings, fixtures, galleries and news the club runs itself.",
+    poster: "/posters/malappuram-fc.jpg",
     video: "/video/Ultrasmalappuram.mp4",
+    ogImage: "/posters/malappuram-fc.jpg",
+    accent: "#e5322d",
     device: "laptop",
     role: "Full Stack Development",
     credits: "Development: Anees Aboobacker — SkiaFlow",
     locationYear: "Malappuram, Kerala © 2026",
+    year: "2026",
     liveUrl: "https://www.ultrasmalappuram.com/",
     liveLabel: "Live Site",
     description:
@@ -282,12 +304,16 @@ const projects: ProjectEntry[] = [
     title: "KRISCORP",
     listTitle: "KrisCorp",
     category: "Next.js / Corporate Site",
-    src: "/project-3.png",
+    tagline: "A construction company's showroom and lead engine — SEO-first, set in motion with GSAP.",
+    poster: "/posters/kriscorp.jpg",
     video: "/video/Kriscorp.mp4",
+    ogImage: "/posters/kriscorp.jpg",
+    accent: "#e0663a",
     device: "laptop",
     role: "Full Stack Development & SEO",
     credits: "Development: Anees Aboobacker — SkiaFlow",
     locationYear: "Kerala, India © 2026",
+    year: "2026",
     liveUrl: "https://kriscorp-website.vercel.app/",
     liveLabel: "Live Site",
     description:
@@ -315,12 +341,16 @@ const projects: ProjectEntry[] = [
     title: "DEVPULSE",
     listTitle: "DevPulse",
     category: "AI / Developer Tools",
-    src: "/project-2.png",
+    tagline: "Paste code, get a scored review — Claude-powered analysis with a history you can come back to.",
+    poster: "/posters/devpulse.jpg",
     video: "/video/Devpulse.mp4",
+    ogImage: "/posters/devpulse.jpg",
+    accent: "#3ad0e6",
     device: "laptop",
     role: "Full-Stack Development & AI Integration",
     credits: "Development: Anees Aboobacker",
     locationYear: "Kerala, India © 2026",
+    year: "2026",
     liveUrl: "https://github.com/ANESSABO0421/devpulse-ai-code-analyzer",
     liveLabel: "Source",
     description:
@@ -348,11 +378,14 @@ const projects: ProjectEntry[] = [
     title: "SYNAPSE",
     listTitle: "Synapse",
     category: "Socket.io / Real-Time Platform",
-    src: "/project-3.png",
+    tagline: "An NSS unit's control room — live group chat, payments and certificates from one codebase.",
+    ogImage: "/og.png",
+    accent: "#c9fd34",
     device: "laptop",
     role: "Full Stack Development & Real-Time Systems",
     credits: "Development: Anees Aboobacker",
     locationYear: "Kerala, India © 2026",
+    year: "2026",
     liveUrl: "https://github.com/ANESSABO0421/Synapsis-NSS-Management-System",
     liveLabel: "Source",
     description:
@@ -377,23 +410,26 @@ const projects: ProjectEntry[] = [
   },
 ];
 
+export const allProjects: readonly ProjectEntry[] = projects;
+
 export const projectDetails: Record<string, ProjectDetail> = Object.fromEntries(
   projects.map((project, index) => {
     const next = projects[(index + 1) % projects.length];
     return [
       project.id,
-      { ...project, nextId: next.id, nextTitle: next.listTitle },
+      {
+        ...project,
+        index: index + 1,
+        total: projects.length,
+        nextId: next.id,
+        nextTitle: next.listTitle,
+      },
     ];
   })
 );
 
 export const projectIds = projects.map((project) => project.id);
 
-// Shape the works list consumes — keeps the section and the detail pages in sync.
-export const projectList = projects.map(({ id, listTitle, category, src, video }) => ({
-  id,
-  title: listTitle,
-  category,
-  src,
-  video,
-}));
+export function getProject(id: string): ProjectDetail | undefined {
+  return projectDetails[id];
+}

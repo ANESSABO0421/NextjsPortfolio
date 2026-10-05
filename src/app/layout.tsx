@@ -1,66 +1,62 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, Syne } from "next/font/google";
+import { Geist_Mono, Outfit, Syne } from "next/font/google";
 import SmoothScrollProvider from "@/components/providers/smooth-scroll-provider";
 import TransitionProvider from "@/components/providers/transition-provider";
+import Header from "@/components/layout/header";
 import CustomCursor from "@/components/ui/custom-cursor";
+import Preloader from "@/components/ui/preloader";
+import { elements } from "@/lib/skills";
+import { site } from "@/lib/site";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-});
+// All three are variable fonts, so each loads as a single file. Syne's wght
+// axis (400–800) also changes its width, which the motion system leans on.
+const outfit = Outfit({ variable: "--font-outfit", subsets: ["latin"], display: "swap" });
+const syne = Syne({ variable: "--font-syne", subsets: ["latin"], display: "swap" });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
 
-const syne = Syne({
-  variable: "--font-syne",
-  subsets: ["latin"],
-  weight: ["400", "500", "700", "800"],
-});
+const title = "Anees Aboobacker — Full Stack MERN Developer";
+const description =
+  "Anees Aboobacker is a Full Stack MERN developer from Kerala, India, building production ERP, HRMS and real-time platforms with React, Next.js, Node.js, Express and MongoDB.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://anees-portofolio.vercel.app"),
+  metadataBase: new URL(site.url),
   title: {
-    default: "Anees Aboobacker - MERN Stack Developer",
-    template: "%s | Anees Aboobacker",
+    default: title,
+    template: "%s — Anees Aboobacker",
   },
-  description:
-    "Portfolio of Anees Aboobacker, a Junior MERN Stack Developer building scalable web and mobile applications using MongoDB, Express.js, React.js, and Node.js.",
+  description,
+  applicationName: "Anees Aboobacker",
   keywords: [
     "Anees Aboobacker",
+    "Full Stack Developer",
     "MERN Stack Developer",
-    "React developer",
+    "React developer Kerala",
     "Node.js developer",
-    "Next.js portfolio",
-    "Full stack developer",
+    "Next.js developer",
+    "ERP developer",
+    "HRMS developer",
+    "SkiaFlow",
   ],
-  authors: [{ name: "Anees Aboobacker" }],
-  creator: "Anees Aboobacker",
+  authors: [{ name: site.name, url: site.url }],
+  creator: site.name,
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Anees Aboobacker - MERN Stack Developer",
-    description:
-      "Junior MERN Stack Developer building scalable web and mobile applications.",
-    url: "/",
-    siteName: "Anees Aboobacker Portfolio",
-    images: [
-      {
-        url: "/anees-aboo3.png",
-        width: 1200,
-        height: 1200,
-        alt: "Anees Aboobacker portrait",
-      },
-    ],
-    locale: "en_US",
     type: "website",
+    url: "/",
+    siteName: "Anees Aboobacker",
+    title,
+    description,
+    locale: "en_US",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: title }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Anees Aboobacker - MERN Stack Developer",
-    description:
-      "Junior MERN Stack Developer building scalable web and mobile applications.",
-    images: ["/anees-aboo3.png"],
+    title,
+    description,
+    images: ["/og.png"],
   },
   robots: {
     index: true,
@@ -73,36 +69,38 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#111112",
+  themeColor: "#0f0f10",
   colorScheme: "dark",
 };
 
 const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
-  name: "Anees Aboobacker",
-  jobTitle: "MERN Stack Developer",
-  url: "https://anees-portofolio.vercel.app",
-  image: "https://anees-portofolio.vercel.app/anees-aboo3.png",
-  sameAs: [
-    "https://linkedin.com/in/anees-aboobacker",
-    "https://github.com/ANESSABO0421",
-  ],
-  knowsAbout: [
-    "MongoDB",
-    "Express.js",
-    "React.js",
-    "Node.js",
-    "Next.js",
-    "React Native",
-    "TypeScript",
-  ],
+  name: site.name,
+  jobTitle: site.role,
+  description: site.shortSummary,
+  url: site.url,
+  image: `${site.url}${site.portrait}`,
+  email: `mailto:${site.email}`,
+  address: { "@type": "PostalAddress", addressRegion: "Kerala", addressCountry: "IN" },
+  worksFor: { "@type": "Organization", name: "XY-NEX Learning & Alans Academy" },
+  alumniOf: { "@type": "CollegeOrUniversity", name: "GEMS Arts & Science College, Ramapuram" },
+  knowsLanguage: site.languages.map((language) => language.name),
+  knowsAbout: elements.map((element) => element.name),
+  sameAs: [site.socials.linkedin, site.socials.github],
 };
+
+// Runs before first paint: decides whether the intro plays (first visit to
+// the home page this session) so the preloader never flashes for anyone else.
+const introScript = `(function(){var d=document.documentElement;d.classList.add("js");try{var seen=sessionStorage.getItem("intro-seen")==="1";d.dataset.intro=(location.pathname==="/"&&!seen)?"play":"skip"}catch(e){d.dataset.intro="skip"}})();`;
 
 export default function RootLayout({
   children,
@@ -112,21 +110,32 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${syne.variable} h-full antialiased dark`}
+      className={`${outfit.variable} ${syne.variable} ${geistMono.variable} dark`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
+      <body>
+        <script dangerouslySetInnerHTML={{ __html: introScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(personJsonLd).replace(/</g, "\\u003c"),
           }}
         />
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-full focus:bg-lime focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-void"
+        >
+          Skip to content
+        </a>
         <SmoothScrollProvider>
           <TransitionProvider>
-            <CustomCursor />
+            <Header />
             {children}
+            <Preloader />
           </TransitionProvider>
         </SmoothScrollProvider>
+        <div aria-hidden className="grain" />
+        <CustomCursor />
       </body>
     </html>
   );

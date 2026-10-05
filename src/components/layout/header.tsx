@@ -1,399 +1,457 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import Magnetic from "@/components/ui/magnetic";
-import { useLenis } from "@/components/providers/smooth-scroll-provider";
-import { useTransition } from "@/components/providers/transition-provider";
-import { Menu, X } from "lucide-react";
+import { ArrowUpRight, Download } from "lucide-react";
 import { SiGithub } from "react-icons/si";
-import { FaLinkedin } from "react-icons/fa6";
+import { FaLinkedinIn } from "react-icons/fa6";
+import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
+import { useIntroDone, useLenis, usePageRevealed } from "@/lib/stores";
+import { playTick, setSoundEnabled, useSoundEnabled } from "@/lib/sound";
+import { pad2, sections, site } from "@/lib/site";
+import { getProject } from "@/lib/projects";
+import { scrollToHash } from "@/components/providers/transition-provider";
+import TransitionLink from "@/components/ui/transition-link";
+import RollingText from "@/components/ui/rolling-text";
+import LocalTime from "@/components/ui/local-time";
 
-const navItems = [
-  { label: "Home", href: "#hero" },
-  { label: "About", href: "#about" },
-  { label: "Skills", href: "#skills" },
-  { label: "Experience", href: "#experience" },
-  { label: "Selected Works", href: "#works" },
-  { label: "Contact", href: "#contact" },
-];
+const BAR_HEIGHT = 56;
+const COLLAPSED_WIDTH = 268;
+const RING_RADIUS = 11;
+const RING_LENGTH = 2 * Math.PI * RING_RADIUS;
+
+function routeLabel(pathname: string) {
+  if (pathname.startsWith("/work/")) {
+    const project = getProject(pathname.split("/")[2] ?? "");
+    if (project) return { index: pad2(project.index), label: project.listTitle };
+    return { index: "—", label: "Case study" };
+  }
+  if (pathname === "/contact") return { index: "→", label: "Contact" };
+  return { index: "—", label: "Off route" };
+}
 
 export default function Header() {
-  const [menuActive, setMenuActive] = useState(false);
-  const [showFloatingButton, setShowFloatingButton] = useState(false);
-  const [useLightMenuMotion, setUseLightMenuMotion] = useState(false);
-  const { lenis } = useLenis();
-  const pathname = usePathname();
-  const { transitionTo } = useTransition();
-  const menuContainerRef = useRef<HTMLDivElement>(null);
-  const menuPathRef = useRef<SVGPathElement>(null);
-  const floatingButtonRef = useRef<HTMLDivElement>(null);
-
-  // 1. Scroll-based display of the floating magnetic menu trigger button
-  useEffect(() => {
-    const lightMotionQuery = window.matchMedia(
-      "(max-width: 767px), (pointer: coarse), (prefers-reduced-motion: reduce)"
-    );
-    const updateMotionMode = () => setUseLightMenuMotion(lightMotionQuery.matches);
-    updateMotionMode();
-
-    let ticking = false;
-    const handleScroll = () => {
-      if (ticking) return;
-      ticking = true;
-
-      requestAnimationFrame(() => {
-        const shouldShow = window.scrollY > 300;
-        setShowFloatingButton((current) => (current === shouldShow ? current : shouldShow));
-        if (!shouldShow) {
-          setMenuActive(false);
-        }
-        ticking = false;
-      });
-    };
-
-    lightMotionQuery.addEventListener("change", updateMotionMode);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      lightMotionQuery.removeEventListener("change", updateMotionMode);
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  // 2. Floating action button entrance/exit (Show on scroll OR when menu is open)
-  useGSAP(() => {
-    if (showFloatingButton || menuActive) {
-      gsap.to(floatingButtonRef.current, {
-        scale: 1,
-        opacity: 1,
-        duration: 0.4,
-        ease: "back.out(1.7)",
-      });
-    } else {
-      gsap.to(floatingButtonRef.current, {
-        scale: 0,
-        opacity: 0,
-        duration: 0.3,
-        ease: "power2.in",
-      });
-    }
-  }, [showFloatingButton, menuActive]);
-
-  // 3. Liquid menu slide-out animation (Curved panel morphing)
-  useGSAP(
-    () => {
-      const menu = menuContainerRef.current;
-      const path = menuPathRef.current;
-      if (!menu || !path) return;
-
-      const width = 380; // Slideout panel width
-      const height = window.innerHeight;
-
-      // Curved initial states and straight target states for SVG
-      const initialPath = `M100 0 L${width} 0 L${width} ${height} L100 ${height} Q-100 ${height / 2} 100 0 Z`;
-      const targetPath = `M0 0 L${width} 0 L${width} ${height} L0 ${height} Q0 ${height / 2} 0 0 Z`;
-
-      if (menuActive) {
-        // Toggle scrolling locks
-        lenis?.stop();
-
-        // 1. Set panels initial slide-in coordinates
-        gsap.set(menu, { xPercent: 100, x: 100, display: "block" });
-        gsap.set(path, { attr: { d: initialPath } });
-
-        const tl = gsap.timeline();
-
-        if (useLightMenuMotion) {
-          tl.to(menu, {
-            xPercent: 0,
-            x: 0,
-            duration: 0.32,
-            ease: "power2.out",
-          });
-
-          tl.fromTo(
-            ".menu-link-item",
-            { x: 28, opacity: 0 },
-            {
-              x: 0,
-              opacity: 1,
-              stagger: 0.04,
-              duration: 0.28,
-              ease: "power2.out",
-            },
-            "-=0.16"
-          );
-          return;
-        }
-
-        // 2. Slide container in from right
-        tl.to(menu, {
-          xPercent: 0,
-          x: 0,
-          duration: 0.85,
-          ease: "power4.inOut",
-        });
-
-        // 3. Morph liquid border path to flat straight edge
-        tl.to(
-          path,
-          {
-            attr: { d: targetPath },
-            duration: 0.85,
-            ease: "power3.inOut",
-          },
-          "-=0.85"
-        );
-
-        // 4. Stagger animate links entrance
-        tl.fromTo(
-          ".menu-link-item",
-          { x: 120, opacity: 0 },
-          {
-            x: 0,
-            opacity: 1,
-            stagger: 0.08,
-            duration: 0.65,
-            ease: "power3.out",
-          },
-          "-=0.4"
-        );
-      } else {
-        lenis?.start();
-
-        const tl = gsap.timeline({
-          onComplete: () => {
-            gsap.set(menu, { display: "none" });
-          },
-        });
-
-        if (useLightMenuMotion) {
-          tl.to(".menu-link-item", {
-            x: 28,
-            opacity: 0,
-            stagger: 0.025,
-            duration: 0.18,
-            ease: "power2.in",
-          });
-
-          tl.to(
-            menu,
-            {
-              xPercent: 100,
-              x: 100,
-              duration: 0.28,
-              ease: "power2.inOut",
-            },
-            "-=0.08"
-          );
-          return;
-        }
-
-        // Slide links out
-        tl.to(".menu-link-item", {
-          x: 80,
-          opacity: 0,
-          stagger: 0.04,
-          duration: 0.4,
-          ease: "power3.in",
-        });
-
-        // Morph border path back to curve
-        tl.to(
-          path,
-          {
-            attr: { d: initialPath },
-            duration: 0.75,
-            ease: "power3.inOut",
-          },
-          "-=0.2"
-        );
-
-        // Slide panel right off screen
-        tl.to(
-          menu,
-          {
-            xPercent: 100,
-            x: 100,
-            duration: 0.75,
-            ease: "power4.inOut",
-          },
-          "-=0.75"
-        );
-      }
-    },
-    { dependencies: [menuActive, useLightMenuMotion], scope: menuContainerRef }
-  );
-
-  // Optimized dynamic navigation callback
-  const handleNavigation = useCallback((label: string, href: string) => {
-    const wasMenuOpen = menuActive;
-    setMenuActive(false);
-
-    // If Contact click, transition to contact page
-    if (label === "Contact" || href === "#contact") {
-      if (wasMenuOpen) {
-        setTimeout(() => {
-          transitionTo("/contact", "Contact");
-        }, 600);
-      } else {
-        transitionTo("/contact", "Contact");
-      }
-      return;
-    }
-
-    // Scroll to section directly if already on home page
-    if (pathname === "/") {
-      const scrollTrigger = () => {
-        const el = document.querySelector(href) as HTMLElement;
-        if (el) {
-          lenis?.scrollTo(el, {
-            duration: 1.8,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-          });
-        }
-      };
-
-      if (wasMenuOpen) {
-        setTimeout(scrollTrigger, 700);
-      } else {
-        scrollTrigger();
-      }
-    } else {
-      // Transition to homepage with hash target
-      const targetUrl = href === "#hero" ? "/" : `/${href}`;
-      if (wasMenuOpen) {
-        setTimeout(() => {
-          transitionTo(targetUrl, label);
-        }, 600);
-      } else {
-        transitionTo(targetUrl, label);
-      }
-    }
-  }, [pathname, lenis, transitionTo, menuActive]);
+  const introDone = useIntroDone();
+  const revealed = usePageRevealed();
+  const ready = introDone && revealed;
 
   return (
     <>
-      {/* Dynamic Static Header (Shown at scroll-top) */}
-      <header className="absolute top-0 left-0 w-full z-40 flex items-center justify-between px-6 sm:px-12 py-8 mix-blend-difference text-white">
-        {/* Kinetic rolling brand logo */}
-        <div
-          onClick={() => handleNavigation("Home", "#hero")}
-          className="group flex cursor-pointer items-center gap-1 font-heading text-lg font-bold uppercase select-none"
+      <TopBar ready={ready} />
+      <Island ready={ready} />
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Top bar — blends with whatever it sits on, so it reads on dark and light
+   pages alike. It scrolls away with the page; the island stays.
+   ───────────────────────────────────────────────────────────────────────── */
+
+function TopBar({ ready }: { ready: boolean }) {
+  const barRef = useRef<HTMLElement>(null);
+
+  useGSAP(
+    () => {
+      if (!ready) return;
+      gsap.fromTo(
+        "[data-topbar-item]",
+        { yPercent: -120, opacity: 0 },
+        { yPercent: 0, opacity: 1, duration: 1.1, ease: "expo.out", stagger: 0.08, delay: 0.25 }
+      );
+    },
+    { scope: barRef, dependencies: [ready] }
+  );
+
+  return (
+    <header
+      ref={barRef}
+      className="pointer-events-none absolute inset-x-0 top-0 z-40 text-white mix-blend-difference"
+    >
+      <div className="flex items-start justify-between gap-6 px-gutter pt-5 sm:pt-7">
+        <TransitionLink
+          href="/"
+          label="Index"
+          data-topbar-item
+          className="roll-trigger pointer-events-auto flex items-baseline gap-1.5 font-heading text-[15px] font-bold uppercase leading-none tracking-[-0.01em] opacity-0"
         >
-          <div className="relative overflow-hidden flex h-6">
-            <span className="inline-block transition-transform duration-500 ease-out group-hover:-translate-y-full">
-              Anees Aboobacker
-            </span>
-            <span className="absolute left-0 top-full inline-block transition-transform duration-500 ease-out group-hover:-translate-y-full text-[#c9fd34]">
-              MERN Dev
-            </span>
-          </div>
+          <RollingText text={site.name} />
+          <span className="mono text-[10px] font-normal">©26</span>
+        </TransitionLink>
+
+        <div
+          data-topbar-item
+          className="hidden items-start gap-16 mono uppercase leading-relaxed opacity-0 lg:flex"
+        >
+          <p>
+            Full Stack
+            <br />
+            MERN Developer
+          </p>
+          <p>
+            {site.region}
+            <br />
+            <LocalTime short /> IST
+          </p>
         </div>
 
-        {/* Desktop Navigation Link items */}
-        <nav className="hidden md:flex items-center gap-2">
-          {navItems.map((item, i) => (
-            <Magnetic key={i} actionStrength={0.25} hoverAreaPadding="px-4 py-2">
-              <span
-                onClick={() => handleNavigation(item.label, item.href)}
-                className="relative text-sm font-light tracking-wide uppercase transition-colors duration-300 hover:text-[#c9fd34] cursor-pointer"
-              >
-                {item.label}
-              </span>
-            </Magnetic>
-          ))}
+        <TransitionLink
+          href="/contact"
+          label="Contact"
+          data-topbar-item
+          className="roll-trigger pointer-events-auto flex items-center gap-2.5 text-[13px] font-medium uppercase leading-none tracking-[0.12em] opacity-0"
+        >
+          <span className="pulse-dot h-2 w-2 rounded-full bg-lime" />
+          <RollingText text="Let's talk" />
+        </TransitionLink>
+      </div>
+    </header>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Island — a persistent pill at the bottom of the screen (thumb reach on
+   phones). Collapsed it shows where you are and how far down the page you
+   have scrolled; opened, it morphs upward into the navigation panel.
+   ───────────────────────────────────────────────────────────────────────── */
+
+function Island({ ready }: { ready: boolean }) {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const lenis = useLenis();
+  const sound = useSoundEnabled();
+  const [open, setOpen] = useState(false);
+  const [activeId, setActiveId] = useState(sections[0].id);
+  // On the home page the island waits until the hero is behind you — the
+  // name owns the first screen.
+  const [pastHero, setPastHero] = useState(false);
+  const visible = ready && (!isHome || pastHero || open);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const ringRef = useRef<SVGCircleElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
+  const panelId = useId();
+
+  const activeIndex = Math.max(0, sections.findIndex((section) => section.id === activeId));
+  const current = isHome
+    ? { index: pad2(activeIndex + 1), label: sections[activeIndex].label }
+    : routeLabel(pathname);
+
+  // Which home section is crossing the middle of the viewport.
+  useEffect(() => {
+    if (!isHome) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveId(entry.target.id);
+        }
+      },
+      { rootMargin: "-49% 0px -50% 0px" }
+    );
+    sections.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [isHome]);
+
+  // Scroll progress ring — written straight to the SVG, never through state.
+  // The only state it touches is the boolean "past the hero" flag.
+  useEffect(() => {
+    const circle = ringRef.current;
+    if (!circle) return;
+    const update = () => {
+      const scroll = lenis ? lenis.scroll : window.scrollY;
+      const limit = lenis ? lenis.limit : document.documentElement.scrollHeight - window.innerHeight;
+      const progress = limit > 0 ? scroll / limit : 0;
+      const clamped = Math.min(1, Math.max(0, Number.isFinite(progress) ? progress : 0));
+      circle.style.strokeDashoffset = String(RING_LENGTH * (1 - clamped));
+      setPastHero(scroll > window.innerHeight * 0.55);
+    };
+    const frame = requestAnimationFrame(update);
+    if (lenis) {
+      const off = lenis.on("scroll", update);
+      return () => {
+        cancelAnimationFrame(frame);
+        off();
+      };
+    }
+    window.addEventListener("scroll", update, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", update);
+    };
+  }, [lenis, pathname]);
+
+  // Entrance once the intro / route curtain is out of the way.
+  useGSAP(
+    () => {
+      gsap.to(rootRef.current, {
+        yPercent: visible ? 0 : 180,
+        opacity: visible ? 1 : 0,
+        duration: visible ? 1 : 0.45,
+        delay: visible && !isHome ? 0.9 : 0,
+        ease: visible ? "expo.out" : "power2.in",
+        overwrite: "auto",
+      });
+    },
+    { dependencies: [visible] }
+  );
+
+  // Label swap whenever the section changes.
+  useGSAP(
+    () => {
+      if (!labelRef.current || prefersReducedMotion()) return;
+      gsap.fromTo(labelRef.current, { yPercent: 100 }, { yPercent: 0, duration: 0.6, ease: "expo.out" });
+    },
+    { dependencies: [current.label, open] }
+  );
+
+  // Morph between pill and panel.
+  useGSAP(
+    () => {
+      const root = rootRef.current;
+      const panel = panelRef.current;
+      if (!root || !panel) return;
+      const reduce = prefersReducedMotion();
+      const items = panel.querySelectorAll("[data-stagger]");
+
+      if (open) {
+        gsap.set(panel, { display: "flex" });
+        const width = Math.min(440, window.innerWidth - 24);
+        const height = panel.scrollHeight + BAR_HEIGHT;
+        gsap.to(root, { width, height, borderRadius: 24, duration: reduce ? 0 : 0.8, ease: "expo.out", overwrite: "auto" });
+        gsap.fromTo(
+          items,
+          { y: 22, opacity: 0 },
+          { y: 0, opacity: 1, duration: reduce ? 0 : 0.7, stagger: 0.035, delay: reduce ? 0 : 0.12, ease: "expo.out" }
+        );
+      } else {
+        gsap.to(items, { opacity: 0, duration: 0.15, overwrite: true });
+        gsap.to(root, {
+          width: COLLAPSED_WIDTH,
+          height: BAR_HEIGHT,
+          borderRadius: BAR_HEIGHT / 2,
+          duration: reduce ? 0 : 0.65,
+          ease: "expo.inOut",
+          overwrite: "auto",
+          onComplete: () => {
+            gsap.set(panel, { display: "none" });
+          },
+        });
+      }
+    },
+    { dependencies: [open], scope: rootRef }
+  );
+
+  // Escape / outside click close, focus management.
+  useEffect(() => {
+    if (!open) return;
+    const root = rootRef.current;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        toggleRef.current?.focus();
+      }
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      if (root && !root.contains(event.target as Node)) setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("pointerdown", onPointerDown);
+    const focusTimer = window.setTimeout(() => {
+      root?.querySelector<HTMLElement>("[data-nav-link]")?.focus({ preventScroll: true });
+    }, 120);
+    return () => {
+      window.clearTimeout(focusTimer);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, [open]);
+
+  const goToSection = (event: React.MouseEvent, id: string) => {
+    event.preventDefault();
+    setOpen(false);
+    window.setTimeout(() => scrollToHash(`#${id}`), 260);
+  };
+
+  return (
+    <div
+      ref={rootRef}
+      style={{ width: COLLAPSED_WIDTH, height: BAR_HEIGHT, borderRadius: BAR_HEIGHT / 2, opacity: 0 }}
+      className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 overflow-hidden border border-line-2 bg-[#141416] text-fg shadow-[0_24px_60px_-20px_rgba(0,0,0,0.75)] sm:bottom-6"
+    >
+      {/* Panel — grows upward from the pill */}
+      <div
+        ref={panelRef}
+        id={panelId}
+        role="dialog"
+        aria-label="Site navigation"
+        className="absolute inset-x-0 top-0 hidden flex-col gap-6 px-5 pb-3 pt-5 sm:px-6"
+      >
+        <div data-stagger className="flex items-center justify-between mono uppercase text-fg-3">
+          <span>Navigation</span>
+          <span>
+            <LocalTime short /> IST
+          </span>
+        </div>
+
+        <nav aria-label="Sections">
+          <ul className="flex flex-col">
+            {sections.map((section, i) => {
+              const isActive = isHome && section.id === activeId;
+              const content = (
+                <>
+                  <span className="mono w-7 text-fg-3">{pad2(i + 1)}</span>
+                  <span
+                    className="font-heading text-[1.65rem] leading-[1.25] tracking-[-0.02em] transition-[font-variation-settings] duration-500 ease-expo [font-variation-settings:'wght'_560] group-hover:[font-variation-settings:'wght'_800] group-focus-visible:[font-variation-settings:'wght'_800]"
+                  >
+                    {section.label}
+                  </span>
+                  {isActive && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-lime" />}
+                </>
+              );
+              const className =
+                "backlit group flex items-center gap-3 rounded-lg px-2 py-1 -mx-2 outline-none";
+              return (
+                <li key={section.id} data-stagger>
+                  {isHome ? (
+                    <a
+                      href={`#${section.id}`}
+                      data-nav-link
+                      data-active={isActive}
+                      aria-current={isActive ? "location" : undefined}
+                      onClick={(event) => goToSection(event, section.id)}
+                      onPointerEnter={() => playTick()}
+                      className={className}
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    <TransitionLink
+                      href={`/#${section.id}`}
+                      label={section.label}
+                      data-nav-link
+                      onClick={() => setOpen(false)}
+                      onPointerEnter={() => playTick()}
+                      className={className}
+                    >
+                      {content}
+                    </TransitionLink>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </nav>
 
-        {/* Mobile menu trigger — padded to a full 44px touch target */}
-        <div className="md:hidden -mr-2.5">
+        <div data-stagger className="flex flex-wrap items-center gap-2 border-t border-line-2 pt-4">
+          <a
+            href={site.socials.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-line-2 text-fg-2 transition-colors hover:border-transparent hover:bg-lime hover:text-void"
+          >
+            <FaLinkedinIn className="h-3.5 w-3.5" />
+          </a>
+          <a
+            href={site.socials.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-line-2 text-fg-2 transition-colors hover:border-transparent hover:bg-lime hover:text-void"
+          >
+            <SiGithub className="h-3.5 w-3.5" />
+          </a>
+          <a
+            href={site.resume}
+            download={site.resumeFileName}
+            className="flex h-9 items-center gap-1.5 rounded-full border border-line-2 px-3.5 text-xs font-medium text-fg-2 transition-colors hover:border-transparent hover:bg-fg hover:text-void"
+          >
+            Résumé <Download className="h-3 w-3" />
+          </a>
+          <a
+            href={`mailto:${site.email}`}
+            className="flex h-9 items-center gap-1.5 rounded-full border border-line-2 px-3.5 text-xs font-medium text-fg-2 transition-colors hover:border-transparent hover:bg-fg hover:text-void"
+          >
+            Email <ArrowUpRight className="h-3 w-3" />
+          </a>
           <button
             type="button"
-            aria-label="Open navigation menu"
-            onClick={() => setMenuActive(true)}
-            className="flex items-center justify-center p-2.5 hover:text-[#c9fd34]"
+            aria-pressed={sound}
+            onClick={() => setSoundEnabled(!sound)}
+            className="ml-auto flex h-9 items-center gap-2 rounded-full px-2 text-xs font-medium text-fg-3 transition-colors hover:text-fg"
           >
-            <Menu className="w-5 h-5" />
+            <span data-on={sound} className="equalizer flex h-3 items-end gap-[2px]">
+              <span />
+              <span />
+              <span />
+            </span>
+            Sound {sound ? "on" : "off"}
           </button>
         </div>
-      </header>
+      </div>
 
-      {/* Floating Sticky Menu Action Trigger (Slides in on scroll down or when menu is active) */}
-      <div
-        ref={floatingButtonRef}
-        className="fixed top-6 right-6 sm:top-8 sm:right-8 z-50 scale-0 opacity-0"
+      {/* The pill itself — always the toggle */}
+      <button
+        ref={toggleRef}
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        aria-label={open ? "Close navigation" : `Open navigation — currently at ${current.label}`}
+        onClick={() => {
+          playTick(open ? 0.8 : 1);
+          setOpen((value) => !value);
+        }}
+        className="absolute inset-x-0 bottom-0 flex items-center gap-3 pl-2 pr-5 text-left"
+        style={{ height: BAR_HEIGHT - 2 }}
       >
-        <Magnetic actionStrength={0.4} hoverAreaPadding="p-0">
-          <button
-            type="button"
-            aria-label={menuActive ? "Close navigation menu" : "Open navigation menu"}
-            onClick={() => setMenuActive((prev) => !prev)}
-            className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg border border-white/10 transition-colors duration-300 cursor-pointer
-              ${menuActive ? "bg-[#c9fd34] text-black" : "bg-[#1f1f21] text-white hover:bg-[#c9fd34] hover:text-black"}
-            `}
+        <span aria-hidden className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+          <svg viewBox="0 0 28 28" className="absolute inset-0 h-full w-full -rotate-90">
+            <circle cx="14" cy="14" r={RING_RADIUS} fill="none" stroke="currentColor" strokeOpacity="0.14" strokeWidth="1.5" />
+            <circle
+              ref={ringRef}
+              cx="14"
+              cy="14"
+              r={RING_RADIUS}
+              fill="none"
+              stroke="var(--accent-lime)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeDasharray={RING_LENGTH}
+              strokeDashoffset={RING_LENGTH}
+            />
+          </svg>
+          <span className="mono text-[10px] text-fg-2">{current.index}</span>
+        </span>
+
+        <span aria-hidden className="block min-w-0 flex-1 overflow-hidden">
+          <span
+            ref={labelRef}
+            className="block truncate font-heading text-[13px] font-semibold uppercase tracking-[0.06em]"
           >
-            {menuActive ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </Magnetic>
-      </div>
+            {open ? "Close" : current.label}
+          </span>
+        </span>
 
-      {/* Fullscreen Overlay Menu (Curved Morphing slide panel) */}
-      <div
-        ref={menuContainerRef}
-        className="fixed top-0 right-0 h-full w-full sm:w-[440px] md:w-[420px] max-w-full z-45 hidden bg-[#1c1c1f]"
-      >
-        {/* Curved boundary graphic using morphing SVG path */}
-        <svg className="absolute top-0 left-[-99px] hidden md:block w-[100px] h-full fill-[#1c1c1f] pointer-events-none">
-          <path ref={menuPathRef} />
-        </svg>
-
-        <div className="flex flex-col h-full justify-between p-8 sm:p-12 md:p-14 text-white font-sans">
-          <div className="flex flex-col gap-10 sm:gap-12 mt-16 sm:mt-12">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-4">
-              Navigation
-            </span>
-            <div className="flex flex-col gap-6">
-              {navItems.map((item, i) => (
-                <div key={i} className="menu-link-item overflow-hidden">
-                  <span
-                    onClick={() => handleNavigation(item.label, item.href)}
-                    className="block font-heading text-2xl sm:text-3xl font-light leading-tight tracking-tight hover:text-[#c9fd34] transition-colors duration-300 cursor-pointer"
-                  >
-                    {item.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">
-              Socials
-            </span>
-            <div className="flex items-center gap-3">
-              <a
-                href="https://www.linkedin.com/in/anees-aboobacker-4842b627a/"
-                target="_blank"
-                aria-label="LinkedIn"
-                className="w-10 h-10 rounded-full border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-black hover:bg-[#c9fd34] hover:border-transparent transition-all duration-300"
-              >
-                <FaLinkedin className="w-4 h-4" />
-              </a>
-              <a
-                href="https://github.com/ANESSABO0421"
-                target="_blank"
-                aria-label="GitHub"
-                className="w-10 h-10 rounded-full border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-black hover:bg-[#c9fd34] hover:border-transparent transition-all duration-300"
-              >
-                <SiGithub className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+        <span aria-hidden className="flex items-center gap-2.5 mono uppercase text-fg-3">
+          {open ? "Esc" : "Menu"}
+          <span className="relative h-2.5 w-4">
+            <span
+              className={`absolute left-0 h-px w-full bg-fg transition-transform duration-500 ease-expo ${
+                open ? "top-1/2 rotate-45" : "top-0"
+              }`}
+            />
+            <span
+              className={`absolute left-0 h-px w-full bg-fg transition-transform duration-500 ease-expo ${
+                open ? "top-1/2 -rotate-45" : "bottom-0"
+              }`}
+            />
+          </span>
+        </span>
+      </button>
+    </div>
   );
 }
