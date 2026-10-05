@@ -1,4 +1,5 @@
-// Placeholder while the contact page is being rebuilt.
+import Conversation from "./conversation";
+
 export default function ContactPage() {
-  return <main id="main" className="min-h-screen bg-night" />;
+  return <Conversation />;
 }

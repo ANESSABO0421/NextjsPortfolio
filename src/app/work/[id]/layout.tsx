@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
-import { projectDetails, projectIds } from "@/lib/projects";
+import { getProject, projectIds } from "@/lib/projects";
+
+// Every case study is known at build time; anything else is a 404.
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   return projectIds.map((id) => ({ id }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
+// Social images come from the colocated opengraph-image.tsx.
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const project = projectDetails[id] || projectDetails["devpulse"];
+  const project = getProject(id);
+  if (!project) return {};
 
-  const title = `${project.title} — ${project.category}`;
+  const title = `${project.listTitle} — ${project.category}`;
   const description = project.description;
 
   return {
@@ -23,24 +24,16 @@ export async function generateMetadata({
       canonical: `/work/${id}`,
     },
     openGraph: {
+      type: "article",
+      url: `/work/${id}`,
+      siteName: "Anees Aboobacker",
       title,
       description,
-      url: `/work/${id}`,
-      images: [
-        {
-          url: project.src,
-          width: 1024,
-          height: 1024,
-          alt: project.title,
-        },
-      ],
-      type: "article",
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [project.src],
     },
   };
 }

@@ -1,435 +1,624 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { useTransition } from "@/components/providers/transition-provider";
-import { projectDetails } from "@/lib/projects";
-import { ArrowUpRight, Pause, Play } from "lucide-react";
+import { Fragment, useEffect, useId, useRef, useState } from "react";
+import type { IconType } from "react-icons";
 import {
-  SiMongodb,
+  SiDocker,
   SiExpress,
-  SiReact,
-  SiNodedotjs,
+  SiMongodb,
   SiNextdotjs,
+  SiNodedotjs,
+  SiPostgresql,
+  SiReact,
+  SiRedux,
+  SiSocketdotio,
   SiTailwindcss,
   SiTypescript,
-  SiSocketdotio,
-  SiPostgresql,
-  SiRedux,
-  SiDocker,
 } from "react-icons/si";
 import { TbBrandReactNative } from "react-icons/tb";
-import type { IconType } from "react-icons";
+import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from "@/lib/gsap";
+import { useFinePointer, useReducedMotion } from "@/lib/stores";
+import { playTick } from "@/lib/sound";
+import { pad2 } from "@/lib/site";
+import { allProjects } from "@/lib/projects";
+import {
+  elements,
+  elementUsage,
+  groupLabels,
+  mernSymbols,
+  projectTotal,
+  roleTotal,
+  type ElementGroup,
+  type StackElement,
+} from "@/lib/skills";
+import { cn } from "@/lib/utils";
+import TransitionLink from "@/components/ui/transition-link";
+import TextReveal from "@/components/ui/text-reveal";
 
-interface Skill {
-  /** Must match the spelling used in project `stack` arrays to link projects. */
-  name: string;
-  Icon: IconType;
-  color: string;
-  note: string;
-  usedFor: string[];
-}
+const ICONS: Record<string, IconType> = {
+  Mg: SiMongodb,
+  Ex: SiExpress,
+  Re: SiReact,
+  No: SiNodedotjs,
+  Nx: SiNextdotjs,
+  Ts: SiTypescript,
+  Rn: TbBrandReactNative,
+  Tw: SiTailwindcss,
+  Io: SiSocketdotio,
+  Pg: SiPostgresql,
+  Rx: SiRedux,
+  Dk: SiDocker,
+};
 
-const skills: Skill[] = [
-  {
-    name: "React.js", Icon: SiReact, color: "#61DAFB",
-    note: "Component architecture, hooks, render performance.",
-    usedFor: ["ERP & HRMS dashboards with 6 role-based views", "Refactoring 6,000+ lines into 50+ modular components"],
-  },
-  {
-    name: "Next.js", Icon: SiNextdotjs, color: "#ffffff",
-    note: "App Router, server rendering, SEO-first builds.",
-    usedFor: ["Client websites and community platforms", "SEO-friendly pages deployed on Vercel"],
-  },
-  {
-    name: "Node.js", Icon: SiNodedotjs, color: "#5FA04E",
-    note: "REST APIs, service-layer design, background jobs.",
-    usedFor: ["APIs serving both web and React Native clients", "node-cron jobs for reminders and attendance closing"],
-  },
-  {
-    name: "Express.js", Icon: SiExpress, color: "#e8e8e8",
-    note: "Middleware, RBAC, controller/service split.",
-    usedFor: ["JWT auth, RBAC and modular middleware routing", "Splitting large controllers into service layers"],
-  },
-  {
-    name: "MongoDB", Icon: SiMongodb, color: "#00ED64",
-    note: "Aggregation pipelines, compound indexing.",
-    usedFor: ["Aggregation pipelines for alumni and analytics data", "Compound indexes to speed up hot queries"],
-  },
-  {
-    name: "TypeScript", Icon: SiTypescript, color: "#3178C6",
-    note: "Typed contracts across the stack.",
-    usedFor: ["Typed API contracts and shared models", "Safer refactors in larger codebases"],
-  },
-  {
-    name: "React Native", Icon: TbBrandReactNative, color: "#61DAFB",
-    note: "Cross-platform mobile apps with Expo.",
-    usedFor: ["Voice-driven expense tracking on mobile", "ERP mobile forms backed by shared REST APIs"],
-  },
-  {
-    name: "Tailwind CSS", Icon: SiTailwindcss, color: "#38BDF8",
-    note: "Utility-first, design-system driven UI.",
-    usedFor: ["Responsive layouts from 320px phones up", "Consistent design tokens — including this site"],
-  },
-  {
-    name: "Socket.io", Icon: SiSocketdotio, color: "#c9fd34",
-    note: "Real-time events, room-scoped broadcasting.",
-    usedFor: ["Live HRMS notifications with presence", "Room-scoped broadcasting for real-time updates"],
-  },
-  {
-    name: "PostgreSQL", Icon: SiPostgresql, color: "#4169E1",
-    note: "Relational schemas, indexed querying.",
-    usedFor: ["Relational schemas for structured data", "Joins and indexed queries"],
-  },
-  {
-    name: "Redux Toolkit", Icon: SiRedux, color: "#764ABC",
-    note: "Predictable global state at scale.",
-    usedFor: ["Global state for data-heavy ERP modules", "Slices for predictable, testable updates"],
-  },
-  {
-    name: "Docker", Icon: SiDocker, color: "#2496ED",
-    note: "Containerized builds and environments.",
-    usedFor: ["Reproducible local development setups", "Consistent builds across machines"],
-  },
-];
+const GROUP_NAMES: Record<ElementGroup, string> = {
+  interface: "Interface",
+  server: "Server",
+  data: "Data",
+  tooling: "Tooling",
+};
 
-const REVOLUTION_MS = 42000; // one full lap of the arc
-const APEX_DEG = 270; // top-center of the circle in screen space (0 = right, 90 = down)
-const STEP = 360 / skills.length;
+// Placement on the 8-column desktop table. The two outer blocks echo the s-
+// and p-blocks of the real periodic table; the hole between them — where a
+// printed table keeps its key — holds the readout.
+const PLACEMENT: Record<string, readonly [col: number, row: number]> = {
+  Mg: [1, 1],
+  Ex: [8, 1],
+  Re: [1, 2],
+  No: [2, 2],
+  Nx: [7, 2],
+  Ts: [8, 2],
+  Rn: [1, 3],
+  Tw: [2, 3],
+  Io: [7, 3],
+  Pg: [8, 3],
+  Rx: [1, 4],
+  Dk: [2, 4],
+};
 
-/**
- * Standalone skills section: tech icons orbit a dome like a marquee. The icon
- * at the apex is "in focus" — it lights up on the arc and a panel below shows
- * what it's used for and which projects use it. Clicking an icon spins it to
- * the apex and holds it there; hovering the arc pauses the orbit.
- *
- * Per-frame positions are written straight to refs; only the focused index is
- * React state, so re-renders happen ~12 times per lap, not 60 times a second.
- */
+const SCRAMBLE = "ABCDEFGHIKLMNOPRSTUXabcdegiklmnorstux";
+
+const bySymbol = Object.fromEntries(elements.map((element) => [element.symbol, element])) as Record<
+  string,
+  StackElement
+>;
+const groups = Object.keys(groupLabels) as ElementGroup[];
+const groupSize = (group: ElementGroup) => elements.filter((element) => element.group === group).length;
+const weightOf = (symbol: string) => elementUsage[symbol].projects.length + elementUsage[symbol].roleCount;
+const isMern = (symbol: string) => (mernSymbols as readonly string[]).includes(symbol);
+const compoundProjects = allProjects.filter((project) =>
+  mernSymbols.every((symbol) => project.stack.includes(bySymbol[symbol].name))
+);
+
+type Highlight = { kind: "group"; group: ElementGroup } | { kind: "compound" } | null;
+type TileState = "focus" | "bond" | "match" | "dim" | "idle";
+
 export default function Skills() {
   const sectionRef = useRef<HTMLElement>(null);
-  const arcRef = useRef<HTMLDivElement>(null);
-  const iconRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const radiusRef = useRef(200);
-  const rotation = useRef({ deg: 0 });
-  const pausedRef = useRef(false);
+  const readoutRef = useRef<HTMLDivElement>(null);
+  const tileRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const swappedRef = useRef(false);
+  const [focus, setFocus] = useState(elements[0].symbol);
+  const [hovering, setHovering] = useState(false);
+  const [highlight, setHighlight] = useState<Highlight>(null);
+  const finePointer = useFinePointer();
+  const reduceMotion = useReducedMotion();
 
-  const [radius, setRadius] = useState(200);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const { transitionTo } = useTransition();
+  const focused = bySymbol[focus];
+  const usage = elementUsage[focus];
+  const Icon = ICONS[focus];
 
-  // Skill name -> projects whose stack lists it. Single source of truth: lib/projects.
-  const projectsBySkill = useMemo(() => {
-    const all = Object.values(projectDetails);
-    return Object.fromEntries(
-      skills.map((s) => [
-        s.name,
-        all.filter((p) => p.stack.includes(s.name)).map((p) => ({ id: p.id, title: p.listTitle })),
-      ])
-    );
-  }, []);
+  const select = (symbol: string) => {
+    setHighlight(null);
+    if (symbol === focus) return;
+    setFocus(symbol);
+    // Pitch climbs with the atomic number, so sweeping the table plays a scale.
+    playTick(0.85 + bySymbol[symbol].number * 0.03);
+  };
 
-  const measure = useCallback(() => {
-    const arc = arcRef.current;
-    if (!arc) return;
-    const next = Math.round(Math.min(Math.max(arc.clientWidth * 0.42, 130), 340));
-    radiusRef.current = next;
-    setRadius(next);
-  }, []);
+  const stateOf = (element: StackElement): TileState => {
+    if (highlight) {
+      const match = highlight.kind === "group" ? element.group === highlight.group : isMern(element.symbol);
+      return match ? "match" : "dim";
+    }
+    if (element.symbol === focus) return "focus";
+    if (focused.bonds.includes(element.symbol)) return "bond";
+    return hovering ? "dim" : "idle";
+  };
 
-  useEffect(() => {
-    measure();
-    window.addEventListener("resize", measure, { passive: true });
-    return () => window.removeEventListener("resize", measure);
-  }, [measure]);
-
-  // Orbit loop.
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let lastActive = -1;
-    // Skip a redundant style write when a frame's math produces the same
-    // rounded position as the last one (happens constantly on high-refresh
-    // displays where deltaMs is tiny) — cuts main-thread work on mobile.
-    const lastX = new Array(skills.length).fill(NaN);
-    const lastY = new Array(skills.length).fill(NaN);
-
-    const render = () => {
-      const r = radiusRef.current;
-      let closestDist = 999;
-      let closestIndex = 0;
-
-      for (let i = 0; i < skills.length; i++) {
-        const theta = (((rotation.current.deg + i * STEP) % 360) + 360) % 360;
-        const rad = (theta * Math.PI) / 180;
-
-        let dist = Math.abs(theta - APEX_DEG);
-        if (dist > 180) dist = 360 - dist;
-
-        const inDome = dist < 90; // upper half of the circle is the visible arc
-        const closeness = inDome ? 1 - dist / 90 : 0;
-        const el = iconRefs.current[i];
-
-        if (el) {
-          const x = Math.round(r * Math.cos(rad) * 10) / 10;
-          const y = Math.round(r * Math.sin(rad) * 10) / 10;
-          if (x !== lastX[i] || y !== lastY[i]) {
-            lastX[i] = x;
-            lastY[i] = y;
-            const scale = 0.62 + closeness * 0.6;
-            // translate3d promotes each icon to its own GPU layer, so the
-            // orbit is pure compositor work — no layout/paint per frame.
-            el.style.transform = `translate3d(-50%, -50%, 0) translate3d(${x}px, ${y}px, 0) scale(${scale})`;
-            el.style.opacity = inDome ? String(Math.min(1, closeness * 1.6 + 0.15)) : "0";
-            el.style.zIndex = String(Math.round(closeness * 100));
-            // Keep hidden icons out of the tab order / hit testing.
-            el.style.pointerEvents = inDome ? "auto" : "none";
-            el.tabIndex = inDome ? 0 : -1;
-          }
-        }
-
-        if (inDome && dist < closestDist) {
-          closestDist = dist;
-          closestIndex = i;
-        }
-      }
-
-      if (closestIndex !== lastActive) {
-        lastActive = closestIndex;
-        setActiveIndex(closestIndex);
-      }
+  // Roving focus: the table is one tab stop, arrows walk the atomic numbers.
+  const onTableKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const index = elements.findIndex((element) => element.symbol === focus);
+    const moves: Record<string, number> = {
+      ArrowRight: index + 1,
+      ArrowDown: index + 1,
+      ArrowLeft: index - 1,
+      ArrowUp: index - 1,
+      Home: 0,
+      End: elements.length - 1,
     };
+    if (!(event.key in moves)) return;
+    event.preventDefault();
+    const next = elements[(moves[event.key] + elements.length) % elements.length];
+    select(next.symbol);
+    tileRefs.current[next.symbol]?.focus();
+  };
 
-    // Shares GSAP's ticker with Lenis/ScrollTrigger — one rAF loop for the page.
-    // Keeps moving continuously — hovering or focusing a skill never stops it,
-    // only the explicit Pause button does.
-    const ticker = (_time: number, deltaMs: number) => {
-      if (!prefersReducedMotion && !pausedRef.current) {
-        rotation.current.deg += (Math.min(deltaMs, 64) / REVOLUTION_MS) * 360;
-      }
-      render();
-    };
-
-    render();
-
-    // Only tick while the section is on screen.
-    let running = false;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !running) {
-          gsap.ticker.add(ticker);
-          running = true;
-        } else if (!entry.isIntersecting && running) {
-          gsap.ticker.remove(ticker);
-          running = false;
-        }
-      },
-      { rootMargin: "100px" }
-    );
-    if (arcRef.current) observer.observe(arcRef.current);
-
-    return () => {
-      observer.disconnect();
-      gsap.ticker.remove(ticker);
-    };
-  }, []);
-
-  // Cross-fade the focus panel whenever the focused skill changes.
-  useEffect(() => {
-    if (!panelRef.current) return;
-    gsap.fromTo(
-      panelRef.current.querySelectorAll(".focus-fade"),
-      { opacity: 0, y: 8 },
-      { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: "power2.out", overwrite: "auto" }
-    );
-  }, [activeIndex]);
-
-  // Section header reveal.
+  /* ── Entrance: the table fills in, element by element ──────────────── */
   useGSAP(
     () => {
-      gsap.fromTo(
-        ".skills-reveal",
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          stagger: 0.12,
-          duration: 0.8,
-          ease: "power3.out",
-          scrollTrigger: { trigger: sectionRef.current, start: "top 80%" },
-        }
-      );
+      const section = sectionRef.current;
+      if (!section) return;
+
+      if (!prefersReducedMotion()) {
+        const tiles = gsap.utils.toArray<HTMLElement>("[data-tile]", section);
+        const inners = gsap.utils.toArray<HTMLElement>("[data-tile-inner]", section);
+        const extras = gsap.utils.toArray<HTMLElement>("[data-table-extra]", section);
+        // Tiles transition opacity and borders in CSS for their hover states,
+        // so the entrance animates clip-path and an inner wrapper instead.
+        gsap.set(tiles, { clipPath: "inset(100% 0% 0% 0%)" });
+        gsap.set(inners, { yPercent: 30 });
+        gsap.set(extras, { opacity: 0, y: 24 });
+
+        ScrollTrigger.create({
+          trigger: "[data-table]",
+          start: "top 78%",
+          once: true,
+          onEnter: () => {
+            gsap.to(tiles, {
+              clipPath: "inset(0% 0% 0% 0%)",
+              duration: 1,
+              ease: "expo.out",
+              stagger: 0.05,
+              clearProps: "clipPath",
+            });
+            gsap.to(inners, { yPercent: 0, duration: 1.1, ease: "expo.out", stagger: 0.05 });
+            tiles.forEach((tile, i) => {
+              const symbol = tile.querySelector<HTMLElement>("[data-symbol]");
+              if (!symbol) return;
+              gsap.to(symbol, {
+                duration: 0.9,
+                delay: 0.1 + i * 0.05,
+                scrambleText: { text: symbol.textContent ?? "", chars: SCRAMBLE, speed: 0.55 },
+              });
+            });
+            gsap.to(extras, { opacity: 1, y: 0, duration: 1.1, ease: "expo.out", stagger: 0.12, delay: 0.35 });
+          },
+        });
+      }
+
+      // This section ships as its own chunk; if it lands after the sections
+      // below have measured themselves, their trigger positions are stale.
+      ScrollTrigger.sort();
+      ScrollTrigger.refresh();
     },
     { scope: sectionRef }
   );
 
-  const setPausedState = useCallback((value: boolean) => {
-    pausedRef.current = value;
-    setPaused(value);
-  }, []);
+  /* ── Readout swap on every new element ─────────────────────────────── */
+  useGSAP(
+    () => {
+      if (!swappedRef.current) {
+        swappedRef.current = true;
+        return;
+      }
+      if (prefersReducedMotion()) return;
+      gsap.fromTo(
+        "[data-swap]",
+        { y: 14, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "expo.out", stagger: 0.035, overwrite: true }
+      );
+      gsap.fromTo(
+        "[data-nucleus]",
+        { scale: 0.55 },
+        { scale: 1, duration: 1, ease: "elastic.out(1, 0.45)", svgOrigin: "100 100", overwrite: true }
+      );
+    },
+    { scope: readoutRef, dependencies: [focus] }
+  );
 
-  // Spin the clicked icon to the apex along the shortest path. The orbit
-  // keeps moving through and past it afterwards — this just fast-forwards
-  // to bring that skill into focus rather than stopping on it.
-  const focusSkill = useCallback((index: number) => {
-    const current = rotation.current.deg;
-    let delta = (((APEX_DEG - index * STEP - current) % 360) + 360) % 360;
-    if (delta > 180) delta -= 360;
-    gsap.to(rotation.current, { deg: current + delta, duration: 0.9, ease: "power3.inOut", overwrite: true });
-  }, []);
-
-  const active = skills[activeIndex];
-  const activeProjects = projectsBySkill[active.name] ?? [];
+  const hint = finePointer
+    ? "Hover an element to see what it bonds with and where it turns up in the work."
+    : "Tap an element to see what it bonds with and where it turns up in the work.";
 
   return (
     <section
       id="skills"
       ref={sectionRef}
-      // No border here on purpose — About, Skills and Experience all share
-      // the same #111112 background so they read as one continuous surface;
-      // a border line would print a hairline seam across identical color.
-      className="relative w-full bg-[#111112] py-20 sm:py-28 lg:py-32 text-white overflow-hidden"
+      aria-labelledby="skills-title"
+      className="relative bg-surface py-28 sm:py-36"
     >
-      {/* Ambient glow spanning the top of the section, tinted by the focused
-          skill. Centered well below the top edge (not at 0%) so it has
-          already faded to transparent by the time it reaches the boundary
-          with About above — that's what avoids the hard seam a gradient (or
-          blurred circle) centered right on the edge would print. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[32rem] sm:h-[38rem] transition-colors duration-700"
-        style={{
-          background: `radial-gradient(60% 55% at 50% 38%, color-mix(in srgb, ${active.color} 14%, transparent), transparent 100%)`,
-        }}
-      />
+      <div className="px-gutter">
+        <div className="flex items-center justify-between mono uppercase text-fg-3">
+          <span>(03) — Stack</span>
+          <span className="hidden sm:inline">
+            Periodic table · {elements.length} elements · {groups.length} groups
+          </span>
+        </div>
 
-      <div className="relative z-10 px-6 sm:px-10 md:px-16 lg:px-24 max-w-7xl mx-auto w-full flex flex-col gap-10 sm:gap-14">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-          <div className="flex flex-col gap-4">
-            <span className="skills-reveal text-xs uppercase tracking-widest text-zinc-500 font-semibold flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#c9fd34]" />
-              Skills &amp; Stack
-            </span>
-            <h2 className="skills-reveal font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-              My Skills.
-            </h2>
-          </div>
-          <p className="skills-reveal max-w-sm text-sm text-zinc-500 font-light leading-relaxed">
-            The tools I ship production work with. Tap any icon to bring it into
-            focus and see what I use it for.
+        <div className="mt-10 grid gap-8 lg:grid-cols-12 lg:items-end">
+          <TextReveal
+            as="h2"
+            text="Twelve elements. One compound."
+            split="words"
+            className="max-w-[14ch] font-heading text-h1 text-fg [font-variation-settings:'wght'_620] lg:col-span-8"
+          />
+          <p className="max-w-[26rem] text-[clamp(1rem,1.25vw,1.15rem)] font-light leading-relaxed text-fg-2 lg:col-span-4 lg:justify-self-end">
+            The stack I reach for, set out like the periodic table and numbered so MERN comes first.{" "}
+            <span className="text-fg-3">{hint}</span>
           </p>
         </div>
+        <span id="skills-title" className="sr-only">
+          Tech stack
+        </span>
 
-        {/* Orbit stage — circle is centered on the stage's bottom edge, so only the dome shows */}
-        <div
-          ref={arcRef}
-          className="relative w-full overflow-hidden"
-          style={{ height: radius + 60 }}
-        >
+        <div className="@container mx-auto mt-16 max-w-[88rem] sm:mt-20">
           <div
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-full rounded-full border border-dashed border-white/[0.09]"
-            style={{ width: radius * 2, height: radius * 2, transform: "translate(-50%, -50%)" }}
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-full rounded-full border border-white/[0.04]"
-            style={{ width: radius * 1.55, height: radius * 1.55, transform: "translate(-50%, -50%)" }}
-          />
-
-          {skills.map((skill, i) => (
-            <button
-              key={skill.name}
-              type="button"
-              ref={(el) => {
-                iconRefs.current[i] = el;
-              }}
-              onClick={() => focusSkill(i)}
-              aria-label={`Focus ${skill.name}`}
-              aria-pressed={i === activeIndex}
-              style={{ "--accent": skill.color } as React.CSSProperties}
-              className={`absolute left-1/2 top-full flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl border bg-[#151517] cursor-pointer will-change-transform transition-[border-color,box-shadow] duration-500 focus-visible:outline-2 focus-visible:outline-[#c9fd34] ${
-                i === activeIndex
-                  ? "border-[color:var(--accent)]/50 shadow-[0_0_32px_-6px_var(--accent)]"
-                  : "border-white/[0.08] shadow-lg hover:border-white/20"
-              }`}
-            >
-              <skill.Icon className="w-5 h-5 sm:w-7 sm:h-7" style={{ color: "var(--accent)" }} />
-            </button>
-          ))}
-        </div>
-
-        {/* Focus card — sits centered right under the arc apex, no boxed panel */}
-        <div
-          ref={panelRef}
-          className="relative z-10 -mt-3 sm:-mt-5 mx-auto flex w-full max-w-lg flex-col items-center gap-4 text-center"
-          style={{ "--accent": active.color } as React.CSSProperties}
-        >
-          <span
-            className="focus-fade flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border shadow-[0_0_40px_-12px_var(--accent)]"
-            style={{
-              borderColor: "color-mix(in srgb, var(--accent) 40%, transparent)",
-              background: "color-mix(in srgb, var(--accent) 12%, #151517)",
+            data-table
+            onPointerEnter={(event) => {
+              if (event.pointerType === "mouse") setHovering(true);
             }}
+            onPointerLeave={() => setHovering(false)}
+            className="grid grid-cols-4 gap-1.5 sm:grid-cols-6 lg:grid-cols-8 lg:[--cell:calc((100cqw_-_2.625rem)/8)] lg:[grid-template-rows:repeat(4,var(--cell))]"
           >
-            <active.Icon className="w-8 h-8 sm:w-10 sm:h-10" style={{ color: active.color }} />
-          </span>
+            {/* The elements */}
+            <div
+              role="group"
+              aria-label="Stack elements — use the arrow keys to move between them"
+              onKeyDown={onTableKeyDown}
+              className="contents"
+            >
+              {elements.map((element) => {
+                const [col, row] = PLACEMENT[element.symbol];
+                const state = stateOf(element);
+                const isFocus = element.symbol === focus;
+                return (
+                  <button
+                    key={element.symbol}
+                    ref={(el) => {
+                      tileRefs.current[element.symbol] = el;
+                    }}
+                    type="button"
+                    data-tile
+                    data-state={state}
+                    aria-pressed={isFocus}
+                    aria-label={`${element.name}, element ${pad2(element.number)}, ${GROUP_NAMES[element.group]}`}
+                    tabIndex={isFocus ? 0 : -1}
+                    onPointerEnter={(event) => {
+                      if (event.pointerType === "mouse") select(element.symbol);
+                    }}
+                    onFocus={() => select(element.symbol)}
+                    onClick={() => select(element.symbol)}
+                    style={{ "--col": col, "--row": row } as React.CSSProperties}
+                    className={cn(
+                      "group relative aspect-square overflow-hidden rounded-md border text-left outline-none",
+                      "transition-[opacity,border-color,background-color] duration-500 ease-expo",
+                      "lg:aspect-auto lg:[grid-column:var(--col)] lg:[grid-row:var(--row)]",
+                      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime",
+                      state === "focus" && "border-lime bg-lime/[0.07]",
+                      state === "bond" && "border-line-3 bg-raised",
+                      state === "match" && "border-fg/40 bg-raised",
+                      state === "idle" && "border-line-2 bg-surface hover:border-line-3",
+                      state === "dim" && "border-line bg-surface opacity-30"
+                    )}
+                  >
+                    <span
+                      data-tile-inner
+                      className="flex h-full flex-col justify-between p-2 sm:p-2.5 xl:p-3.5"
+                    >
+                      <span className="flex items-start justify-between mono text-[10px] leading-none xl:text-[11px]">
+                        <span className={isFocus ? "text-lime" : "text-fg-3"}>{pad2(element.number)}</span>
+                        <span className="hidden text-fg-4 sm:inline">{groupLabels[element.group]}</span>
+                      </span>
+                      <span
+                        data-symbol
+                        className="font-heading text-[clamp(1.45rem,3.3vw,3.4rem)] leading-none tracking-[-0.03em] text-fg [font-variation-settings:'wght'_640] transition-[font-variation-settings] duration-500 ease-expo group-hover:[font-variation-settings:'wght'_800] group-aria-pressed:[font-variation-settings:'wght'_800]"
+                      >
+                        {element.symbol}
+                      </span>
+                      <span className="flex items-end justify-between gap-1.5">
+                        <span className="hidden truncate text-[11px] leading-tight text-fg-2 sm:block xl:text-xs">
+                          {element.name}
+                        </span>
+                        <span className="mono ml-auto text-[10px] leading-none text-fg-4">
+                          {weightOf(element.symbol)}
+                        </span>
+                      </span>
+                    </span>
+                    {state === "bond" && (
+                      <span
+                        aria-hidden
+                        className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full border border-lime sm:hidden"
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
 
-          <div className="focus-fade flex flex-col gap-1.5">
-            <h3 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight">{active.name}</h3>
-            <p className="max-w-xs mx-auto text-xs sm:text-sm text-zinc-500 font-light leading-relaxed">
-              {active.note}
-            </p>
+            {/* Readout — sits where a printed table keeps its key */}
+            <div
+              ref={readoutRef}
+              data-table-extra
+              className="@container relative col-span-full mt-4 flex min-h-0 flex-col overflow-hidden rounded-lg border border-line-2 bg-[#131315] p-5 sm:p-6 lg:mt-0 lg:[grid-column:3/7] lg:[grid-row:1/4] lg:p-5 xl:p-7"
+            >
+              <p className="sr-only" aria-live="polite">
+                {focused.name}, element {pad2(focused.number)}. {focused.note}
+              </p>
+
+              <div data-swap className="flex items-center justify-between gap-4 mono uppercase text-fg-3">
+                <span>
+                  No. {pad2(focused.number)} — {GROUP_NAMES[focused.group]}
+                </span>
+                <span className="flex items-center gap-2 truncate text-fg-2">
+                  <Icon aria-hidden className="h-3.5 w-3.5 shrink-0" style={{ color: focused.color }} />
+                  <span className="truncate">{focused.name}</span>
+                </span>
+              </div>
+
+              <div className="mt-5 flex min-h-0 flex-1 gap-5 @lg:gap-7">
+                <div className="relative aspect-square w-[34%] max-w-[13.5rem] shrink-0 self-start">
+                  <Atom element={focused} animate={!reduceMotion} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3
+                    data-swap
+                    className="font-heading text-[1.6rem] leading-none tracking-[-0.025em] text-fg [font-variation-settings:'wght'_700] @md:text-[2rem] @xl:text-[2.6rem]"
+                  >
+                    {focused.name}
+                  </h3>
+                  <p data-swap className="mt-3 text-[15px] leading-snug text-fg-2 @xl:text-base">
+                    {focused.note}
+                  </p>
+                  <ul data-swap className="mt-4 flex flex-col gap-1.5 text-sm leading-snug text-fg-3 lg:hidden xl:flex">
+                    {focused.usedFor.map((use) => (
+                      <li key={use} className="flex gap-2.5">
+                        <span aria-hidden className="mt-[0.55em] h-px w-3 shrink-0 bg-fg-4" />
+                        {use}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div data-swap className="mt-5 flex flex-col gap-3 border-t border-line-2 pt-4">
+                <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
+                  <span className="mono uppercase text-fg-4">Found in</span>
+                  <span className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+                    {usage.projects.map((project) => (
+                      <TransitionLink
+                        key={project.id}
+                        href={`/work/${project.id}`}
+                        label={project.title}
+                        className="text-fg underline decoration-line-3 underline-offset-4 transition-colors hover:text-lime hover:decoration-lime"
+                      >
+                        {project.title}
+                      </TransitionLink>
+                    ))}
+                  </span>
+                  <span className="mono ml-auto uppercase text-fg-4">
+                    {usage.projects.length}/{projectTotal} projects · {usage.roleCount}/{roleTotal} roles
+                  </span>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 lg:hidden xl:flex">
+                  <span className="mono mr-2 uppercase text-fg-4">Bonds with</span>
+                  {focused.bonds.map((symbol) => (
+                    <button
+                      key={symbol}
+                      type="button"
+                      onClick={() => {
+                        select(symbol);
+                        tileRefs.current[symbol]?.focus({ preventScroll: true });
+                      }}
+                      className="rounded-full border border-line-2 px-3 py-1 text-xs text-fg-2 transition-colors hover:border-lime hover:text-lime"
+                    >
+                      {bySymbol[symbol].name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* The compound */}
+            <HighlightToggle
+              data-table-extra
+              value={{ kind: "compound" }}
+              active={highlight?.kind === "compound"}
+              onChange={setHighlight}
+              className="col-span-full mt-1.5 flex flex-col items-start justify-between gap-3 rounded-lg border border-line-2 p-4 text-left transition-colors duration-500 ease-expo hover:border-line-3 sm:flex-row sm:items-center lg:mt-0 lg:flex-col lg:items-start lg:[grid-column:3/7] lg:[grid-row:4] xl:p-5"
+            >
+              <span className="mono uppercase text-fg-3">
+                Compound — whole in {compoundProjects.length} of {projectTotal} projects
+              </span>
+              <span className="font-heading text-[clamp(1.35rem,2.3vw,2.25rem)] leading-none tracking-[-0.02em] text-fg [font-variation-settings:'wght'_680]">
+                {mernSymbols.map((symbol, i) => (
+                  <Fragment key={symbol}>
+                    {i > 0 && <span className="text-fg-4"> + </span>}
+                    {symbol}
+                  </Fragment>
+                ))}
+                <span className="text-fg-4"> → </span>
+                <span className="text-lime">MERN</span>
+              </span>
+            </HighlightToggle>
+
+            {/* Groups */}
+            <div
+              data-table-extra
+              className="col-span-full grid grid-cols-4 gap-1.5 lg:[grid-column:7/9] lg:[grid-row:4] lg:grid-cols-2"
+            >
+              {groups.map((group) => {
+                const active = highlight?.kind === "group" && highlight.group === group;
+                return (
+                  <HighlightToggle
+                    key={group}
+                    aria-label={`${GROUP_NAMES[group]} — ${groupSize(group)} elements`}
+                    value={{ kind: "group", group }}
+                    active={active}
+                    onChange={setHighlight}
+                    className={cn(
+                      "flex min-h-14 flex-col justify-between rounded-md border p-2.5 text-left transition-colors duration-500 ease-expo",
+                      active ? "border-fg/40 bg-raised" : "border-line-2 hover:border-line-3"
+                    )}
+                  >
+                    <span className="mono text-[10px] leading-none text-fg-4">{pad2(groupSize(group))}</span>
+                    <span className="caption text-fg-2">{groupLabels[group]}</span>
+                  </HighlightToggle>
+                );
+              })}
+            </div>
           </div>
 
-          <ul className="focus-fade flex flex-col items-center gap-1.5">
-            {active.usedFor.map((item) => (
-              <li
-                key={item}
-                className="flex items-center gap-2 text-xs sm:text-sm leading-relaxed text-zinc-300 font-light"
-              >
-                <span className="h-1 w-1 shrink-0 rounded-full" style={{ background: active.color }} />
-                {item}
-              </li>
-            ))}
-          </ul>
-
-          {activeProjects.length > 0 ? (
-            <div className="focus-fade flex flex-wrap items-center justify-center gap-2 pt-1">
-              {activeProjects.map((p) => (
-                <a
-                  key={p.id}
-                  href={`/work/${p.id}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    transitionTo(`/work/${p.id}`, p.title);
-                  }}
-                  className="group inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-3.5 py-1.5 text-xs font-medium text-zinc-300 transition-colors duration-300 hover:bg-white hover:text-black hover:border-transparent"
-                >
-                  {p.title}
-                  <ArrowUpRight className="w-3 h-3 transition-transform duration-300 group-hover:rotate-45" />
-                </a>
-              ))}
-            </div>
-          ) : (
-            <p className="focus-fade text-xs text-zinc-600 font-light leading-relaxed pt-1">
-              Used in professional and client work rather than a listed case study.
-            </p>
-          )}
-
-          <button
-            type="button"
-            onClick={() => setPausedState(!paused)}
-            className="focus-fade inline-flex items-center gap-2 pt-1 text-[10px] uppercase tracking-widest font-semibold text-zinc-600 hover:text-white transition-colors"
-          >
-            {paused ? <Play className="w-3 h-3" /> : <Pause className="w-3 h-3" />}
-            {paused ? "Resume orbit" : "Pause orbit"}
-          </button>
+          <p data-table-extra className="mt-6 mono uppercase text-fg-4">
+            Weight = projects + roles an element appears in. Not to be confused with years.
+          </p>
         </div>
       </div>
     </section>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Highlight toggles (compound, groups). Mouse users preview on hover; touch
+   and keyboard users toggle on click — event.detail is 0 for clicks that
+   come from the keyboard.
+   ───────────────────────────────────────────────────────────────────────── */
+
+type HighlightToggleProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "value" | "onChange"> & {
+  value: Exclude<Highlight, null>;
+  active: boolean;
+  onChange: (next: Highlight) => void;
+  "data-table-extra"?: boolean;
+};
+
+function HighlightToggle({ value, active, onChange, children, ...rest }: HighlightToggleProps) {
+  const pointerTypeRef = useRef("mouse");
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onPointerDown={(event) => {
+        pointerTypeRef.current = event.pointerType;
+      }}
+      onPointerEnter={(event) => {
+        if (event.pointerType === "mouse") onChange(value);
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === "mouse") onChange(null);
+      }}
+      onClick={(event) => {
+        if (event.detail !== 0 && pointerTypeRef.current === "mouse") return;
+        onChange(active ? null : value);
+      }}
+      onBlur={() => onChange(null)}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Atom — the focused element as a Bohr model: three electron shells, and
+   its bonds orbiting on the outer ring (labels counter-rotate to stay
+   upright). SMIL keeps it off the main thread; it pauses off-screen.
+   ───────────────────────────────────────────────────────────────────────── */
+
+const SHELL = "M 38 100 a 62 22 0 1 0 124 0 a 62 22 0 1 0 -124 0";
+const RING = 86;
+
+function Atom({ element, animate }: { element: StackElement; animate: boolean }) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg || !animate) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) svg.unpauseAnimations();
+      else svg.pauseAnimations();
+    });
+    observer.observe(svg);
+    return () => observer.disconnect();
+  }, [animate]);
+
+  return (
+    <svg ref={svgRef} viewBox="0 0 200 200" aria-hidden className="h-full w-full overflow-visible">
+      <circle cx="100" cy="100" r={RING} fill="none" stroke="var(--border-medium)" strokeDasharray="1.5 5" />
+
+      <g>
+        {animate && (
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            from="0 100 100"
+            to="360 100 100"
+            dur="44s"
+            repeatCount="indefinite"
+          />
+        )}
+        {element.bonds.map((symbol, i) => {
+          const angle = (i / element.bonds.length) * Math.PI * 2 - Math.PI / 2;
+          return (
+            <g
+              key={symbol}
+              transform={`translate(${(100 + RING * Math.cos(angle)).toFixed(2)} ${(100 + RING * Math.sin(angle)).toFixed(2)})`}
+            >
+              <g>
+                {animate && (
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    from="0"
+                    to="-360"
+                    dur="44s"
+                    repeatCount="indefinite"
+                  />
+                )}
+                <circle r="14" fill="#131315" stroke="var(--border-strong)" />
+                <text
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fontSize="10"
+                  fill="var(--text-secondary)"
+                  style={{ fontFamily: "var(--font-mono)" }}
+                >
+                  {symbol}
+                </text>
+              </g>
+            </g>
+          );
+        })}
+      </g>
+
+      {[0, 60, 120].map((tilt, i) => (
+        <g key={tilt} transform={`rotate(${tilt} 100 100)`}>
+          <path id={`${uid}-shell-${i}`} d={SHELL} fill="none" stroke="var(--border-strong)" />
+          {animate ? (
+            <circle r="3" fill="var(--accent-lime)">
+              <animateMotion dur={`${2.4 + i * 0.8}s`} begin={`-${i * 0.7}s`} repeatCount="indefinite">
+                <mpath href={`#${uid}-shell-${i}`} />
+              </animateMotion>
+            </circle>
+          ) : (
+            <circle r="3" cx={i % 2 ? 38 : 162} cy="100" fill="var(--accent-lime)" />
+          )}
+        </g>
+      ))}
+
+      <g data-nucleus>
+        <circle cx="100" cy="100" r="29" fill="var(--accent-lime)" />
+        <text
+          x="100"
+          y="101"
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize="25"
+          fill="#0a0a0b"
+          style={{ fontFamily: "var(--font-heading)", fontVariationSettings: "'wght' 760" }}
+        >
+          {element.symbol}
+        </text>
+      </g>
+    </svg>
   );
 }

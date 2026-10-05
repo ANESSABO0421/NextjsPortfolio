@@ -20,11 +20,13 @@ const COLLAPSED_WIDTH = 268;
 const RING_RADIUS = 11;
 const RING_LENGTH = 2 * Math.PI * RING_RADIUS;
 
+// Unknown case-study ids are 404s. The 404 page is prerendered once (as
+// /_not-found), so every unmatched path must resolve to the same label the
+// server rendered — otherwise hydration fails.
 function routeLabel(pathname: string) {
   if (pathname.startsWith("/work/")) {
     const project = getProject(pathname.split("/")[2] ?? "");
     if (project) return { index: pad2(project.index), label: project.listTitle };
-    return { index: "—", label: "Case study" };
   }
   if (pathname === "/contact") return { index: "→", label: "Contact" };
   return { index: "—", label: "Off route" };
@@ -138,14 +140,21 @@ function Island({ ready }: { ready: boolean }) {
     ? { index: pad2(activeIndex + 1), label: sections[activeIndex].label }
     : routeLabel(pathname);
 
-  // Which home section is crossing the middle of the viewport.
+  // Which home section is crossing the middle of the viewport. After a jump,
+  // a pinned section (position: fixed) can still report as intersecting in
+  // the same batch as the one actually there, so track everything in view
+  // and let the lowest section on the page win.
   useEffect(() => {
     if (!isHome) return;
+    const inView = new Set<string>();
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) setActiveId(entry.target.id);
+          if (entry.isIntersecting) inView.add(entry.target.id);
+          else inView.delete(entry.target.id);
         }
+        const lowest = sections.filter(({ id }) => inView.has(id)).pop();
+        if (lowest) setActiveId(lowest.id);
       },
       { rootMargin: "-49% 0px -50% 0px" }
     );
@@ -280,7 +289,10 @@ function Island({ ready }: { ready: boolean }) {
     <div
       ref={rootRef}
       style={{ width: COLLAPSED_WIDTH, height: BAR_HEIGHT, borderRadius: BAR_HEIGHT / 2, opacity: 0 }}
-      className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 overflow-hidden border border-line-2 bg-[#141416] text-fg shadow-[0_24px_60px_-20px_rgba(0,0,0,0.75)] sm:bottom-6"
+      // Centred with auto margins rather than a translate: GSAP owns this
+      // element's transform (yPercent) and would otherwise fold the CSS
+      // translate into it, which it doesn't do reliably on every path.
+      className="fixed inset-x-0 bottom-4 z-50 mx-auto overflow-hidden border border-line-2 bg-[#141416] text-fg shadow-[0_24px_60px_-20px_rgba(0,0,0,0.75)] sm:bottom-6"
     >
       {/* Panel — grows upward from the pill */}
       <div

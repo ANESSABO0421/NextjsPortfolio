@@ -4,6 +4,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* The experience route map runs sideways only where it has room to and
+   motion is welcome; everyone else rides the vertical line. Keep in sync
+   with RAIL_QUERY in experience.tsx. */
+@custom-variant rail (@media (min-width: 64rem) and (min-height: 37.5rem) and (prefers-reduced-motion: no-preference));
+
 /* ───────────────────────────────────────────────────────────────────────
    Design tokens
    ─────────────────────────────────────────────────────────────────────── */
@@ -570,6 +575,15 @@ html.js .intro-hidden {
 @keyframes equalize {
   from { transform: scaleY(0.25); }
   to { transform: scaleY(1); }
+}
+
+/* The train on the route map idles on its suspension. */
+.train {
+  animation: train-bob 1.3s ease-in-out infinite;
+}
+
+@keyframes train-bob {
+  50% { transform: translateY(-1.5px); }
 }
 
 /* GPU-promote surfaces that are transformed on every scroll frame. */

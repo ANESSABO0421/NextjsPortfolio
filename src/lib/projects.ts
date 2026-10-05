@@ -24,8 +24,6 @@ export interface ProjectEntry {
   poster?: string;
   /** Optional screen-recording that plays inside the device mockup instead of the static poster. */
   video?: string;
-  /** Image used for social cards — the poster when there is one. */
-  ogImage: string;
   /** Sampled from the product's own UI; only ever used in small doses. */
   accent: string;
   device: ProjectDevice;
@@ -60,7 +58,6 @@ const projects: ProjectEntry[] = [
     tagline: "One platform replacing an academy group's legacy software — HR, admissions, payroll and attendance.",
     poster: "/posters/obsera.jpg",
     video: "/video/Obsera.mp4",
-    ogImage: "/posters/obsera.jpg",
     accent: "#e2338f",
     device: "laptop",
     role: "Full Stack Architecture & Systems Engineering",
@@ -233,7 +230,6 @@ const projects: ProjectEntry[] = [
     tagline: "Speak a transaction, get an insight — a voice-first expense tracker with Gemini analytics.",
     poster: "/posters/spendova.jpg",
     video: "/video/Spendova.mp4",
-    ogImage: "/posters/spendova.jpg",
     accent: "#3d7bff",
     device: "phone",
     role: "Mobile App & REST API Development",
@@ -270,7 +266,6 @@ const projects: ProjectEntry[] = [
     tagline: "A home for the Ultras — standings, fixtures, galleries and news the club runs itself.",
     poster: "/posters/malappuram-fc.jpg",
     video: "/video/Ultrasmalappuram.mp4",
-    ogImage: "/posters/malappuram-fc.jpg",
     accent: "#e5322d",
     device: "laptop",
     role: "Full Stack Development",
@@ -307,7 +302,6 @@ const projects: ProjectEntry[] = [
     tagline: "A construction company's showroom and lead engine — SEO-first, set in motion with GSAP.",
     poster: "/posters/kriscorp.jpg",
     video: "/video/Kriscorp.mp4",
-    ogImage: "/posters/kriscorp.jpg",
     accent: "#e0663a",
     device: "laptop",
     role: "Full Stack Development & SEO",
@@ -344,7 +338,6 @@ const projects: ProjectEntry[] = [
     tagline: "Paste code, get a scored review — Claude-powered analysis with a history you can come back to.",
     poster: "/posters/devpulse.jpg",
     video: "/video/Devpulse.mp4",
-    ogImage: "/posters/devpulse.jpg",
     accent: "#3ad0e6",
     device: "laptop",
     role: "Full-Stack Development & AI Integration",
@@ -379,7 +372,6 @@ const projects: ProjectEntry[] = [
     listTitle: "Synapse",
     category: "Socket.io / Real-Time Platform",
     tagline: "An NSS unit's control room — live group chat, payments and certificates from one codebase.",
-    ogImage: "/og.png",
     accent: "#c9fd34",
     device: "laptop",
     role: "Full Stack Development & Real-Time Systems",
