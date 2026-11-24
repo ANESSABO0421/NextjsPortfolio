@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import TransitionLink from "@/components/ui/transition-link";
 
 export const metadata: Metadata = {
-  title: "Off route",
+  title: "Page not found",
   robots: { index: false, follow: true },
 };
 
@@ -10,8 +10,7 @@ export default function NotFound() {
   return (
     <main id="main" className="relative flex min-h-[100svh] flex-col justify-center bg-night px-gutter pb-32 pt-28">
       <div className="flex items-center justify-between mono uppercase text-fg-3">
-        <span>(404) — Off route</span>
-        <span className="hidden sm:inline">Line map · not to scale</span>
+        <span>Page not found</span>
       </div>
 
       {/* The line runs out */}
@@ -24,19 +23,19 @@ export default function NotFound() {
       </div>
 
       <h1 className="mt-14 max-w-[16ch] font-heading text-[clamp(2.75rem,8vw,8rem)] leading-[0.9] tracking-[-0.04em] text-fg [font-variation-settings:'wght'_640]">
-        This station isn’t on the map.
+        This page doesn’t exist.
       </h1>
       <p className="mt-8 max-w-[34rem] text-lead font-light text-fg-2">
-        The page you were heading for doesn’t exist — or it moved further down the line.
+        The link may have changed. You can head home or browse my projects.
       </p>
 
       <div className="mt-12 flex flex-wrap gap-3">
         <TransitionLink
           href="/"
-          label="Index"
+          label="Home"
           className="rounded-full bg-lime px-7 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-void transition-colors hover:bg-fg"
         >
-          Back to the index
+          Back to home
         </TransitionLink>
         <TransitionLink
           href="/#works"

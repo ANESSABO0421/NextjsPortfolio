@@ -27,7 +27,7 @@ export interface ProjectEntry {
   /** Sampled from the product's own UI; only ever used in small doses. */
   accent: string;
   device: ProjectDevice;
-  role: string;
+  role?: string;
   credits: string;
   locationYear: string;
   year: string;
@@ -50,6 +50,99 @@ export interface ProjectDetail extends ProjectEntry {
 
 // Ordered the same way the works section renders them; "next case" wraps around.
 const projects: ProjectEntry[] = [
+  {
+    id: "d-aide-nexus",
+    title: "D-AIDE NEXUS",
+    listTitle: "D-AIDE Nexus",
+    category: "Admission & University Processing ERP",
+    tagline: "I built a full-stack ERP that takes a student from admission at a learning centre to a university enrollment number in one workspace.",
+    accent: "#38bdb0",
+    device: "laptop",
+    credits: "I built this with one other developer as a team of two.",
+    locationYear: "Kerala, India © 2026",
+    year: "2026",
+    liveUrl: "",
+    liveLabel: "",
+    description:
+      "I built D-AIDE Nexus, a multi-role admission ERP for an education partner network, covering documents, payments, bank reconciliation, verification and university submission.",
+    about:
+      "I built D-AIDE Nexus for an education partner network to connect learning-centre admissions with university processing. I brought the workflow into one workspace: centres admit students through a one-page form that saves itself, upload documents and payment receipts, and submit for review. I built tools for staff to verify documents, automatically match receipts to imported bank statements, export verified students in each university's Excel format, and record enrollment numbers.",
+    highlights: [
+      "I built a one-page admission form with automatic saving, clear section requirements and in-place file previews.",
+      "I automated receipt reading and bank reconciliation, matching credits by reference and amount with duplicate detection.",
+      "I built a guided verification checklist for documents and payments, with a full audit log.",
+      "I connected verified admissions to university-specific Excel exports, document bundles and enrollment-number imports.",
+    ],
+    stack: [
+      "Next.js", "React", "TypeScript", "TanStack Query", "Tailwind CSS", "shadcn/ui", "GSAP",
+      "Node.js", "Express", "Zod", "Session Auth", "bcrypt", "Role-Based Access", "Audit Logging",
+      "PostgreSQL", "Neon", "Drizzle ORM", "Redis", "Upstash", "Backblaze B2", "S3 API",
+      "PaddleOCR", "Tesseract.js", "SheetJS", "ExcelJS", "PDF Parsing & Rendering",
+      "npm Workspaces", "Vitest", "PGlite", "Playwright", "Render",
+    ],
+    modules: [
+      {
+        title: "Catalogue builder",
+        badge: "Setup",
+        description: "I built a step-by-step catalogue builder for universities, boards, courses, specialisations, sessions, fees and required documents.",
+        points: [
+          "I added a single-file Excel import with a row-by-row check before saving.",
+          "I automated code generation for catalogue entries.",
+        ],
+      },
+      {
+        title: "One-page admission form",
+        badge: "Admissions",
+        description: "I built an admission form where every section saves itself, so learning centres can work through an application in one place.",
+        points: [
+          "I made locked sections explain exactly what is missing.",
+          "I highlighted required documents and added in-place file previews.",
+        ],
+      },
+      {
+        title: "Payment automation & bank reconciliation",
+        badge: "Payments",
+        description: "I integrated OCR to read the amount, UTR, date and payer from receipt screenshots and reduce manual payment entry.",
+        points: [
+          "I added bank-statement imports from PDF, scanned PDF, Excel, CSV and images.",
+          "I matched bank credits to receipts by reference and amount, with duplicate detection.",
+        ],
+      },
+      {
+        title: "Verification workflow",
+        badge: "Review",
+        description: "I built a guided checklist for staff to approve or return each document and payment.",
+        points: ["I kept a full audit log so verification decisions can be traced."],
+      },
+      {
+        title: "University processing",
+        badge: "Submission",
+        description: "I built university-specific export templates with a drag-and-drop column editor and live preview.",
+        points: [
+          "I made each batch generate an Excel sheet and a document zip organised by university, course and application.",
+          "I added manual enrollment-number entry and bulk uploads from Excel.",
+        ],
+      },
+      {
+        title: "Roles & security",
+        badge: "Access",
+        description: "I implemented Super Admin, Admin and LSC centre roles with session authentication, bcrypt and centre-scoped data access.",
+        points: [
+          "I used private, versioned Backblaze B2 storage through the S3 API, with signed file links.",
+          "I used PostgreSQL on Neon with Drizzle ORM, and Upstash Redis for caching and sessions.",
+        ],
+      },
+      {
+        title: "Architecture & testing",
+        badge: "Engineering",
+        description: "I organised the application as an npm-workspaces monorepo with shared Zod schemas and TypeScript types, deployed on Render.",
+        points: [
+          "I tested the backend with Vitest and in-memory PostgreSQL through PGlite.",
+          "I tested browser workflows with Playwright.",
+        ],
+      },
+    ],
+  },
   {
     id: "obsera",
     title: "OBSERA",

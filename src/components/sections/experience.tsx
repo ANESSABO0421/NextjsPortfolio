@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { ArrowUpRight, Download } from "lucide-react";
 import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import { certifications, education, roles, type Role, type RoleKind } from "@/lib/experience";
-import { pad2, site } from "@/lib/site";
+import { site } from "@/lib/site";
 import { getLenis } from "@/lib/stores";
 import { cn } from "@/lib/utils";
 import Magnetic from "@/components/ui/magnetic";
@@ -67,10 +67,9 @@ export default function Experience() {
         const progress = stage.querySelector<HTMLElement>("[data-progress]");
         const branch = stage.querySelector<HTMLElement>("[data-branch]");
         const boardName = stage.querySelector<HTMLElement>("[data-board-name]");
-        const boardIndex = stage.querySelector<HTMLElement>("[data-board-index]");
         const stations = gsap.utils.toArray<HTMLElement>("[data-station]", stage);
         const panels = gsap.utils.toArray<HTMLElement>("[data-stop]", stage);
-        if (!track || !mainLine || !progress || !branch || !boardName || !boardIndex) return;
+        if (!track || !mainLine || !progress || !branch || !boardName) return;
 
         const first = stations[0];
         const last = stations[stations.length - 1];
@@ -118,7 +117,6 @@ export default function Experience() {
             { opacity: 0, yPercent: 50 },
             { opacity: 1, yPercent: 0, duration: 0.8, delay: 0.16, stagger: 0.035, ease: "expo.out", overwrite: true }
           );
-          boardIndex.textContent = `${pad2(next + 1)} / ${pad2(panels.length)}`;
           gsap.to(boardName, {
             duration: 0.7,
             overwrite: true,
@@ -263,19 +261,17 @@ export default function Experience() {
       {/* Intro */}
       <div className="px-gutter pb-16 pt-28 sm:pt-36 rail:pb-20">
         <div className="flex items-center justify-between mono uppercase text-fg-3">
-          <span>(04) — Experience</span>
-          <span className="hidden sm:inline">Line map · not to scale</span>
+          <span>Experience</span>
         </div>
         <div className="mt-10 grid gap-8 lg:grid-cols-12 lg:items-end">
           <TextReveal
             as="h2"
-            text="The route so far."
+            text="Where I’ve worked."
             split="words"
             className="font-heading text-h1 text-fg [font-variation-settings:'wght'_620] lg:col-span-7"
           />
           <p className="max-w-[26rem] text-[clamp(1rem,1.25vw,1.15rem)] font-light leading-relaxed text-fg-2 lg:col-span-5 lg:justify-self-end">
-            Four stops from intern to founder — and, since July 2026, two lines running side by side: the day job
-            and a studio of my own.
+            I work as a full-stack developer at XY-NEX & Alans Academy and run SkiaFlow, my freelance studio.
           </p>
         </div>
         <span id="experience-title" className="sr-only">
@@ -294,16 +290,16 @@ export default function Experience() {
           aria-hidden
           className="absolute inset-x-0 top-6 z-10 hidden items-center justify-between px-gutter mono uppercase text-fg-3 rail:flex"
         >
-          <span>Line map — not to scale</span>
+          <span>Experience</span>
           <span className="flex items-center gap-6">
             <span className="flex items-center gap-2">
-              <span className="h-[3px] w-5 bg-lime" /> Line 1 · Employment
+              <span className="h-[3px] w-5 bg-lime" /> Employment
             </span>
             <span className="flex items-center gap-2">
-              <span className="h-[3px] w-5 bg-cobalt" /> Line 2 · Studio
+              <span className="h-[3px] w-5 bg-cobalt" /> Freelance
             </span>
             <span className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-[2px] border-2 border-fg-3" /> Depot · Education
+              <span className="h-2.5 w-2.5 rounded-[2px] border-2 border-fg-3" /> Education
             </span>
           </span>
         </div>
@@ -399,9 +395,6 @@ export default function Experience() {
                 {stops[0].station}
               </span>
             </div>
-            <span data-board-index className="mono text-fg-3">
-              01 / {pad2(stops.length)}
-            </span>
           </div>
 
           <ol
@@ -460,25 +453,10 @@ export default function Experience() {
    as a three-column board on the rail.
    ───────────────────────────────────────────────────────────────────────── */
 
-function LineBadge({ stop }: { stop: Stop }) {
-  const label = stop.kind === "depot" ? "Depot" : stop.kind === "terminus" ? "L1 · L2" : onBranch(stop) ? "L2" : "L1";
-  return (
-    <span
-      className={cn(
-        "inline-flex h-5 items-center rounded-full border px-2 mono text-[10px] leading-none",
-        stop.kind === "role" && (onBranch(stop) ? "border-cobalt text-[#8ea2ff]" : "border-lime/60 text-lime"),
-        stop.kind !== "role" && "border-line-3 text-fg-2"
-      )}
-    >
-      {label}
-    </span>
-  );
-}
 
 function StopHeading({ stop }: { stop: Stop }) {
   return (
     <p data-line className="flex flex-wrap items-center gap-3 rail:hidden">
-      <LineBadge stop={stop} />
       <span className="caption text-fg-2">{stop.station}</span>
     </p>
   );
@@ -502,7 +480,7 @@ function StopDetail({ stop, onTerminusFocus }: { stop: Stop; onTerminusFocus: ()
         </div>
         <div className="flex flex-col gap-3 text-[15px] leading-relaxed text-fg-2 rail:col-span-5">
           <p data-line>
-            Where the line starts: three years of computer science at {education.school}, {education.campus}, under{" "}
+            I studied computer science at {education.school}, {education.campus}, under{" "}
             {education.university}.
           </p>
           {certifications.map((cert) => (
@@ -536,9 +514,9 @@ function StopDetail({ stop, onTerminusFocus }: { stop: Stop; onTerminusFocus: ()
         <div className="flex flex-col gap-3 rail:col-span-5">
           <StopHeading stop={stop} />
           <h3 data-line className="font-heading text-h3 text-fg [font-variation-settings:'wght'_680]">
-            The line keeps going.
+            What’s next?
           </h3>
-          <p data-line className="text-fg-2">Both lines meet here — and the next stop is unbuilt.</p>
+          <p data-line className="text-fg-2">I’m open to new projects and opportunities.</p>
         </div>
         <p data-line className="text-[15px] leading-relaxed text-fg-2 rail:col-span-4">
           Freelance projects run through {site.studio.name}, the studio I founded in {site.studio.founded}. Everything

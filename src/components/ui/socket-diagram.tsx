@@ -230,7 +230,7 @@ export default function SocketDiagram({ className }: { className?: string }) {
         <span ref={logRef} aria-hidden className="text-fg-3">
           {logLine(ROOMS[0], ROOMS[0].clients.length - 1)}
         </span>
-        <span>Drawn, not recorded</span>
+        <span>Message flow</span>
       </figcaption>
     </figure>
   );

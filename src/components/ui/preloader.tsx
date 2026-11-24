@@ -34,7 +34,6 @@ function waitForAssets(timeoutMs: number) {
 export default function Preloader() {
   const rootRef = useRef<HTMLDivElement>(null);
   const wordRef = useRef<HTMLSpanElement>(null);
-  const counterRef = useRef<HTMLSpanElement>(null);
   const barRef = useRef<HTMLSpanElement>(null);
   const playingRef = useRef(false);
   const lenis = useLenis();
@@ -63,8 +62,6 @@ export default function Preloader() {
     let cancelled = false;
 
     const renderCounter = () => {
-      const value = Math.round(counter.value);
-      if (counterRef.current) counterRef.current.textContent = String(value).padStart(3, "0");
       if (barRef.current) barRef.current.style.transform = `scaleX(${counter.value / 100})`;
     };
 
@@ -154,8 +151,8 @@ export default function Preloader() {
 
       <div className="relative flex h-full flex-col justify-between px-gutter py-6 sm:py-8">
         <div data-content className="flex items-start justify-between mono uppercase text-fg-3">
-          <span>{site.name} — Portfolio ’26</span>
-          <span className="hidden sm:inline">{site.coordinates}</span>
+          <span>{site.name}</span>
+
         </div>
 
         <div className="flex items-center justify-center">
@@ -177,12 +174,6 @@ export default function Preloader() {
         <div className="flex flex-col gap-5">
           <div data-content className="flex items-end justify-between gap-6">
             <span className="caption max-w-[14rem] text-fg-3">{site.role}</span>
-            <span
-              ref={counterRef}
-              className="font-heading text-[clamp(3.5rem,13vw,12rem)] font-bold leading-[0.8] tracking-[-0.04em] tabular-nums"
-            >
-              000
-            </span>
           </div>
           <span data-content className="relative block h-px w-full bg-line-2">
             <span ref={barRef} className="absolute inset-0 origin-left scale-x-0 bg-lime" />

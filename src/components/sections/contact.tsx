@@ -118,7 +118,7 @@ export default function Contact() {
     >
       <div className="px-gutter">
         <div className="flex items-center justify-between mono uppercase text-fg-3">
-          <span>(06) — Contact</span>
+          <span>Contact</span>
           <span className="flex items-center gap-2">
             <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-lime" />
             <LocalTime /> IST
@@ -129,14 +129,14 @@ export default function Contact() {
         <div className="relative mt-14 sm:mt-20">
           <h2 id="contact-title" className="font-heading uppercase text-fg">
             <span className="block text-[clamp(1.5rem,4.2vw,4.5rem)] leading-none tracking-[-0.02em] text-fg-3 [font-variation-settings:'wght'_560]">
-              Next stop —
+              Have a project
             </span>
             <span
               data-kinetic
               className="wght block text-[12.2vw] leading-[0.84] tracking-[-0.05em]"
               style={{ "--wght": 800 } as React.CSSProperties}
             >
-              Yours<span className="text-lime">?</span>
+              In mind<span className="text-lime">?</span>
             </span>
           </h2>
 
@@ -232,7 +232,7 @@ export default function Contact() {
               Based
             </dt>
             <dd data-rise className="text-fg-2">
-              {site.region} <span className="mono text-fg-4">· {site.coordinates}</span>
+              {site.region}
             </dd>
           </dl>
         </div>
@@ -265,7 +265,7 @@ export default function Contact() {
 
       {/* Bottom bar — clear of the floating navigation island */}
       <div className="flex flex-col gap-4 px-gutter pb-28 pt-8 mono uppercase text-fg-4 sm:flex-row sm:items-center sm:justify-between sm:pb-32">
-        <span>© 2026 {site.name} · Portfolio ’26</span>
+        <span>© 2026 {site.name}</span>
         <span className="hidden md:inline">Designed &amp; built in {site.region}</span>
         <button
           type="button"

@@ -7,7 +7,6 @@ import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import { useIntroDone, usePageRevealed } from "@/lib/stores";
 import { projectDetails, type ProjectDetail, type ProjectModule } from "@/lib/projects";
 import { elements, type StackElement } from "@/lib/skills";
-import { pad2 } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import TransitionLink from "@/components/ui/transition-link";
 import Magnetic from "@/components/ui/magnetic";
@@ -16,6 +15,7 @@ import PreviewVideo from "@/components/ui/preview-video";
 import PhoneMockup from "@/components/ui/phone-mockup";
 import LaptopMockup from "@/components/ui/laptop-mockup";
 import SocketDiagram from "@/components/ui/socket-diagram";
+import AdmissionWorkflow from "@/components/ui/admission-workflow";
 
 const host = (url: string) => new URL(url).host.replace(/^www\./, "");
 const longestWord = (title: string) => Math.max(...title.split(" ").map((word) => word.length));
@@ -105,13 +105,6 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
     { scope: rootRef }
   );
 
-  const sections = [
-    "The brief",
-    "Built with",
-    ...(project.modules?.length ? ["Modules"] : []),
-    ...(project.rolesMatrix?.length ? ["Access"] : []),
-  ];
-  const label = (name: string) => `(${pad2(sections.indexOf(name) + 1)}) — ${name}`;
   const matched = project.stack
     .map((name) => elementByName[name])
     .filter((element): element is StackElement => !!element)
@@ -133,7 +126,7 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
             <RollingText text="All work" />
           </TransitionLink>
           <span>
-            Case {pad2(project.index)} / {pad2(project.total)}
+            Project details
           </span>
         </div>
 
@@ -172,7 +165,7 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
 
         <dl className="grid gap-8 pt-10 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            ["Role", project.role],
+            ...(project.role ? [["Role", project.role]] : []),
             ["Credits", project.credits],
             ["Location & year", project.locationYear],
           ].map(([term, value]) => (
@@ -181,7 +174,7 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
               <dd className="text-[15px] leading-relaxed text-black/80">{value}</dd>
             </div>
           ))}
-          <div data-mast-fade className="intro-hidden flex flex-col gap-2">
+          {project.liveUrl && <div data-mast-fade className="intro-hidden flex flex-col gap-2">
             <dt className="mono uppercase text-black/45">{project.liveLabel === "Live Site" ? "Live" : "Code"}</dt>
             <dd>
               <a
@@ -194,7 +187,7 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
                 <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-500 ease-expo group-hover:rotate-45" />
               </a>
             </dd>
-          </div>
+          </div>}
         </dl>
       </div>
 
@@ -206,7 +199,9 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
         className="relative overflow-hidden bg-void px-gutter py-20 text-fg sm:py-28"
       >
         <div data-device className="relative mx-auto flex w-full max-w-[68rem] justify-center will-change-transform">
-          {project.device === "phone" ? (
+          {project.id === "d-aide-nexus" ? (
+            <AdmissionWorkflow className="max-w-[42rem]" />
+          ) : project.device === "phone" ? (
             <PhoneMockup
               video={project.video}
               poster={project.poster}
@@ -233,9 +228,9 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
 
         <div className="mx-auto mt-12 flex max-w-[68rem] flex-wrap items-center justify-between gap-6 mono uppercase text-fg-4">
           <span>
-            Fig. {pad2(project.index)} — {project.video ? "Screen recording" : "Diagram — no recording yet"}
+            {project.video ? "Screen recording" : "How it works"}
           </span>
-          <Magnetic strength={0.35}>
+          {project.liveUrl && <Magnetic strength={0.35}>
             <a
               href={project.liveUrl}
               target="_blank"
@@ -245,17 +240,17 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
               {project.liveLabel}
               <ArrowUpRight className="h-4 w-4 transition-transform duration-500 ease-expo group-hover:rotate-45" />
             </a>
-          </Magnetic>
+          </Magnetic>}
         </div>
       </section>
 
       {/* ── Story ──────────────────────────────────────────────────────── */}
       <div data-theme="light" className="bg-paper px-gutter py-24 text-void sm:py-32">
         <section aria-labelledby="brief-title" className="grid gap-10 lg:grid-cols-12">
-          <p className="mono uppercase text-black/45 lg:col-span-3">{label("The brief")}</p>
+          <p className="mono uppercase text-black/45 lg:col-span-3">Overview</p>
           <div className="flex flex-col gap-14 lg:col-span-9">
             <h2 id="brief-title" className="sr-only">
-              The brief
+              Overview
             </h2>
             <p
               data-reveal
@@ -264,13 +259,12 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
               {project.about}
             </p>
             <ol className="grid border-t border-black/10 sm:grid-cols-2 sm:gap-x-10">
-              {project.highlights.map((highlight, i) => (
+              {project.highlights.map((highlight) => (
                 <li
                   key={highlight}
                   data-reveal
                   className="flex gap-5 border-b border-black/10 py-6 text-[15px] leading-relaxed text-black/75"
                 >
-                  <span className="mono shrink-0 pt-0.5 text-black/35">{pad2(i + 1)}</span>
                   {highlight}
                 </li>
               ))}
@@ -279,7 +273,7 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
         </section>
 
         <section aria-labelledby="stack-title" className="mt-24 grid gap-10 sm:mt-32 lg:grid-cols-12">
-          <p className="mono uppercase text-black/45 lg:col-span-3">{label("Built with")}</p>
+          <p className="mono uppercase text-black/45 lg:col-span-3">Tech stack</p>
           <div className="lg:col-span-9">
             <h2 id="stack-title" className="sr-only">
               Built with
@@ -291,7 +285,6 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
                   title={element.note}
                   className="flex h-24 w-24 flex-col justify-between rounded-md border border-black/15 bg-white/50 p-2.5 sm:h-28 sm:w-28"
                 >
-                  <span className="mono text-[10px] leading-none text-black/40">{pad2(element.number)}</span>
                   <span className="font-heading text-[2rem] leading-none tracking-[-0.03em] [font-variation-settings:'wght'_700]">
                     {element.symbol}
                   </span>
@@ -307,22 +300,19 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
                 </li>
               ))}
             </ul>
-            <p className="mt-4 mono uppercase text-black/40">
-              Solid tiles are elements from the stack table on the home page.
-            </p>
           </div>
         </section>
 
         {project.modules && project.modules.length > 0 && (
           <section aria-labelledby="modules-title" className="mt-24 grid gap-10 sm:mt-32 lg:grid-cols-12">
-            <p className="mono uppercase text-black/45 lg:col-span-3">{label("Modules")}</p>
+            <p className="mono uppercase text-black/45 lg:col-span-3">Features</p>
             <div className="lg:col-span-9">
               <h2
                 id="modules-title"
                 data-reveal
                 className="font-heading text-h2 leading-none [font-variation-settings:'wght'_660]"
               >
-                {project.modules.length} modules, one platform.
+                What I built
               </h2>
               <ModuleIndex modules={project.modules} />
             </div>
@@ -331,28 +321,27 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
 
         {project.rolesMatrix && project.rolesMatrix.length > 0 && (
           <section aria-labelledby="roles-title" className="mt-24 grid gap-10 sm:mt-32 lg:grid-cols-12">
-            <p className="mono uppercase text-black/45 lg:col-span-3">{label("Access")}</p>
+            <p className="mono uppercase text-black/45 lg:col-span-3">Access</p>
             <div className="lg:col-span-9">
               <h2
                 id="roles-title"
                 data-reveal
                 className="font-heading text-h2 leading-none [font-variation-settings:'wght'_660]"
               >
-                {project.rolesMatrix.length} roles, each scoped.
+                Who can access what
               </h2>
               <ul className="mt-10 border-t border-black/10">
-                {project.rolesMatrix.map((persona, i) => (
+                {project.rolesMatrix.map((persona) => (
                   <li
                     key={persona.role}
                     data-reveal
                     className="grid gap-2 border-b border-black/10 py-6 sm:grid-cols-12 sm:gap-6"
                   >
-                    <span className="mono text-black/35 sm:col-span-1">{pad2(i + 1)}</span>
                     <span className="font-heading text-xl leading-tight [font-variation-settings:'wght'_640] sm:col-span-3">
                       {persona.role}
                     </span>
                     <span className="mono uppercase text-black/50 sm:col-span-3">{persona.badge}</span>
-                    <p className="text-[15px] leading-relaxed text-black/70 sm:col-span-5">{persona.scope}</p>
+                    <p className="text-[15px] leading-relaxed text-black/70 sm:col-span-6">{persona.scope}</p>
                   </li>
                 ))}
               </ul>
@@ -370,9 +359,6 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
       >
         <div className="flex items-center justify-between mono uppercase text-fg-3">
           <span>Next case</span>
-          <span>
-            {pad2(next.index)} / {pad2(next.total)}
-          </span>
         </div>
 
         <TransitionLink
@@ -410,8 +396,8 @@ export default function CaseStudy({ project }: { project: ProjectDetail }) {
                   className="object-cover object-top transition-[scale] duration-[1.2s] ease-expo group-hover:scale-[1.05]"
                 />
               ) : (
-                <span className="flex h-full w-full items-center justify-center font-heading text-[clamp(5rem,12vw,11rem)] leading-none text-outline [--outline-color:var(--border-strong)] [font-variation-settings:'wght'_800]">
-                  {pad2(next.index)}
+                <span className="flex h-full w-full items-center justify-center font-heading text-[clamp(1.5rem,4vw,4rem)] text-center px-6 leading-none text-outline [--outline-color:var(--border-strong)] [font-variation-settings:'wght'_800]">
+                  {next.listTitle}
                 </span>
               )}
             </span>
@@ -465,7 +451,6 @@ function ModuleIndex({ modules }: { modules: ProjectModule[] }) {
                 onClick={() => setOpen(isOpen ? null : i)}
                 className="group flex w-full items-center gap-5 py-6 text-left sm:gap-8"
               >
-                <span className="mono w-6 shrink-0 text-black/35">{pad2(i + 1)}</span>
                 <span className="flex-1 font-heading text-[clamp(1.15rem,2vw,1.9rem)] leading-tight tracking-[-0.015em] [font-variation-settings:'wght'_600] transition-[font-variation-settings] duration-500 ease-expo group-hover:[font-variation-settings:'wght'_760]">
                   {module.title}
                 </span>
@@ -497,7 +482,7 @@ function ModuleIndex({ modules }: { modules: ProjectModule[] }) {
               )}
             >
               <div className="overflow-hidden">
-                <div className="grid gap-6 pb-10 pl-11 sm:pl-14 lg:grid-cols-2 lg:gap-12">
+                <div className="grid gap-6 pb-10  lg:grid-cols-2 lg:gap-12">
                   <p className="text-[15px] leading-relaxed text-black/75">{module.description}</p>
                   {module.points && (
                     <ul className="flex flex-col gap-2.5 text-[15px] leading-relaxed text-black/65">

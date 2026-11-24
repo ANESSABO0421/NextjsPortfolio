@@ -44,7 +44,7 @@ export interface NavSection {
 
 // Ids are kept from the previous build so existing /#hash links keep working.
 export const sections: NavSection[] = [
-  { id: "hero", label: "Index" },
+  { id: "hero", label: "Home" },
   { id: "about", label: "About" },
   { id: "skills", label: "Stack" },
   { id: "experience", label: "Experience" },

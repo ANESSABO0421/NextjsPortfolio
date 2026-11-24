@@ -4,7 +4,6 @@ import { useRef } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import { allProjects, projectDetails, type ProjectDetail } from "@/lib/projects";
-import { pad2 } from "@/lib/site";
 import { playTick } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 import { scrollToHash } from "@/components/providers/transition-provider";
@@ -14,6 +13,7 @@ import RollingText from "@/components/ui/rolling-text";
 import PreviewVideo from "@/components/ui/preview-video";
 import PhoneMockup from "@/components/ui/phone-mockup";
 import SocketDiagram from "@/components/ui/socket-diagram";
+import AdmissionWorkflow from "@/components/ui/admission-workflow";
 
 const projects = allProjects.map((project) => projectDetails[project.id]);
 const host = (url: string) => new URL(url).host.replace(/^www\./, "");
@@ -123,8 +123,7 @@ export default function Works() {
       {/* Contents */}
       <div className="px-gutter">
         <div className="flex items-center justify-between mono uppercase text-fg-3">
-          <span>(05) — Work</span>
-          <span className="hidden sm:inline">Issue ’26 · {projects.length} case studies</span>
+          <span>Work</span>
         </div>
         <div className="mt-10 grid gap-14 lg:grid-cols-12 lg:gap-10">
           <TextReveal
@@ -133,8 +132,8 @@ export default function Works() {
             split="words"
             className="font-heading text-display text-fg [font-variation-settings:'wght'_640] lg:col-span-6"
           />
-          <nav aria-label="Case studies in this issue" className="lg:col-span-6 lg:col-start-7 lg:self-end">
-            <p className="mono uppercase text-fg-4">In this issue</p>
+          <nav aria-label="Projects" className="lg:col-span-6 lg:col-start-7 lg:self-end">
+            <p className="mono uppercase text-fg-4">Projects</p>
             <ol className="mt-4 border-t border-line-2">
               {projects.map((project) => (
                 <li key={project.id} className="border-b border-line-2">
@@ -145,9 +144,8 @@ export default function Works() {
                       scrollToHash(`#work-${project.id}`);
                     }}
                     onPointerEnter={() => playTick(1 + project.index * 0.04)}
-                    className="backlit roll-trigger group grid grid-cols-[2.25rem_1fr_auto] items-center gap-x-4 py-3.5 outline-none sm:grid-cols-[2.5rem_1fr_auto_3rem]"
+                    className="backlit roll-trigger group grid grid-cols-[1fr_auto] items-center gap-x-4 py-3.5 outline-none sm:grid-cols-[1fr_auto]"
                   >
-                    <span className="mono text-fg-4">{pad2(project.index)}</span>
                     <span className="flex items-center gap-3 font-heading text-[clamp(1.2rem,1.7vw,1.6rem)] leading-none text-fg [font-variation-settings:'wght'_620]">
                       <RollingText text={project.listTitle} />
                       <span
@@ -157,7 +155,6 @@ export default function Works() {
                       />
                     </span>
                     <span className="hidden mono uppercase text-fg-3 sm:block">{project.category}</span>
-                    <span className="mono text-right text-fg-4">p.{pad2(project.index * 2)}</span>
                   </a>
                 </li>
               ))}
@@ -176,7 +173,7 @@ export default function Works() {
           return (
             <div key={project.id}>
               <Spread project={project} />
-              <Folio project={project} />
+
             </div>
           );
         })}
@@ -191,17 +188,14 @@ export default function Works() {
 
 type SpreadProps = { project: ProjectDetail };
 
-function Kicker({ project, note }: { project: ProjectDetail; note: string }) {
+function Kicker({ project }: SpreadProps) {
   return (
     <div
       data-reveal
       className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 mono uppercase text-fg-3"
     >
       <span className="flex items-center gap-3">
-        <span className="text-fg">{pad2(project.index)}</span>
-        <span className="text-fg-4">/ {pad2(project.total)}</span>
-        <span aria-hidden className="h-px w-8 bg-line-3" />
-        <span>{note}</span>
+        <span>{project.listTitle}</span>
       </span>
       <span className="flex items-center gap-2.5">
         <span aria-hidden className="h-1.5 w-1.5 rounded-full" style={{ background: project.accent }} />
@@ -298,7 +292,7 @@ function ReadMore({ project }: SpreadProps) {
 }
 
 function StackLine({ project }: SpreadProps) {
-  return <p className="mono uppercase leading-relaxed text-fg-3">{project.stack.join(" / ")}</p>;
+  return <p className="mono uppercase leading-relaxed text-fg-3">{project.stack.slice(0, 8).join(" / ")}</p>;
 }
 
 function Highlights({ project, count = 3 }: SpreadProps & { count?: number }) {
@@ -314,14 +308,6 @@ function Highlights({ project, count = 3 }: SpreadProps & { count?: number }) {
   );
 }
 
-function Folio({ project }: SpreadProps) {
-  return (
-    <div aria-hidden className="mt-20 flex items-center gap-5 px-gutter mono text-fg-4 sm:mt-24">
-      <span className="h-px flex-1 bg-line" />
-      <span>— {pad2(project.index * 2)} —</span>
-    </div>
-  );
-}
 
 /* ─────────────────────────────────────────────────────────────────────────
    Spreads
@@ -333,7 +319,7 @@ function CoverSpread({ project }: SpreadProps) {
     <article id={`work-${project.id}`} data-spread aria-labelledby={`work-${project.id}-title`} className="relative">
       <SpreadHeading project={project} />
       <div className="px-gutter">
-        <Kicker project={project} note="Cover story" />
+        <Kicker project={project} />
         <CaseLink project={project} view className="mt-6 block">
           <Letters
             lines={[project.title]}
@@ -382,7 +368,7 @@ function PhoneSpread({ project }: SpreadProps) {
         </div>
 
         <div className="flex flex-col gap-8 lg:hidden">
-          <Kicker project={project} note="Mobile" />
+          <Kicker project={project} />
           <Letters
             lines={[project.title]}
             className="font-heading text-[13.5vw] uppercase leading-[0.8] tracking-[-0.04em] text-fg [font-variation-settings:'wght'_700]"
@@ -399,7 +385,7 @@ function PhoneSpread({ project }: SpreadProps) {
 
         <div className="flex flex-col gap-8 lg:col-span-4 lg:col-start-9">
           <div className="hidden lg:block">
-            <Kicker project={project} note="Mobile" />
+            <Kicker project={project} />
           </div>
           <p data-reveal className="font-heading text-[clamp(1.6rem,2.4vw,2.4rem)] leading-[1.12] tracking-[-0.02em] text-fg [font-variation-settings:'wght'_520]">
             {project.tagline}
@@ -426,7 +412,7 @@ function BehindSpread({ project }: SpreadProps) {
     <article id={`work-${project.id}`} data-spread aria-labelledby={`work-${project.id}-title`} className="relative overflow-hidden">
       <SpreadHeading project={project} />
       <div className="px-gutter">
-        <Kicker project={project} note="Feature" />
+        <Kicker project={project} />
       </div>
       {/* One grid, three overlapping cells: the footage starts inside the
           first line and fills the space the right-set second line leaves. */}
@@ -480,7 +466,7 @@ function QuoteSpread({ project }: SpreadProps) {
       <SpreadHeading project={project} />
       <div className="grid gap-14 lg:grid-cols-12 lg:gap-10">
         <div className="flex flex-col gap-10 lg:col-span-7">
-          <Kicker project={project} note="Client work" />
+          <Kicker project={project} />
           <Letters
             lines={[project.title]}
             className="font-heading text-[14vw] uppercase leading-[0.8] tracking-[-0.045em] text-fg [font-variation-settings:'wght'_700] lg:text-[8vw]"
@@ -503,7 +489,6 @@ function QuoteSpread({ project }: SpreadProps) {
             <Footage project={project} className="aspect-[960/444] w-full rounded-xl ring-1 ring-white/10" />
           </CaseLink>
           <figcaption className="mt-3 flex items-center justify-between mono uppercase text-fg-4">
-            <span>Fig. {pad2(project.index)}</span>
             <a
               href={project.liveUrl}
               target="_blank"
@@ -532,7 +517,7 @@ function SplitSpread({ project }: SpreadProps) {
     <article id={`work-${project.id}`} data-spread aria-labelledby={`work-${project.id}-title`} className="relative">
       <SpreadHeading project={project} />
       <div className="px-gutter lg:hidden">
-        <Kicker project={project} note="Tooling" />
+        <Kicker project={project} />
       </div>
       <div className="mt-8 grid items-center gap-12 lg:mt-0 lg:grid-cols-12 lg:gap-10">
         <CaseLink project={project} view className="block lg:col-span-7">
@@ -540,7 +525,7 @@ function SplitSpread({ project }: SpreadProps) {
         </CaseLink>
         <div className="flex flex-col gap-8 px-gutter lg:col-span-5 lg:pl-0">
           <div className="hidden lg:block">
-            <Kicker project={project} note="Tooling" />
+            <Kicker project={project} />
           </div>
           <Letters
             lines={[top.toUpperCase(), bottom.toUpperCase()]}
@@ -568,7 +553,7 @@ function SignalSpread({ project }: SpreadProps) {
   return (
     <article id={`work-${project.id}`} data-spread aria-labelledby={`work-${project.id}-title`} className="relative px-gutter">
       <SpreadHeading project={project} />
-      <Kicker project={project} note="No footage — a diagram instead" />
+      <Kicker project={project} />
       <CaseLink project={project} view className="mt-6 block">
         <Letters
           lines={[project.title]}
@@ -589,7 +574,7 @@ function SignalSpread({ project }: SpreadProps) {
           </div>
         </div>
         <div data-reveal className="lg:col-span-6 lg:col-start-7">
-          <SocketDiagram />
+          {project.id === "d-aide-nexus" ? <AdmissionWorkflow /> : <SocketDiagram />}
         </div>
       </div>
     </article>
@@ -597,6 +582,7 @@ function SignalSpread({ project }: SpreadProps) {
 }
 
 const SPREADS: Record<string, (props: SpreadProps) => React.ReactElement> = {
+  "d-aide-nexus": SignalSpread,
   obsera: CoverSpread,
   spendova: PhoneSpread,
   "malappuram-fc": BehindSpread,

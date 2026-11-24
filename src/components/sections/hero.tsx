@@ -5,7 +5,7 @@ import Image from "next/image";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import { useFinePointer, useIntroDone, usePageRevealed } from "@/lib/stores";
 import { projectDetails } from "@/lib/projects";
-import { pad2, site } from "@/lib/site";
+import { site } from "@/lib/site";
 import TransitionLink from "@/components/ui/transition-link";
 import TextReveal from "@/components/ui/text-reveal";
 
@@ -33,7 +33,7 @@ const FLIGHT = [
 ];
 
 const statement =
-  "I build the systems institutions run on — ERPs, HRMS platforms and real-time tools, engineered end to end.";
+  "I build ERPs, web apps and real-time tools for education and business.";
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -307,9 +307,6 @@ export default function Hero() {
         className="relative z-10 flex items-start justify-between gap-10 px-gutter pt-[17svh] sm:pt-[19svh]"
       >
         <div className="max-w-[19rem] sm:max-w-[26rem]">
-          <p data-fade className="intro-hidden mono mb-5 uppercase text-fg-3">
-            (01) — Index · Portfolio ’26
-          </p>
           <TextReveal
             text={statement}
             ready={ready}
@@ -337,16 +334,13 @@ export default function Hero() {
           {activeProject ? (
             <span className="text-fg">
               <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full align-middle" style={{ background: activeProject.accent }} />
-              {pad2(activeProject.index)} / {activeProject.listTitle} — {activeProject.category}
+              {activeProject.listTitle} — {activeProject.category}
             </span>
           ) : finePointer ? (
-            "↳ Hover the letters — each one opens a case study"
+            "Selected projects"
           ) : (
             "↳ Tap a letter — each one opens a case study"
           )}
-        </p>
-        <p data-fade className="intro-hidden mono hidden uppercase text-fg-3 sm:block">
-          Scroll to dive in
         </p>
       </div>
 

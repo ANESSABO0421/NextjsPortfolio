@@ -8,7 +8,7 @@ import { FaLinkedinIn } from "react-icons/fa6";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import { useIntroDone, useLenis, usePageRevealed } from "@/lib/stores";
 import { playTick, setSoundEnabled, useSoundEnabled } from "@/lib/sound";
-import { pad2, sections, site } from "@/lib/site";
+import { sections, site } from "@/lib/site";
 import { getProject } from "@/lib/projects";
 import { scrollToHash } from "@/components/providers/transition-provider";
 import TransitionLink from "@/components/ui/transition-link";
@@ -26,10 +26,10 @@ const RING_LENGTH = 2 * Math.PI * RING_RADIUS;
 function routeLabel(pathname: string) {
   if (pathname.startsWith("/work/")) {
     const project = getProject(pathname.split("/")[2] ?? "");
-    if (project) return { index: pad2(project.index), label: project.listTitle };
+    if (project) return { label: project.listTitle };
   }
-  if (pathname === "/contact") return { index: "→", label: "Contact" };
-  return { index: "—", label: "Off route" };
+  if (pathname === "/contact") return { label: "Contact" };
+  return { label: "Off route" };
 }
 
 export default function Header() {
@@ -73,12 +73,11 @@ function TopBar({ ready }: { ready: boolean }) {
       <div className="flex items-start justify-between gap-6 px-gutter pt-5 sm:pt-7">
         <TransitionLink
           href="/"
-          label="Index"
+          label="Home"
           data-topbar-item
           className="roll-trigger pointer-events-auto flex items-baseline gap-1.5 font-heading text-[15px] font-bold uppercase leading-none tracking-[-0.01em] opacity-0"
         >
           <RollingText text={site.name} />
-          <span className="mono text-[10px] font-normal">©26</span>
         </TransitionLink>
 
         <div
@@ -137,7 +136,7 @@ function Island({ ready }: { ready: boolean }) {
 
   const activeIndex = Math.max(0, sections.findIndex((section) => section.id === activeId));
   const current = isHome
-    ? { index: pad2(activeIndex + 1), label: sections[activeIndex].label }
+    ? { label: sections[activeIndex].label }
     : routeLabel(pathname);
 
   // Which home section is crossing the middle of the viewport. After a jump,
@@ -311,11 +310,10 @@ function Island({ ready }: { ready: boolean }) {
 
         <nav aria-label="Sections">
           <ul className="flex flex-col">
-            {sections.map((section, i) => {
+            {sections.map((section) => {
               const isActive = isHome && section.id === activeId;
               const content = (
                 <>
-                  <span className="mono w-7 text-fg-3">{pad2(i + 1)}</span>
                   <span
                     className="font-heading text-[1.65rem] leading-[1.25] tracking-[-0.02em] transition-[font-variation-settings] duration-500 ease-expo [font-variation-settings:'wght'_560] group-hover:[font-variation-settings:'wght'_800] group-focus-visible:[font-variation-settings:'wght'_800]"
                   >
@@ -436,7 +434,6 @@ function Island({ ready }: { ready: boolean }) {
               strokeDashoffset={RING_LENGTH}
             />
           </svg>
-          <span className="mono text-[10px] text-fg-2">{current.index}</span>
         </span>
 
         <span aria-hidden className="block min-w-0 flex-1 overflow-hidden">

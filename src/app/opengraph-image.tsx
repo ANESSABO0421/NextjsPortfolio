@@ -7,7 +7,7 @@ export const contentType = "image/png";
 
 export default function OpengraphImage() {
   return portraitCard({
-    eyebrow: `${site.name} — Portfolio ’26`,
+    eyebrow: `${site.name} — Full Stack Developer`,
     lines: ["Anees", "Aboobacker"],
     subtitle: site.role,
     detail: `ERP · HRMS · Real-time platforms — ${site.region}`,

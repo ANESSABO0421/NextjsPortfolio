@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { OG_COLORS as C, OG_SIZE, ogFonts, publicImage } from "@/lib/og";
 import { getProject, projectIds } from "@/lib/projects";
-import { pad2, site } from "@/lib/site";
+import { site } from "@/lib/site";
 
 export const alt = `Case study by ${site.name}`;
 export const size = OG_SIZE;
@@ -39,7 +39,7 @@ export default async function OpengraphImage({ params }: { params: Promise<{ id:
           }}
         >
           <div style={{ display: "flex", fontSize: 17, letterSpacing: 3, color: C.muted, textTransform: "uppercase" }}>
-            Case {pad2(project.index)} / {pad2(project.total)}
+            Project by {site.name}
           </div>
 
           <div style={{ display: "flex", flexDirection: "column" }}>

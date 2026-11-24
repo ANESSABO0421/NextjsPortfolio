@@ -41,7 +41,7 @@ const STEPS: Step[] = [
     autoComplete: "name",
     placeholder: "Your name",
     ask: () =>
-      "Hi — I’m Anees Bot. I’ll take a few details and hand them straight to Anees. First, what should he call you?",
+      "Hi, thanks for getting in touch. What’s your name?",
     validate: (value) => (value.length < 2 ? "A name with at least two letters, please." : null),
   },
   {
@@ -49,7 +49,7 @@ const STEPS: Step[] = [
     input: "email",
     autoComplete: "email",
     placeholder: "you@company.com",
-    ask: (answers) => `Good to meet you, ${firstName(answers.name)}. Where can he reply?`,
+    ask: (answers) => `Good to meet you, ${firstName(answers.name)}. What’s your email address?`,
     validate: (value) =>
       /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value) ? null : "That doesn’t look like an email address yet.",
   },
@@ -78,7 +78,7 @@ const STEPS: Step[] = [
     key: "message",
     input: "textarea",
     placeholder: "A few lines about what you need…",
-    ask: () => "Last one — tell him about it. A few lines is plenty.",
+    ask: () => "Tell me a little about what you have in mind.",
     validate: (value) => (value.length < 12 ? "Just a little more detail — a sentence or two." : null),
   },
 ];
@@ -314,11 +314,11 @@ export default function Conversation() {
       <div data-fade className="intro-hidden flex items-center justify-between mono uppercase text-fg-3">
         <TransitionLink
           href="/"
-          label="Index"
+          label="Home"
           className="roll-trigger group inline-flex items-center gap-2 transition-colors hover:text-fg"
         >
           <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-500 ease-expo group-hover:-translate-x-1" />
-          <RollingText text="Index" />
+          <RollingText text="Home" />
         </TransitionLink>
         <span className="flex items-center gap-2">
           <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-lime" />
@@ -345,7 +345,7 @@ export default function Conversation() {
 
       <div className="mt-14 grid gap-16 sm:mt-20 lg:grid-cols-12 lg:gap-10">
         {/* Conversation */}
-        <section data-chat aria-label="Conversation with Anees Bot" className="lg:col-span-7">
+        <section data-chat aria-label="Contact details" className="lg:col-span-7">
           <ol role="log" aria-live="polite" aria-relevant="additions" className="flex flex-col gap-7">
             {visible.map((step, index) => {
               const botShown = index < shownBots;
@@ -416,7 +416,7 @@ export default function Conversation() {
                     onClick={send}
                     className="roll-trigger group inline-flex items-center gap-3 rounded-full bg-lime px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-void"
                   >
-                    <RollingText text="Seal & send the letter" />
+                    <RollingText text="Send message" />
                     <ArrowUpRight className="h-4 w-4 transition-transform duration-500 ease-expo group-hover:rotate-45" />
                   </button>
                 </Magnetic>
@@ -503,7 +503,7 @@ function BotLine({ id, text, highlight = false }: { id: string; text: string; hi
     <div data-msg className="flex items-start gap-3">
       <Avatar />
       <div className="flex flex-col gap-1.5 pt-1">
-        <span className="mono uppercase text-fg-4">Anees Bot</span>
+        <span className="mono uppercase text-fg-4">Contact</span>
         <p
           id={id}
           className={cn(
@@ -753,7 +753,6 @@ function Letter({ answers, activeKey }: { answers: Answers; activeKey: FieldKey 
           className="flex h-14 w-11 shrink-0 flex-col items-center justify-center gap-0.5 rounded-[3px] border border-dashed border-black/25 mono text-[8px] uppercase leading-none text-black/45"
         >
           <span className="font-heading text-sm text-cobalt [font-variation-settings:'wght'_800]">AA</span>
-          ’26
         </span>
       </div>
 
@@ -891,10 +890,10 @@ function SentScreen({
         </button>
         <TransitionLink
           href="/"
-          label="Index"
+          label="Home"
           className="inline-flex items-center gap-2 rounded-full px-5 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-fg-2 transition-colors hover:text-fg"
         >
-          Back to the index
+          Back to home
         </TransitionLink>
         <button
           type="button"
