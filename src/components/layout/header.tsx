@@ -14,6 +14,7 @@ import { scrollToHash } from "@/components/providers/transition-provider";
 import TransitionLink from "@/components/ui/transition-link";
 import RollingText from "@/components/ui/rolling-text";
 import LocalTime from "@/components/ui/local-time";
+import Magnetic from "@/components/ui/magnetic";
 
 const BAR_HEIGHT = 56;
 const COLLAPSED_WIDTH = 268;
@@ -52,6 +53,8 @@ export default function Header() {
 
 function TopBar({ ready }: { ready: boolean }) {
   const barRef = useRef<HTMLElement>(null);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
   useGSAP(
     () => {
@@ -62,49 +65,106 @@ function TopBar({ ready }: { ready: boolean }) {
         { yPercent: 0, opacity: 1, duration: 1.1, ease: "expo.out", stagger: 0.08, delay: 0.25 }
       );
     },
-    { scope: barRef, dependencies: [ready] }
+    { scope: barRef, dependencies: [ready, isHome] }
   );
+
+  // One header for every page. On the slate pages (home, contact) it is plain
+  // white; on case studies — which flip between light and dark — it blends.
+  const solid = pathname === "/" || pathname === "/contact";
+  const item = "pointer-events-auto opacity-0";
+  const link = (id: "works" | "about", label: string) => {
+    const inner = (
+      <>
+        <RollingText text={label} />
+        <span aria-hidden className="nav-dot" />
+      </>
+    );
+    const className = `${item} nav-link roll-trigger`;
+    return isHome ? (
+      <a
+        href={`#${id}`}
+        data-topbar-item
+        onClick={(event) => {
+          event.preventDefault();
+          scrollToHash(`#${id}`);
+        }}
+        className={className}
+      >
+        {inner}
+      </a>
+    ) : (
+      <TransitionLink href={`/#${id}`} label={label} data-topbar-item className={className}>
+        {inner}
+      </TransitionLink>
+    );
+  };
 
   return (
     <header
       ref={barRef}
-      className="pointer-events-none absolute inset-x-0 top-0 z-40 text-white mix-blend-difference"
+      className={`pointer-events-none absolute inset-x-0 top-0 z-40 text-white ${solid ? "" : "mix-blend-difference"}`}
     >
-      <div className="flex items-start justify-between gap-6 px-gutter pt-5 sm:pt-7">
+      <div className="grid grid-cols-[1fr_auto] items-center gap-6 px-gutter pt-5 sm:pt-7 lg:grid-cols-[1fr_auto_1fr]">
+        {/* Wordmark — the © spins and the line slides to the full name on hover */}
         <TransitionLink
           href="/"
           label="Home"
           data-topbar-item
-          className="roll-trigger pointer-events-auto flex items-baseline gap-1.5 font-heading text-[15px] font-bold uppercase leading-none tracking-[-0.01em] opacity-0"
+          className={`${item} brand group flex items-center gap-2 text-[0.95rem] font-medium leading-none tracking-[-0.02em]`}
         >
-          <RollingText text={site.name} />
+          <span aria-hidden className="brand-copy inline-block">©</span>
+          <span className="relative block overflow-y-clip whitespace-nowrap">
+            <span className="brand-line flex">
+              <span className="pr-1.5">Code by</span>
+              <span className="brand-swap relative inline-block">
+                <span className="block">{site.firstName}</span>
+                <span className="absolute left-0 top-full block whitespace-nowrap">{site.firstName} Aboobacker</span>
+              </span>
+            </span>
+          </span>
         </TransitionLink>
 
+        {/* Status pill — availability and the local clock */}
         <div
           data-topbar-item
-          className="hidden items-start gap-16 mono uppercase leading-relaxed opacity-0 lg:flex"
+          className={`${item} hidden items-center gap-2.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-[0.72rem] font-medium tracking-[0.02em] backdrop-blur-md lg:flex`}
         >
-          <p>
-            Full Stack
-            <br />
-            MERN Developer
-          </p>
-          <p>
-            {site.region}
-            <br />
+          <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-[#9be59b]" />
+          Available for freelance
+          <span className="h-3 w-px bg-white/30" />
+          <span className="tabular-nums text-white/80">
             <LocalTime short /> IST
-          </p>
+          </span>
         </div>
 
-        <TransitionLink
-          href="/contact"
-          label="Contact"
-          data-topbar-item
-          className="roll-trigger pointer-events-auto flex items-center gap-2.5 text-[13px] font-medium uppercase leading-none tracking-[0.12em] opacity-0"
-        >
-          <span className="pulse-dot h-2 w-2 rounded-full bg-lime" />
-          <RollingText text="Let's talk" />
-        </TransitionLink>
+        <nav aria-label="Primary" className="flex items-center justify-end gap-6 text-[0.95rem] font-medium leading-none tracking-[-0.01em] sm:gap-9">
+          {link("works", "Work")}
+          {link("about", "About")}
+          <TransitionLink
+            href="/contact"
+            label="Contact"
+            data-topbar-item
+            aria-current={pathname === "/contact" ? "page" : undefined}
+            className={`${item} nav-link roll-trigger`}
+          >
+            <RollingText text="Contact" />
+            <span aria-hidden className="nav-dot" />
+          </TransitionLink>
+          <span data-topbar-item className={`${item} hidden sm:block`}>
+            <Magnetic strength={0.35}>
+              <TransitionLink
+                href="/contact"
+                label="Contact"
+                tabIndex={-1}
+                aria-hidden
+                className="roll-trigger group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-[0.8rem] font-semibold text-pal-ink shadow-[0_10px_30px_-12px_rgba(0,0,0,0.5)] transition-colors duration-300 hover:bg-pal-ink hover:text-white"
+              >
+                <RollingText text="Let's talk" />
+                <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-500 ease-expo group-hover:rotate-45" />
+              </TransitionLink>
+            </Magnetic>
+          </span>
+        </nav>
       </div>
     </header>
   );
@@ -427,7 +487,7 @@ function Island({ ready }: { ready: boolean }) {
               cy="14"
               r={RING_RADIUS}
               fill="none"
-              stroke="var(--accent-lime)"
+              stroke="var(--pal-glass)"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeDasharray={RING_LENGTH}

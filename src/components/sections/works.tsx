@@ -1,592 +1,200 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
-import { allProjects, projectDetails, type ProjectDetail } from "@/lib/projects";
-import { playTick } from "@/lib/sound";
-import { cn } from "@/lib/utils";
-import { scrollToHash } from "@/components/providers/transition-provider";
+import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion, hasFinePointer } from "@/lib/gsap";
+import { allProjects } from "@/lib/projects";
+import { pad2 } from "@/lib/site";
 import TransitionLink from "@/components/ui/transition-link";
 import TextReveal from "@/components/ui/text-reveal";
-import RollingText from "@/components/ui/rolling-text";
-import PreviewVideo from "@/components/ui/preview-video";
-import PhoneMockup from "@/components/ui/phone-mockup";
-import SocketDiagram from "@/components/ui/socket-diagram";
-import AdmissionWorkflow from "@/components/ui/admission-workflow";
 
-const projects = allProjects.map((project) => projectDetails[project.id]);
-const host = (url: string) => new URL(url).host.replace(/^www\./, "");
+const PREVIEW_W = 380;
+const PREVIEW_H = 260;
 
 /**
- * The work, laid out like an issue of a magazine: a contents page, then one
- * spread per case study — each with its own grid, as an art director would
- * set them, rather than six copies of the same card.
+ * Selected work as one oversized index. Each row is a doorway: hovering lifts
+ * it out of the list (everything else dims) and a floating still follows the
+ * cursor with a little weight — it leans into the direction of travel.
  */
 export default function Works() {
   const sectionRef = useRef<HTMLElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const stackRef = useRef<HTMLDivElement>(null);
+  const fine = useRef(false);
 
   useGSAP(
     () => {
       const section = sectionRef.current;
-      if (!section || prefersReducedMotion()) return;
+      if (!section) return;
+      fine.current = hasFinePointer();
+      if (prefersReducedMotion()) return;
 
-      gsap.utils.toArray<HTMLElement>("[data-spread]", section).forEach((spread) => {
-        const chars = spread.querySelectorAll("[data-char]");
-        if (chars.length) {
-          gsap.fromTo(
-            chars,
-            { yPercent: 112 },
-            {
-              yPercent: 0,
-              duration: 1.3,
-              ease: "expo.out",
-              stagger: 0.035,
-              scrollTrigger: { trigger: spread, start: "top 80%", once: true },
-            }
-          );
-        }
-        const reveals = spread.querySelectorAll("[data-reveal]");
-        if (reveals.length) {
-          gsap.fromTo(
-            reveals,
-            { opacity: 0, y: 32 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 1.1,
-              ease: "expo.out",
-              stagger: 0.08,
-              scrollTrigger: { trigger: spread, start: "top 72%", once: true },
-            }
-          );
-        }
+      /* Rows build themselves as they arrive */
+      gsap.utils.toArray<HTMLElement>("[data-row]", section).forEach((row) => {
+        const title = row.querySelector("[data-title]");
+        const meta = row.querySelectorAll("[data-meta]");
+        const line = row.querySelector("[data-line]");
+        const tl = gsap.timeline({ scrollTrigger: { trigger: row, start: "top 92%", once: true } });
+        tl.fromTo(line, { scaleX: 0 }, { scaleX: 1, duration: 1.5, ease: "expo.inOut" }, 0)
+          .fromTo(title, { yPercent: 110 }, { yPercent: 0, duration: 1.3, ease: "expo.out" }, 0.1)
+          .fromTo(meta, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 1, stagger: 0.06, ease: "expo.out" }, 0.3);
       });
 
-      // Footage drifts inside its frame, a touch slower than the page.
-      gsap.utils.toArray<HTMLElement>("[data-parallax]", section).forEach((inner) => {
-        gsap.fromTo(
-          inner,
-          { yPercent: -7 },
-          {
-            yPercent: 7,
-            ease: "none",
-            scrollTrigger: { trigger: inner.parentElement, start: "top bottom", end: "bottom top", scrub: true },
-          }
-        );
-      });
+      /* Floating preview — follows the cursor, leans with its velocity */
+      const preview = previewRef.current;
+      if (!preview || !fine.current) return;
+      gsap.set(preview, { xPercent: -50, yPercent: -50, scale: 0.6, opacity: 0, rotate: 0 });
+      const x = gsap.quickTo(preview, "x", { duration: 0.7, ease: "power3.out" });
+      const y = gsap.quickTo(preview, "y", { duration: 0.7, ease: "power3.out" });
+      const rotate = gsap.quickTo(preview, "rotate", { duration: 0.6, ease: "power3.out" });
+      let lastX = 0;
+      const onMove = (event: PointerEvent) => {
+        if (event.pointerType !== "mouse") return;
+        x(event.clientX + 60);
+        y(event.clientY);
+        rotate(gsap.utils.clamp(-9, 9, (event.clientX - lastX) * 0.35));
+        lastX = event.clientX;
+      };
+      window.addEventListener("pointermove", onMove, { passive: true });
 
-      // The cover opens from a framed plate to full bleed.
-      gsap.utils.toArray<HTMLElement>("[data-cover-clip]", section).forEach((plate) => {
-        gsap.fromTo(
-          plate,
-          { clipPath: "inset(8% 11% 8% 11% round 1.5rem)" },
-          {
-            clipPath: "inset(0% 0% 0% 0% round 0rem)",
-            ease: "none",
-            scrollTrigger: { trigger: plate, start: "top 92%", end: "top 8%", scrub: true },
-          }
-        );
+      // Scrolling (not the pointer) can carry the list away — hide with it.
+      const hideNow = () =>
+        gsap.to(preview, { opacity: 0, scale: 0.6, duration: 0.4, ease: "expo.in", overwrite: "auto" });
+      ScrollTrigger.create({
+        trigger: "[data-list]",
+        start: "top bottom",
+        end: "bottom 40%",
+        onLeave: hideNow,
+        onLeaveBack: hideNow,
       });
-
-      // Footage that slides across the type it sits on.
-      gsap.utils.toArray<HTMLElement>("[data-drift]", section).forEach((el) => {
-        gsap.fromTo(
-          el,
-          { xPercent: 9 },
-          {
-            xPercent: -9,
-            ease: "none",
-            scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true },
-          }
-        );
-      });
-
-      // Objects that travel faster than the page around them.
-      gsap.utils.toArray<HTMLElement>("[data-float]", section).forEach((el) => {
-        gsap.fromTo(
-          el,
-          { y: 90 },
-          {
-            y: -90,
-            ease: "none",
-            scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true },
-          }
-        );
-      });
+      return () => window.removeEventListener("pointermove", onMove);
     },
     { scope: sectionRef }
   );
 
+  const show = (index: number) => {
+    if (!fine.current) return;
+    const stack = stackRef.current;
+    const preview = previewRef.current;
+    if (!stack || !preview) return;
+    Array.from(stack.children).forEach((child, i) => {
+      gsap.to(child, {
+        opacity: i === index ? 1 : 0,
+        scale: i === index ? 1 : 1.12,
+        duration: 0.6,
+        ease: "expo.out",
+        overwrite: "auto",
+      });
+    });
+    gsap.to(preview, { opacity: 1, scale: 1, duration: 0.7, ease: "expo.out", overwrite: "auto" });
+  };
+
+  const hide = () => {
+    if (!fine.current || !previewRef.current) return;
+    gsap.to(previewRef.current, { opacity: 0, scale: 0.6, duration: 0.5, ease: "expo.in", overwrite: "auto" });
+  };
+
   return (
-    <section id="works" ref={sectionRef} aria-labelledby="works-title" className="relative bg-void py-28 sm:py-36">
-      {/* Contents */}
+    <section id="works" ref={sectionRef} aria-labelledby="works-title" className="relative bg-pal-ink py-28 text-white sm:py-40">
       <div className="px-gutter">
-        <div className="flex items-center justify-between mono uppercase text-fg-3">
-          <span>Work</span>
+        <div className="flex items-center justify-between mono uppercase text-white/50">
+          <span>Selected work</span>
+          <span>({pad2(allProjects.length)})</span>
         </div>
-        <div className="mt-10 grid gap-14 lg:grid-cols-12 lg:gap-10">
-          <TextReveal
-            as="h2"
-            text="Selected work."
-            split="words"
-            className="font-heading text-display text-fg [font-variation-settings:'wght'_640] lg:col-span-6"
-          />
-          <nav aria-label="Projects" className="lg:col-span-6 lg:col-start-7 lg:self-end">
-            <p className="mono uppercase text-fg-4">Projects</p>
-            <ol className="mt-4 border-t border-line-2">
-              {projects.map((project) => (
-                <li key={project.id} className="border-b border-line-2">
-                  <a
-                    href={`#work-${project.id}`}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      scrollToHash(`#work-${project.id}`);
-                    }}
-                    onPointerEnter={() => playTick(1 + project.index * 0.04)}
-                    className="backlit roll-trigger group grid grid-cols-[1fr_auto] items-center gap-x-4 py-3.5 outline-none sm:grid-cols-[1fr_auto]"
-                  >
-                    <span className="flex items-center gap-3 font-heading text-[clamp(1.2rem,1.7vw,1.6rem)] leading-none text-fg [font-variation-settings:'wght'_620]">
-                      <RollingText text={project.listTitle} />
-                      <span
-                        aria-hidden
-                        className="h-1.5 w-1.5 scale-0 rounded-full transition-transform duration-500 ease-expo group-hover:scale-100 group-focus-visible:scale-100"
-                        style={{ background: project.accent }}
-                      />
-                    </span>
-                    <span className="hidden mono uppercase text-fg-3 sm:block">{project.category}</span>
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
-        </div>
+        <TextReveal
+          as="h2"
+          text="Things I've shipped."
+          split="words"
+          className="mt-10 max-w-[12ch] text-[clamp(2.4rem,5.6vw,5.8rem)] font-medium leading-[0.92] tracking-[-0.05em]"
+        />
         <span id="works-title" className="sr-only">
           Selected work
         </span>
       </div>
 
-      {/* Spreads */}
-      <div className="mt-32 flex flex-col gap-36 sm:mt-44 sm:gap-48">
-        {projects.map((project) => {
-          const Spread = SPREADS[project.id] ?? QuoteSpread;
-          return (
-            <div key={project.id}>
-              <Spread project={project} />
+      <ul data-list className="group/list mt-20 px-gutter sm:mt-28" onPointerLeave={hide}>
+        {allProjects.map((project, i) => (
+          <li key={project.id} data-row className="relative">
+            <span data-line aria-hidden className="absolute inset-x-0 top-0 h-px origin-left bg-white/20" />
+            <TransitionLink
+              href={`/work/${project.id}`}
+              label={project.listTitle}
+              onPointerEnter={() => show(i)}
+              onFocus={() => show(i)}
+              onBlur={hide}
+              aria-label={`Open case study: ${project.listTitle}`}
+              className="group/row grid grid-cols-[2.5rem_1fr_auto] items-center gap-x-4 py-7 opacity-100 outline-none transition-opacity duration-500 group-hover/list:opacity-30 hover:opacity-100 focus-visible:opacity-100 sm:py-8 md:grid-cols-[4.5rem_1fr_17rem_5rem_3rem]"
+            >
+              <span data-meta className="mono text-white/45">
+                {pad2(i + 1)}
+              </span>
 
+              <span className="min-w-0">
+                <span className="block overflow-hidden pb-[0.08em]">
+                  <span
+                    data-title
+                    className="block text-[clamp(1.7rem,4.2vw,4.4rem)] font-medium leading-[0.98] tracking-[-0.045em] transition-transform duration-700 ease-expo group-hover/row:translate-x-[1.6vw]"
+                  >
+                    {project.listTitle}
+                  </span>
+                </span>
+                <span data-meta className="mt-1 block text-sm text-white/55 md:hidden">
+                  {project.category}
+                </span>
+              </span>
+
+              <span data-meta className="hidden text-[0.95rem] leading-snug text-white/60 md:block">
+                {project.category}
+              </span>
+              <span data-meta className="hidden mono text-white/45 md:block">
+                {project.year}
+              </span>
+
+              <span
+                data-meta
+                className="flex h-10 w-10 items-center justify-center justify-self-end rounded-full border border-white/25 transition-all duration-500 ease-expo group-hover/row:border-transparent group-hover/row:bg-white group-hover/row:text-pal-ink md:h-12 md:w-12"
+                style={{ ["--accent" as string]: project.accent }}
+              >
+                <ArrowUpRight className="h-4 w-4 transition-transform duration-500 ease-expo group-hover/row:rotate-45" />
+              </span>
+            </TransitionLink>
+
+            {/* Phones have no hover — show the still inline instead */}
+            {project.poster && (
+              <div className="relative -mt-2 mb-8 aspect-[16/10] overflow-hidden rounded-2xl md:hidden">
+                <Image src={project.poster} alt="" fill sizes="90vw" className="object-cover" />
+              </div>
+            )}
+          </li>
+        ))}
+        <li aria-hidden className="h-px bg-white/20" />
+      </ul>
+
+      {/* The cursor-following still */}
+      <div
+        ref={previewRef}
+        aria-hidden
+        className="pointer-events-none fixed left-0 top-0 z-40 hidden overflow-hidden rounded-[1.25rem] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.8)] md:block"
+        style={{ width: PREVIEW_W, height: PREVIEW_H, opacity: 0 }}
+      >
+        <div ref={stackRef} className="absolute inset-0">
+          {allProjects.map((project) => (
+            <div key={project.id} className="absolute inset-0 opacity-0">
+              {project.poster ? (
+                <Image src={project.poster} alt="" fill sizes={`${PREVIEW_W}px`} className="object-cover" />
+              ) : (
+                <div
+                  className="flex h-full w-full items-end p-6"
+                  style={{ background: `linear-gradient(135deg, ${project.accent}, #151a1c 85%)` }}
+                >
+                  <span className="text-3xl font-medium tracking-[-0.04em] text-white">{project.listTitle}</span>
+                </div>
+              )}
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
     </section>
   );
 }
-
-/* ─────────────────────────────────────────────────────────────────────────
-   Shared pieces
-   ───────────────────────────────────────────────────────────────────────── */
-
-type SpreadProps = { project: ProjectDetail };
-
-function Kicker({ project }: SpreadProps) {
-  return (
-    <div
-      data-reveal
-      className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 mono uppercase text-fg-3"
-    >
-      <span className="flex items-center gap-3">
-        <span>{project.listTitle}</span>
-      </span>
-      <span className="flex items-center gap-2.5">
-        <span aria-hidden className="h-1.5 w-1.5 rounded-full" style={{ background: project.accent }} />
-        {project.category} · {project.year}
-      </span>
-    </div>
-  );
-}
-
-/** Decorative title set letter by letter, so each glyph can rise through its own mask. */
-function Letters({ lines, className, lineClassNames }: { lines: string[]; className?: string; lineClassNames?: string[] }) {
-  return (
-    <span aria-hidden className={cn("block", className)}>
-      {lines.map((line, l) => (
-        <span key={l} className={cn("block whitespace-nowrap", lineClassNames?.[l])}>
-          {Array.from(line).map((char, i) => (
-            <span key={i} className="-mb-[0.08em] inline-block overflow-hidden pb-[0.08em] align-top">
-              <span data-char className="inline-block">
-                {char === " " ? " " : char}
-              </span>
-            </span>
-          ))}
-        </span>
-      ))}
-    </span>
-  );
-}
-
-/** The one real heading per spread — visual titles are decoration. */
-function SpreadHeading({ project }: SpreadProps) {
-  return (
-    <h3 id={`work-${project.id}-title`} className="sr-only">
-      {project.listTitle} — {project.category}
-    </h3>
-  );
-}
-
-function CaseLink({
-  project,
-  className,
-  children,
-  view = false,
-}: {
-  project: ProjectDetail;
-  className?: string;
-  children: React.ReactNode;
-  /** Media links: hidden from assistive tech (the "Read" link covers them) and shown with the VIEW cursor. */
-  view?: boolean;
-}) {
-  return (
-    <TransitionLink
-      href={`/work/${project.id}`}
-      label={project.listTitle}
-      className={className}
-      {...(view
-        ? { "aria-hidden": true, tabIndex: -1, "data-cursor": "view", "data-cursor-label": "View" }
-        : {})}
-    >
-      {children}
-    </TransitionLink>
-  );
-}
-
-function Footage({ project, className }: SpreadProps & { className?: string }) {
-  return (
-    <span className={cn("group/footage relative block overflow-hidden bg-elevated", className)}>
-      <span data-parallax className="absolute inset-x-0 -inset-y-[9%] block">
-        {project.video && (
-          <PreviewVideo
-            src={project.video}
-            poster={project.poster}
-            label={`${project.listTitle} — screen recording`}
-            className="h-full w-full object-cover transition-[scale] duration-[1.2s] ease-expo group-hover/footage:scale-[1.035]"
-          />
-        )}
-      </span>
-    </span>
-  );
-}
-
-function ReadMore({ project }: SpreadProps) {
-  return (
-    <CaseLink
-      project={project}
-      className="roll-trigger group inline-flex items-center gap-4 text-sm font-semibold uppercase tracking-[0.14em] text-fg"
-    >
-      <span className="flex h-12 w-12 items-center justify-center rounded-full border border-line-3 transition-colors duration-500 ease-expo group-hover:border-lime group-hover:bg-lime group-hover:text-void">
-        <ArrowUpRight className="h-4 w-4 transition-transform duration-500 ease-expo group-hover:rotate-45" />
-      </span>
-      <RollingText text="Read the case study" />
-      <span className="sr-only">: {project.listTitle}</span>
-    </CaseLink>
-  );
-}
-
-function StackLine({ project }: SpreadProps) {
-  return <p className="mono uppercase leading-relaxed text-fg-3">{project.stack.slice(0, 8).join(" / ")}</p>;
-}
-
-function Highlights({ project, count = 3 }: SpreadProps & { count?: number }) {
-  return (
-    <ul className="flex flex-col gap-2.5 text-[15px] leading-relaxed text-fg-2">
-      {project.highlights.slice(0, count).map((highlight) => (
-        <li key={highlight} className="flex gap-3">
-          <span aria-hidden className="mt-[0.75em] h-px w-3 shrink-0 bg-fg-4" />
-          {highlight}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-
-/* ─────────────────────────────────────────────────────────────────────────
-   Spreads
-   ───────────────────────────────────────────────────────────────────────── */
-
-/** 01 — Cover story: the name across the full measure, footage opening to full bleed. */
-function CoverSpread({ project }: SpreadProps) {
-  return (
-    <article id={`work-${project.id}`} data-spread aria-labelledby={`work-${project.id}-title`} className="relative">
-      <SpreadHeading project={project} />
-      <div className="px-gutter">
-        <Kicker project={project} />
-        <CaseLink project={project} view className="mt-6 block">
-          <Letters
-            lines={[project.title]}
-            className="font-heading text-[12.6vw] uppercase leading-[0.8] tracking-[-0.055em] text-fg [font-variation-settings:'wght'_780]"
-          />
-        </CaseLink>
-      </div>
-      <CaseLink project={project} view className="mt-8 block sm:mt-10">
-        <span data-cover-clip className="block">
-          <Footage project={project} className="aspect-[4/3] max-h-[92svh] w-full sm:aspect-[16/9]" />
-        </span>
-      </CaseLink>
-      <div className="mt-12 grid gap-10 px-gutter sm:mt-16 lg:grid-cols-12">
-        <p data-reveal className="text-lead font-light text-fg lg:col-span-6">
-          {project.tagline}
-        </p>
-        <dl data-reveal className="grid content-start gap-5 text-sm lg:col-span-3">
-          <div className="flex flex-col gap-1.5">
-            <dt className="mono uppercase text-fg-4">Role</dt>
-            <dd className="text-fg-2">{project.role}</dd>
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <dt className="mono uppercase text-fg-4">Credits</dt>
-            <dd className="text-fg-2">{project.credits}</dd>
-          </div>
-        </dl>
-        <div data-reveal className="flex flex-col items-start gap-8 lg:col-span-3">
-          <StackLine project={project} />
-          <ReadMore project={project} />
-        </div>
-      </div>
-    </article>
-  );
-}
-
-/** 02 — Phone: the name runs up the spine, the handset floats ahead of the page. */
-function PhoneSpread({ project }: SpreadProps) {
-  return (
-    <article id={`work-${project.id}`} data-spread aria-labelledby={`work-${project.id}-title`} className="relative px-gutter">
-      <SpreadHeading project={project} />
-      <div className="grid items-center gap-14 lg:grid-cols-12 lg:gap-10">
-        <div aria-hidden className="hidden h-full items-center lg:col-span-3 lg:flex">
-          <span className="font-heading text-[min(10.5vw,12.5svh)] uppercase leading-[0.8] tracking-[-0.04em] text-fg [font-variation-settings:'wght'_700] [writing-mode:vertical-rl] rotate-180">
-            <Letters lines={[project.title]} />
-          </span>
-        </div>
-
-        <div className="flex flex-col gap-8 lg:hidden">
-          <Kicker project={project} />
-          <Letters
-            lines={[project.title]}
-            className="font-heading text-[13.5vw] uppercase leading-[0.8] tracking-[-0.04em] text-fg [font-variation-settings:'wght'_700]"
-          />
-        </div>
-
-        <div className="flex justify-center lg:col-span-4">
-          <CaseLink project={project} view className="block">
-            <span data-float className="block">
-              <PhoneMockup video={project.video} poster={project.poster} label={`${project.listTitle} app — screen recording`} />
-            </span>
-          </CaseLink>
-        </div>
-
-        <div className="flex flex-col gap-8 lg:col-span-4 lg:col-start-9">
-          <div className="hidden lg:block">
-            <Kicker project={project} />
-          </div>
-          <p data-reveal className="font-heading text-[clamp(1.6rem,2.4vw,2.4rem)] leading-[1.12] tracking-[-0.02em] text-fg [font-variation-settings:'wght'_520]">
-            {project.tagline}
-          </p>
-          <div data-reveal>
-            <Highlights project={project} />
-          </div>
-          <div data-reveal className="flex flex-col items-start gap-8">
-            <StackLine project={project} />
-            <ReadMore project={project} />
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-/** 03 — Feature: the name set huge, the footage sliding across its lower edge. */
-function BehindSpread({ project }: SpreadProps) {
-  const [first, ...rest] = project.title.split(" ");
-  const titleClass =
-    "font-heading text-[10vw] uppercase leading-[0.8] tracking-[-0.05em] text-fg [font-variation-settings:'wght'_700]";
-  return (
-    <article id={`work-${project.id}`} data-spread aria-labelledby={`work-${project.id}-title`} className="relative overflow-hidden">
-      <SpreadHeading project={project} />
-      <div className="px-gutter">
-        <Kicker project={project} />
-      </div>
-      {/* One grid, three overlapping cells: the footage starts inside the
-          first line and fills the space the right-set second line leaves. */}
-      <div className="mt-8 grid gap-y-8 px-gutter sm:mt-12 lg:grid-cols-12 lg:gap-y-0">
-        <Letters lines={[first]} className={cn(titleClass, "lg:col-span-12 lg:row-start-1")} />
-        <Letters
-          lines={[rest.join(" ")]}
-          className={cn(titleClass, "text-right lg:col-span-4 lg:col-start-9 lg:row-start-2")}
-        />
-        <CaseLink
-          project={project}
-          view
-          className="relative z-10 block lg:col-span-6 lg:col-start-2 lg:row-span-2 lg:row-start-2 lg:-mt-[3.2vw]"
-        >
-          <span data-drift className="block">
-            <Footage
-              project={project}
-              className="aspect-[832/480] w-full rounded-xl shadow-[0_40px_80px_-30px_rgba(0,0,0,0.9)] ring-1 ring-white/10"
-            />
-          </span>
-        </CaseLink>
-      </div>
-      <div className="mt-12 grid gap-10 px-gutter sm:mt-16 lg:grid-cols-12">
-        <p data-reveal className="text-lead font-light text-fg lg:col-span-5">
-          {project.tagline}
-        </p>
-        <div data-reveal className="lg:col-span-4 lg:col-start-6">
-          <Highlights project={project} />
-        </div>
-        <div data-reveal className="flex flex-col items-start gap-8 lg:col-span-3 lg:col-start-10 lg:items-end">
-          <a
-            href={project.liveUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 mono uppercase text-fg-2 transition-colors hover:text-lime"
-          >
-            {host(project.liveUrl)}
-            <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-500 ease-expo group-hover:rotate-45" />
-          </a>
-          <ReadMore project={project} />
-        </div>
-      </div>
-    </article>
-  );
-}
-
-/** 04 — Pull quote: the pitch set as display type beside a small framed figure. */
-function QuoteSpread({ project }: SpreadProps) {
-  return (
-    <article id={`work-${project.id}`} data-spread aria-labelledby={`work-${project.id}-title`} className="relative px-gutter">
-      <SpreadHeading project={project} />
-      <div className="grid gap-14 lg:grid-cols-12 lg:gap-10">
-        <div className="flex flex-col gap-10 lg:col-span-7">
-          <Kicker project={project} />
-          <Letters
-            lines={[project.title]}
-            className="font-heading text-[14vw] uppercase leading-[0.8] tracking-[-0.045em] text-fg [font-variation-settings:'wght'_700] lg:text-[8vw]"
-          />
-          <blockquote
-            data-reveal
-            className="font-heading text-[clamp(1.75rem,3.3vw,3.4rem)] leading-[1.08] tracking-[-0.025em] text-fg-2 [font-variation-settings:'wght'_480]"
-          >
-            <span aria-hidden className="text-lime">“</span>
-            {project.tagline}
-            <span aria-hidden className="text-lime">”</span>
-          </blockquote>
-          <div data-reveal className="flex flex-wrap items-center justify-between gap-8">
-            <StackLine project={project} />
-            <ReadMore project={project} />
-          </div>
-        </div>
-        <figure data-reveal className="lg:col-span-5 lg:self-end">
-          <CaseLink project={project} view className="block">
-            <Footage project={project} className="aspect-[960/444] w-full rounded-xl ring-1 ring-white/10" />
-          </CaseLink>
-          <figcaption className="mt-3 flex items-center justify-between mono uppercase text-fg-4">
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-lime"
-            >
-              {host(project.liveUrl)} ↗
-            </a>
-          </figcaption>
-        </figure>
-      </div>
-    </article>
-  );
-}
-
-/** 05 — Split: footage bleeds off the left edge, the name stacks beside it. */
-function SplitSpread({ project }: SpreadProps) {
-  const name = project.listTitle;
-  const cut = Math.ceil(name.length / 2);
-  const isCamel = /[a-z][A-Z]/.test(name);
-  const [top, bottom] = isCamel
-    ? [name.slice(0, name.search(/[a-z][A-Z]/) + 1), name.slice(name.search(/[a-z][A-Z]/) + 1)]
-    : [name.slice(0, cut), name.slice(cut)];
-
-  return (
-    <article id={`work-${project.id}`} data-spread aria-labelledby={`work-${project.id}-title`} className="relative">
-      <SpreadHeading project={project} />
-      <div className="px-gutter lg:hidden">
-        <Kicker project={project} />
-      </div>
-      <div className="mt-8 grid items-center gap-12 lg:mt-0 lg:grid-cols-12 lg:gap-10">
-        <CaseLink project={project} view className="block lg:col-span-7">
-          <Footage project={project} className="aspect-[832/480] w-full lg:rounded-r-2xl" />
-        </CaseLink>
-        <div className="flex flex-col gap-8 px-gutter lg:col-span-5 lg:pl-0">
-          <div className="hidden lg:block">
-            <Kicker project={project} />
-          </div>
-          <Letters
-            lines={[top.toUpperCase(), bottom.toUpperCase()]}
-            lineClassNames={["", "text-outline [--outline-color:var(--text-secondary)]"]}
-            className="font-heading text-[18vw] leading-[0.8] tracking-[-0.05em] text-fg [font-variation-settings:'wght'_700] lg:text-[8.6vw]"
-          />
-          <p data-reveal className="text-lead font-light text-fg">
-            {project.tagline}
-          </p>
-          <div data-reveal>
-            <Highlights project={project} />
-          </div>
-          <div data-reveal className="flex flex-col items-start gap-8">
-            <StackLine project={project} />
-            <ReadMore project={project} />
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-/** 06 — No footage: the mechanism, drawn. */
-function SignalSpread({ project }: SpreadProps) {
-  return (
-    <article id={`work-${project.id}`} data-spread aria-labelledby={`work-${project.id}-title`} className="relative px-gutter">
-      <SpreadHeading project={project} />
-      <Kicker project={project} />
-      <CaseLink project={project} view className="mt-6 block">
-        <Letters
-          lines={[project.title]}
-          className="font-heading text-[11.3vw] uppercase leading-[0.8] tracking-[-0.055em] text-fg [font-variation-settings:'wght'_780]"
-        />
-      </CaseLink>
-      <div className="mt-14 grid items-center gap-14 lg:grid-cols-12 lg:gap-10">
-        <div className="flex flex-col gap-8 lg:col-span-5">
-          <p data-reveal className="text-lead font-light text-fg">
-            {project.tagline}
-          </p>
-          <div data-reveal>
-            <Highlights project={project} />
-          </div>
-          <div data-reveal className="flex flex-col items-start gap-8">
-            <StackLine project={project} />
-            <ReadMore project={project} />
-          </div>
-        </div>
-        <div data-reveal className="lg:col-span-6 lg:col-start-7">
-          {project.id === "d-aide-nexus" ? <AdmissionWorkflow /> : <SocketDiagram />}
-        </div>
-      </div>
-    </article>
-  );
-}
-
-const SPREADS: Record<string, (props: SpreadProps) => React.ReactElement> = {
-  "d-aide-nexus": SignalSpread,
-  obsera: CoverSpread,
-  spendova: PhoneSpread,
-  "malappuram-fc": BehindSpread,
-  kriscorp: QuoteSpread,
-  devpulse: SplitSpread,
-  synapse: SignalSpread,
-};

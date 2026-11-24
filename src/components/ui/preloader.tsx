@@ -35,6 +35,7 @@ export default function Preloader() {
   const rootRef = useRef<HTMLDivElement>(null);
   const wordRef = useRef<HTMLSpanElement>(null);
   const barRef = useRef<HTMLSpanElement>(null);
+  const numRef = useRef<HTMLSpanElement>(null);
   const playingRef = useRef(false);
   const lenis = useLenis();
 
@@ -63,6 +64,7 @@ export default function Preloader() {
 
     const renderCounter = () => {
       if (barRef.current) barRef.current.style.transform = `scaleX(${counter.value / 100})`;
+      if (numRef.current) numRef.current.textContent = String(Math.round(counter.value)).padStart(3, "0");
     };
 
     const finish = () => {
@@ -145,7 +147,7 @@ export default function Preloader() {
     >
       <div className="absolute inset-0 flex">
         {Array.from({ length: COLUMNS }, (_, i) => (
-          <span key={i} data-column className="-mx-px h-full flex-1 bg-void" />
+          <span key={i} data-column className="-mx-px h-full flex-1 bg-pal-ink" />
         ))}
       </div>
 
@@ -157,7 +159,7 @@ export default function Preloader() {
 
         <div className="flex items-center justify-center">
           <div data-content className="flex items-center gap-4">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-lime" />
+            <span className="h-2 w-2 shrink-0 rounded-full bg-pal-glass" />
             <span className="block overflow-hidden pb-[0.12em] -mb-[0.12em]">
               <span
                 ref={wordRef}
@@ -174,9 +176,15 @@ export default function Preloader() {
         <div className="flex flex-col gap-5">
           <div data-content className="flex items-end justify-between gap-6">
             <span className="caption max-w-[14rem] text-fg-3">{site.role}</span>
+            <span
+              ref={numRef}
+              className="text-[clamp(4rem,14vw,12rem)] font-medium leading-[0.8] tracking-[-0.06em] tabular-nums"
+            >
+              000
+            </span>
           </div>
           <span data-content className="relative block h-px w-full bg-line-2">
-            <span ref={barRef} className="absolute inset-0 origin-left scale-x-0 bg-lime" />
+            <span ref={barRef} className="absolute inset-0 origin-left scale-x-0 bg-pal-glass" />
           </span>
         </div>
       </div>

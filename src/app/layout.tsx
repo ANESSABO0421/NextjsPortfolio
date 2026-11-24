@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Outfit, Syne } from "next/font/google";
+import { Caveat, Geist_Mono, Newsreader, Outfit, Syne } from "next/font/google";
 import SmoothScrollProvider from "@/components/providers/smooth-scroll-provider";
 import TransitionProvider from "@/components/providers/transition-provider";
 import Header from "@/components/layout/header";
@@ -13,6 +13,9 @@ import "./globals.css";
 // axis (400–800) also changes its width, which the motion system leans on.
 const outfit = Outfit({ variable: "--font-outfit", subsets: ["latin"], display: "swap" });
 const syne = Syne({ variable: "--font-syne", subsets: ["latin"], display: "swap" });
+// The contact letter: a typeset serif for the letterhead and body, a hand for the signature.
+const newsreader = Newsreader({ variable: "--font-newsreader", subsets: ["latin"], style: ["normal", "italic"], display: "swap" });
+const caveat = Caveat({ variable: "--font-caveat", subsets: ["latin"], display: "swap" });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
 
 const title = "Anees Aboobacker — Full Stack MERN Developer";
@@ -110,7 +113,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${syne.variable} ${geistMono.variable} dark`}
+      className={`${outfit.variable} ${syne.variable} ${geistMono.variable} ${newsreader.variable} ${caveat.variable} dark`}
       suppressHydrationWarning
     >
       <body>

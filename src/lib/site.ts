@@ -18,6 +18,7 @@ export const site = {
   resumeFileName: "Anees-Aboobacker-Resume.pdf",
   portrait: "/anees-aboo3.png",
   portraitStudio: "/Anees.png",
+  portraitCasual: "/anees-casual.jpg",
   summary:
     "Full Stack (MERN) Developer building production ERP, HRMS, and real-time platforms. Currently developing a multi-tenant HRMS serving 6 role-based dashboards — owning the Leave Management module and leading frontend and backend architecture refactoring. Skilled in REST API design, JWT authentication, RBAC, Socket.io, and MongoDB query optimization.",
   shortSummary:
@@ -46,9 +47,9 @@ export interface NavSection {
 export const sections: NavSection[] = [
   { id: "hero", label: "Home" },
   { id: "about", label: "About" },
-  { id: "skills", label: "Stack" },
-  { id: "experience", label: "Experience" },
   { id: "works", label: "Work" },
+  { id: "experience", label: "Experience" },
+  { id: "skills", label: "Stack" },
   { id: "contact", label: "Contact" },
 ];
 

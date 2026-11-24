@@ -41,6 +41,18 @@
   --bg-light: #f3f3f3;
   --bg-light-alt: #e8e8e8;
 
+  /* Portrait palette — sampled from the photographs: slate studio backdrop,
+     espresso shirt, cream trousers, stone wall, glass-blue sky. */
+  --pal-slate: #94a0a5;
+  --pal-espresso: #452f31;
+  --pal-cream: #e9e5da;
+  --pal-stone: #cfccc6;
+  --pal-glass: #91b3bd;
+  --pal-ink: #151a1c;
+
+  /* How far the section below tucks under the hero's curved edge. */
+  --lap: 2.5rem;
+
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
 
@@ -90,6 +102,8 @@
 @theme inline {
   --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-hand: var(--font-caveat), "Segoe Script", cursive;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --color-void: var(--bg-void);
@@ -107,6 +121,12 @@
   --color-line: var(--border-subtle);
   --color-line-2: var(--border-medium);
   --color-line-3: var(--border-strong);
+  --color-pal-slate: var(--pal-slate);
+  --color-pal-espresso: var(--pal-espresso);
+  --color-pal-cream: var(--pal-cream);
+  --color-pal-stone: var(--pal-stone);
+  --color-pal-glass: var(--pal-glass);
+  --color-pal-ink: var(--pal-ink);
   --color-paper: var(--bg-light);
   --color-paper-2: var(--bg-light-alt);
 
@@ -143,7 +163,7 @@
   --text-display: clamp(3rem, 8vw, 8rem);
   --text-display--line-height: 0.92;
   --text-display--letter-spacing: -0.035em;
-  --text-h1: clamp(2.5rem, 6vw, 6rem);
+  --text-h1: clamp(2.2rem, 4.6vw, 4.6rem);
   --text-h1--line-height: 0.95;
   --text-h1--letter-spacing: -0.03em;
   --text-h2: clamp(2rem, 4vw, 4rem);
@@ -173,6 +193,20 @@
   }
   @media (width >= 64rem) {
     padding-inline: 6rem;
+  }
+}
+
+/* Left gutter only — lets edge-hugging pills line their text up with the grid. */
+@utility pl-gutter {
+  padding-left: 1.5rem;
+  @media (width >= 40rem) {
+    padding-left: 2.5rem;
+  }
+  @media (width >= 48rem) {
+    padding-left: 4rem;
+  }
+  @media (width >= 64rem) {
+    padding-left: 6rem;
   }
 }
 
@@ -495,7 +529,7 @@ html.js .intro-hidden {
   display: inline-block;
   width: 0.5em;
   height: 1.05em;
-  background: var(--accent-lime);
+  background: var(--caret-color, var(--accent-lime));
   vertical-align: -0.16em;
   animation: caret-blink 1.05s steps(1) infinite;
 }
@@ -586,6 +620,83 @@ html.js .intro-hidden {
   50% { transform: translateY(-1.5px); }
 }
 
+/* Hero arrow nudges along its own diagonal. */
+.hero-arrow > svg {
+  animation: arrow-nudge 2.4s var(--ease-in-out-expo) infinite;
+}
+
+@keyframes arrow-nudge {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(6px, 6px); }
+}
+
+/* Header — Dennis-style details: the © spins and the wordmark slides to the
+   full name on hover; nav links grow a dot underneath. */
+.brand-copy {
+  transition: transform 0.9s var(--ease-expo);
+}
+.brand:hover .brand-copy {
+  transform: rotate(360deg);
+}
+.brand-line {
+  transition: transform 0.7s var(--ease-expo);
+}
+.brand-swap > span {
+  transition: transform 0.7s var(--ease-expo);
+}
+.brand:hover .brand-swap > span {
+  transform: translateY(-100%);
+}
+
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+.nav-dot {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: currentColor;
+  transform: scale(0);
+  transition: transform 0.45s var(--ease-expo);
+}
+.nav-link:hover .nav-dot,
+.nav-link:focus-visible .nav-dot,
+.nav-link[aria-current="page"] .nav-dot {
+  transform: scale(1);
+}
+
+/* Experience world — flags flutter, clouds bob. */
+.flag-wave {
+  animation: flag-wave 1.6s ease-in-out infinite;
+}
+
+@keyframes flag-wave {
+  0%, 100% { clip-path: polygon(0 0, 100% 20%, 80% 50%, 100% 80%, 0 100%); }
+  50% { clip-path: polygon(0 0, 100% 8%, 86% 46%, 100% 92%, 0 100%); }
+}
+
+.cloud-drift {
+  animation: cloud-drift 18s ease-in-out infinite alternate;
+}
+
+@keyframes cloud-drift {
+  to { transform: translate3d(40px, -6px, 0); }
+}
+
+/* About — the casual portrait's palette, as chips that lift on hover. */
+.swatch {
+  transition: transform 0.6s var(--ease-expo);
+}
+
+.swatch:hover {
+  transform: translateY(-6px) scale(1.12);
+}
+
 /* GPU-promote surfaces that are transformed on every scroll frame. */
 .gpu {
   transform: translateZ(0);
@@ -595,6 +706,12 @@ html.js .intro-hidden {
 /* ───────────────────────────────────────────────────────────────────────
    Reduced motion — CSS-driven loops stop; GSAP paths check the same query.
    ─────────────────────────────────────────────────────────────────────── */
+
+@media (min-width: 40rem) {
+  :root {
+    --lap: 4rem;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *,

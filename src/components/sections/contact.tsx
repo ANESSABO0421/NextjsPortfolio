@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowUp, ArrowUpRight, Check, Copy, Download } from "lucide-react";
 import { SiGithub } from "react-icons/si";
 import { FaLinkedinIn } from "react-icons/fa6";
@@ -13,57 +13,41 @@ import TransitionLink from "@/components/ui/transition-link";
 import RollingText from "@/components/ui/rolling-text";
 import LocalTime from "@/components/ui/local-time";
 
-const WORDMARK = site.name.toUpperCase();
-
 /**
- * The closing section doubles as the footer. The headline answers the route
- * map's last stop, swelling from thin to heavy as it scrolls in; the name at
- * the very bottom is fitted to the full measure, a bookend to the hero.
+ * The closing section is the hero's bookend: same slate, same white type.
+ * A huge headline, a magnetic round call to action, and the details.
  */
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
-  const wordmarkRef = useRef<HTMLSpanElement>(null);
   const [copied, setCopied] = useState(false);
-
-  // Fit the wordmark to the column at rest weight; letters may swell past it on hover.
-  useEffect(() => {
-    const mark = wordmarkRef.current;
-    const frame = mark?.parentElement;
-    if (!mark || !frame) return;
-    const fit = () => {
-      mark.style.fontSize = "100px";
-      const natural = mark.scrollWidth;
-      if (natural > 0) mark.style.fontSize = `${(100 * frame.clientWidth) / natural}px`;
-    };
-    fit();
-    const observer = new ResizeObserver(fit);
-    observer.observe(frame);
-    let cancelled = false;
-    void document.fonts?.ready.then(() => {
-      if (!cancelled) fit();
-    });
-    return () => {
-      cancelled = true;
-      observer.disconnect();
-    };
-  }, []);
 
   useGSAP(
     () => {
       const section = sectionRef.current;
       if (!section || prefersReducedMotion()) return;
 
-      // Syne's weight axis also drives its width, so the line physically grows.
       gsap.fromTo(
-        "[data-kinetic]",
-        { "--wght": 400 },
+        "[data-line] > span",
+        { yPercent: 110 },
         {
-          "--wght": 800,
-          ease: "none",
-          scrollTrigger: { trigger: "[data-kinetic]", start: "top 92%", end: "top 38%", scrub: true },
+          yPercent: 0,
+          duration: 1.4,
+          stagger: 0.12,
+          ease: "expo.out",
+          scrollTrigger: { trigger: "[data-headline]", start: "top 85%", once: true },
         }
       );
-
+      gsap.fromTo(
+        "[data-cta]",
+        { scale: 0, rotate: -90 },
+        {
+          scale: 1,
+          rotate: 0,
+          duration: 1.4,
+          ease: "back.out(1.6)",
+          scrollTrigger: { trigger: "[data-headline]", start: "top 70%", once: true },
+        }
+      );
       gsap.fromTo(
         "[data-rise]",
         { opacity: 0, y: 36 },
@@ -73,19 +57,17 @@ export default function Contact() {
           duration: 1.1,
           ease: "expo.out",
           stagger: 0.08,
-          scrollTrigger: { trigger: "[data-details]", start: "top 85%", once: true },
+          scrollTrigger: { trigger: "[data-details]", start: "top 88%", once: true },
         }
       );
-
+      // The closing word drifts sideways with the scroll, like the hero's ribbon.
       gsap.fromTo(
-        "[data-mark-letter]",
-        { yPercent: 105 },
+        "[data-drift]",
+        { xPercent: 6 },
         {
-          yPercent: 0,
-          duration: 1.2,
-          ease: "expo.out",
-          stagger: 0.03,
-          scrollTrigger: { trigger: wordmarkRef.current, start: "top 95%", once: true },
+          xPercent: -22,
+          ease: "none",
+          scrollTrigger: { trigger: "[data-drift]", start: "top bottom", end: "bottom top", scrub: true },
         }
       );
     },
@@ -109,47 +91,44 @@ export default function Contact() {
     else window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const pill =
+    "inline-flex items-center gap-2 rounded-full border border-white/35 px-4 py-2 text-sm transition-colors duration-300 hover:border-transparent hover:bg-white hover:text-pal-ink";
+
   return (
     <section
       id="contact"
       ref={sectionRef}
       aria-labelledby="contact-title"
-      className="relative overflow-hidden bg-surface pt-28 sm:pt-36"
+      className="relative z-40 -mt-[var(--lap)] overflow-hidden rounded-t-[var(--lap)] bg-pal-slate pt-28 text-white sm:pt-36"
     >
       <div className="px-gutter">
-        <div className="flex items-center justify-between mono uppercase text-fg-3">
+        <div className="flex items-center justify-between mono uppercase text-white/70">
           <span>Contact</span>
           <span className="flex items-center gap-2">
-            <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-lime" />
+            <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-white" />
             <LocalTime /> IST
           </span>
         </div>
 
-        {/* Headline + call to action */}
-        <div className="relative mt-14 sm:mt-20">
-          <h2 id="contact-title" className="font-heading uppercase text-fg">
-            <span className="block text-[clamp(1.5rem,4.2vw,4.5rem)] leading-none tracking-[-0.02em] text-fg-3 [font-variation-settings:'wght'_560]">
-              Have a project
+        <div data-headline className="relative mt-14 sm:mt-20">
+          <h2
+            id="contact-title"
+            className="text-[clamp(2.6rem,7.6vw,8rem)] font-medium leading-[0.9] tracking-[-0.055em]"
+          >
+            <span data-line className="block overflow-hidden pb-[0.08em]">
+              <span className="block">Let&apos;s work</span>
             </span>
-            <span
-              data-kinetic
-              className="wght block text-[12.2vw] leading-[0.84] tracking-[-0.05em]"
-              style={{ "--wght": 800 } as React.CSSProperties}
-            >
-              In mind<span className="text-lime">?</span>
+            <span data-line className="block overflow-hidden pb-[0.08em]">
+              <span className="block">together.</span>
             </span>
           </h2>
 
-        </div>
-
-        {/* Call to action — sits on the rule, like a seal on a fold */}
-        <div className="relative mt-14 flex justify-end sm:mt-24 sm:h-px sm:bg-line-2">
-          <div className="sm:absolute sm:right-[4%] sm:top-0 sm:-translate-y-1/2">
+          <div data-cta className="absolute -top-6 right-0 sm:top-auto sm:bottom-[0.4em]">
             <Magnetic strength={0.4}>
               <TransitionLink
                 href="/contact"
                 label="Contact"
-                className="roll-trigger group relative flex h-36 w-36 flex-col items-center justify-center gap-2 rounded-full bg-cobalt text-center text-[11px] font-bold uppercase leading-tight tracking-[0.16em] text-white transition-transform duration-500 ease-expo hover:scale-105 sm:h-44 sm:w-44 lg:h-52 lg:w-52"
+                className="roll-trigger group flex h-24 w-24 flex-col items-center justify-center gap-1 rounded-full bg-pal-ink text-center text-[11px] font-semibold uppercase leading-tight tracking-[0.14em] text-white transition-transform duration-500 ease-expo hover:scale-105 sm:h-32 sm:w-32 lg:h-36 lg:w-36"
               >
                 <ArrowUpRight className="h-5 w-5 transition-transform duration-500 ease-expo group-hover:rotate-45" />
                 <RollingText text="Start a" />
@@ -159,118 +138,73 @@ export default function Contact() {
           </div>
         </div>
 
-        {/* Details */}
         <div
           data-details
-          className="mt-10 grid gap-12 border-t border-line-2 pt-10 sm:mt-0 sm:border-t-0 sm:pt-28 lg:grid-cols-12 lg:gap-10 lg:pt-32"
+          className="mt-20 grid gap-12 border-t border-white/30 pt-10 sm:mt-28 lg:grid-cols-12 lg:gap-10"
         >
           <div data-rise className="flex flex-col items-start gap-5 lg:col-span-7">
-            <span className="mono uppercase text-fg-4">Write</span>
+            <span className="mono uppercase text-white/65">Write</span>
             <a
               href={`mailto:${site.email}`}
-              className="roll-trigger font-heading text-[clamp(1.4rem,3.6vw,3.6rem)] leading-none tracking-[-0.03em] text-fg transition-colors hover:text-lime [font-variation-settings:'wght'_600]"
+              className="roll-trigger text-[clamp(1.2rem,2.4vw,2.4rem)] font-medium leading-none tracking-[-0.04em]"
             >
               <RollingText text={site.email} />
             </a>
-            <button
-              type="button"
-              onClick={copyEmail}
-              className="inline-flex items-center gap-2 rounded-full border border-line-2 px-4 py-2 text-xs font-medium uppercase tracking-[0.12em] text-fg-2 transition-colors hover:border-line-3 hover:text-fg"
-            >
-              {copied ? <Check className="h-3.5 w-3.5 text-lime" /> : <Copy className="h-3.5 w-3.5" />}
+            <button type="button" onClick={copyEmail} className={pill}>
+              {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
               <span aria-live="polite">{copied ? "Copied" : "Copy address"}</span>
             </button>
           </div>
 
           <dl className="grid grid-cols-[6.5rem_1fr] gap-x-6 gap-y-5 text-[15px] lg:col-span-5">
-            <dt data-rise className="mono pt-0.5 uppercase text-fg-4">
-              Call
-            </dt>
+            <dt data-rise className="mono pt-0.5 uppercase text-white/65">Call</dt>
             <dd data-rise>
-              <a href={site.phoneHref} className="text-fg-2 transition-colors hover:text-fg">
+              <a href={site.phoneHref} className="transition-opacity hover:opacity-70">
                 {site.phone}
               </a>
             </dd>
 
-            <dt data-rise className="mono pt-0.5 uppercase text-fg-4">
-              Elsewhere
-            </dt>
+            <dt data-rise className="mono pt-0.5 uppercase text-white/65">Elsewhere</dt>
             <dd data-rise className="flex flex-wrap gap-2">
-              <a
-                href={site.socials.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-line-2 px-3.5 py-1.5 text-sm text-fg-2 transition-colors hover:border-transparent hover:bg-lime hover:text-void"
-              >
+              <a href={site.socials.linkedin} target="_blank" rel="noopener noreferrer" className={pill}>
                 <FaLinkedinIn className="h-3.5 w-3.5" /> LinkedIn
               </a>
-              <a
-                href={site.socials.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-line-2 px-3.5 py-1.5 text-sm text-fg-2 transition-colors hover:border-transparent hover:bg-lime hover:text-void"
-              >
+              <a href={site.socials.github} target="_blank" rel="noopener noreferrer" className={pill}>
                 <SiGithub className="h-3.5 w-3.5" /> GitHub
               </a>
-              <a
-                href={site.resume}
-                download={site.resumeFileName}
-                className="inline-flex items-center gap-2 rounded-full border border-line-2 px-3.5 py-1.5 text-sm text-fg-2 transition-colors hover:border-transparent hover:bg-fg hover:text-void"
-              >
+              <a href={site.resume} download={site.resumeFileName} className={pill}>
                 Résumé <Download className="h-3.5 w-3.5" />
               </a>
             </dd>
 
-            <dt data-rise className="mono pt-0.5 uppercase text-fg-4">
-              Studio
-            </dt>
-            <dd data-rise className="text-fg-2">
-              {site.studio.name} <span className="text-fg-4">— est. {site.studio.founded}</span>
+            <dt data-rise className="mono pt-0.5 uppercase text-white/65">Studio</dt>
+            <dd data-rise>
+              {site.studio.name} <span className="text-white/65">— est. {site.studio.founded}</span>
             </dd>
 
-            <dt data-rise className="mono pt-0.5 uppercase text-fg-4">
-              Based
-            </dt>
-            <dd data-rise className="text-fg-2">
-              {site.region}
-            </dd>
+            <dt data-rise className="mono pt-0.5 uppercase text-white/65">Based</dt>
+            <dd data-rise>{site.region}</dd>
           </dl>
         </div>
       </div>
 
-      {/* Wordmark — fitted to the unpadded inner frame */}
-      <div className="mt-24 px-gutter sm:mt-32">
-        <div className="overflow-hidden">
-          <span
-            ref={wordmarkRef}
-            aria-hidden
-            className="group/mark inline-block whitespace-nowrap font-heading uppercase leading-[0.8] tracking-[-0.045em] text-fg [font-size:7.6vw]"
-          >
-            {Array.from(WORDMARK).map((char, i) => (
-              <span
-                key={i}
-                className="-mb-[0.06em] inline-block overflow-hidden pb-[0.06em] align-top [&:has(+span:hover)>span]:[--wght:700] [span:hover+&>span]:[--wght:700]"
-              >
-                <span
-                  data-mark-letter
-                  className="wght inline-block transition-[font-variation-settings,color] duration-700 ease-expo [--wght:560] hover:text-lime hover:[--wght:800]"
-                >
-                  {char === " " ? " " : char}
-                </span>
-              </span>
-            ))}
-          </span>
+      {/* Closing word — drifts sideways as you reach the end */}
+      <div aria-hidden className="mt-24 overflow-hidden sm:mt-32">
+        <div
+          data-drift
+          className="w-max whitespace-nowrap text-[min(17vw,28svh)] font-medium leading-[0.8] tracking-[-0.06em] text-white/90"
+        >
+          {site.firstName} — {site.firstName} — {site.firstName}
         </div>
       </div>
 
-      {/* Bottom bar — clear of the floating navigation island */}
-      <div className="flex flex-col gap-4 px-gutter pb-28 pt-8 mono uppercase text-fg-4 sm:flex-row sm:items-center sm:justify-between sm:pb-32">
+      <div className="flex flex-col gap-4 px-gutter pb-28 pt-10 mono uppercase text-white/70 sm:flex-row sm:items-center sm:justify-between sm:pb-32">
         <span>© 2026 {site.name}</span>
         <span className="hidden md:inline">Designed &amp; built in {site.region}</span>
         <button
           type="button"
           onClick={backToTop}
-          className="group inline-flex items-center gap-2 self-start uppercase text-fg-3 transition-colors hover:text-fg sm:self-auto"
+          className="group inline-flex items-center gap-2 self-start uppercase transition-opacity hover:opacity-70 sm:self-auto"
         >
           Back to top
           <ArrowUp className="h-3.5 w-3.5 transition-transform duration-500 ease-expo group-hover:-translate-y-0.5" />

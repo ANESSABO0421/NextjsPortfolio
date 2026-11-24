@@ -81,6 +81,12 @@ export default function TextReveal({
 
       let targets = build();
 
+      // Line breaks depend on the real font metrics — re-split once it's in.
+      let cancelled = false;
+      void document.fonts?.ready.then(() => {
+        if (!cancelled) targets = build();
+      });
+
       const play = () => {
         if (revealed) return;
         revealed = true;
@@ -113,6 +119,7 @@ export default function TextReveal({
       observer.observe(el);
 
       return () => {
+        cancelled = true;
         window.clearTimeout(resizeTimer);
         observer.disconnect();
         instance?.revert();
